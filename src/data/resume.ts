@@ -19,9 +19,7 @@ export const resume: {
 } = {
   name: '최정길',
   interests: 'Backend · Server · Systems',
-  // PDF를 public/files/resume.pdf에 넣은 뒤 '/files/resume.pdf'로 변경하세요.
-  // null이면 다운로드 링크를 표시하지 않습니다.
-  pdfUrl: null,
+  pdfUrl: "/files/resume.pdf",
   sections: [
     {
       id: 'education',
