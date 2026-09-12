@@ -1,19 +1,5 @@
 export const projects = [
   {
-    slug: 'linux-web-dashboard',
-    title: 'Linux Web Dashboard',
-    subtitle: 'Linux의 상태를 읽는 백엔드',
-    summary: 'Linux /proc 파일시스템에서 CPU, 메모리, 네트워크, 디스크 지표를 직접 수집하고 REST API로 제공하는 프로젝트입니다.',
-    stack: ['Python', 'FastAPI', 'Linux'],
-    repository: 'https://github.com/GIRIBUIN/Linux-Web-Dashboard',
-    overview: '운영체제가 시스템 정보를 어떤 형태로 제공하는지 이해하기 위해 시작한 프로젝트입니다. /proc의 원시 데이터를 읽고, 지표로 계산하고, API 응답으로 전달하는 과정을 다룹니다.',
-    sections: [
-      { title: '데이터를 읽는 일부터', paragraphs: ['CPU는 /proc/stat, 메모리는 /proc/meminfo, 네트워크는 /proc/net/dev, 디스크는 /proc/diskstats를 사용합니다. 각 파일을 직접 파싱해 시스템 지표의 바탕이 되는 데이터를 수집합니다.'] },
-      { title: '수집과 계산, API의 경계', paragraphs: ['Parser는 원시 파일을 읽고, Service는 수집한 값을 바탕으로 지표를 계산합니다. API 계층은 FastAPI로 엔드포인트를 제공하고, Schema 계층은 Pydantic으로 응답 구조를 정의합니다.', '파일을 읽는 방식과 외부에 제공하는 응답을 나누어, 각 계층의 책임을 구분한 구조입니다.'] },
-      { title: '구현 현황', paragraphs: ['README 기준으로 CPU, 메모리, 네트워크, 디스크 지표 API와 상태 확인 엔드포인트가 구현되어 있습니다. /proc 파일과의 초기 대조 검증 및 아키텍처·API 문서가 정리되어 있습니다.'], items: ['GET /health', 'GET /metrics/cpu · /metrics/memory', 'GET /metrics/network · /metrics/disk'] },
-    ],
-  },
-  {
     slug: 'zzz',
     title: 'ZZZ',
     subtitle: '웨어러블과 환경 데이터를 연결하는 수면 관리 서비스',
@@ -39,6 +25,20 @@ export const projects = [
       { title: '서비스 구성', paragraphs: ['Python과 Flask 기반 백엔드, HTML·CSS·JavaScript 프런트엔드, MySQL 데이터베이스로 구성됩니다. 저장소는 크롤링, AI 분석, 데이터베이스, 라우트와 화면 템플릿을 구분하고 있습니다.'] },
       { title: '주요 기능', paragraphs: ['README에서 소개하는 주요 기능은 다음과 같습니다.'], items: ['키워드 기반 리뷰 분석 및 요약', '데이터베이스 캐싱', 'AI 맞춤형 추천', '개인 라이브러리'] },
       { title: '팀 개발 환경', paragraphs: ['건국대학교 전공심화프로젝트로 진행한 팀 프로젝트입니다. Docker 기반 실행 환경을 사용하며, 저장소에 팀원이 동일한 방식으로 서비스를 실행할 수 있도록 환경 설정 절차를 정리했습니다.'] },
+    ],
+  },
+  {
+    slug: 'rpi-parking',
+    title: 'RPI Parking',
+    subtitle: '센서 감지부터 중앙 모니터링까지, IoT 주차장 시스템',
+    summary: '초음파 센서로 주차 공간의 점유 상태를 판단하고, 차단기 제어와 중앙 모니터링을 MQTT로 연결하는 팀 프로젝트입니다.',
+    stack: ['C', 'Python', 'Raspberry Pi', 'MQTT', 'SQLite'],
+    repository: 'https://github.com/GIRIBUIN/RPI-Parking-service-driver',
+    overview: '주차 슬롯 두 곳과 입구 차단기로 구성한 모형을 대상으로, 차량 감지·장치 제어·상태 수집을 연결하는 임베디드 시스템 프로젝트입니다. 주차 공간의 점유 상태와 입출차 이벤트를 중앙 서버에서 모아 확인하는 구조를 설계합니다.',
+    sections: [
+      { title: '세 장치의 역할 분리', paragraphs: ['첫 번째 Raspberry Pi는 초음파 센서로 슬롯의 점유 상태를 판단합니다. 두 번째 장치는 차량 접근과 출차 요청에 따라 차단기를 제어합니다. 세 번째 장치는 MQTT 브로커와 중앙 서버를 맡아 상태 및 이벤트를 저장하고 대시보드에 표시하는 구조입니다.'] },
+      { title: '상태와 이벤트를 전달하는 방식', paragraphs: ['MQTT 토픽을 슬롯 상태, 센서 거리값, 전체 주차장 상태, 차단기 상태, 입출차 이벤트로 나누어 정의합니다. 각 장치가 발행하거나 구독하는 메시지를 구분해 감지 장치와 제어 장치, 중앙 서버를 연결합니다.', '슬롯은 EMPTY와 OCCUPIED, 주차장은 AVAILABLE과 FULL, 차단기는 OPEN과 CLOSED로 상태를 구분합니다. 입차와 출차 이벤트는 상태 정보와 별도로 전달하도록 설계합니다.'] },
+      { title: '동작 시나리오와 설계 기준', paragraphs: ['README에는 정상 입차, 만차, 출차 시나리오와 메시지 형식이 정리되어 있습니다. 초음파 센서 간 간섭을 줄이기 위해 순차적으로 측정하고, 일정 시간 동안 감지 상태가 유지되는지를 기준으로 점유 여부를 판단하는 방식을 설명합니다.'], items: ['슬롯 점유 상태와 전체 만차 여부 판단', '차량 접근 및 출차 요청에 따른 차단기 제어', '중앙 서버의 상태 저장과 최근 이벤트 모니터링'] },
     ],
   },
 ];
