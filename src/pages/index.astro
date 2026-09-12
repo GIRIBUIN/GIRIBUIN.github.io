@@ -1,0 +1,29 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { projects } from '../data/projects';
+---
+<Layout title="포트폴리오" section="projects">
+  <section class="intro" aria-labelledby="intro-heading">
+    <h1 id="intro-heading">안녕하세요, GIRI입니다.</h1>
+    <p>건국대학교 컴퓨터공학부에서 공부하고 있습니다.<br />백엔드, 서버, 시스템에 관심을 두고 프로젝트를 만들고 있습니다.</p>
+    <p>시스템이 왜 그렇게 설계되고, 어떻게 동작하는지 이해하는 것을 중요하게 생각합니다. 직접 만들며 배운 것들을 코드와 글로 남깁니다.</p>
+  </section>
+  <section id="projects" aria-labelledby="projects-heading">
+    <div class="section-heading"><h2 id="projects-heading">프로젝트</h2><span lang="en">SELECTED WORK</span></div>
+    <ol class="project-list">
+      {projects.map((project, index) => (
+        <li class="project-entry">
+          <article>
+            <div class="project-heading"><span class="project-number" aria-hidden="true">0{index + 1}</span><h3><a href={'/projects/' + project.slug + '/'}>{project.title}</a></h3></div>
+            <p>{project.summary}</p>
+            <div class="project-meta"><span>{project.stack.join(' · ')}</span><a href={'/projects/' + project.slug + '/'} aria-label={project.title + ' 자세히 읽기'}>자세히 읽기 →</a></div>
+          </article>
+        </li>
+      ))}
+    </ol>
+  </section>
+  <section class="contact-note" aria-labelledby="contact-heading">
+    <h2 id="contact-heading">이야기를 나누고 싶다면</h2>
+    <p>소프트웨어나 프로젝트에 관한 이야기라면 반갑습니다.<br /><a href="mailto:giribuin@gmail.com">giribuin@gmail.com</a>으로 편하게 연락해 주세요.</p>
+  </section>
+</Layout>

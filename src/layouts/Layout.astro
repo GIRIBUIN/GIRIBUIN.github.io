@@ -1,0 +1,51 @@
+---
+import '../styles/global.css';
+
+interface Props {
+  title: string;
+  description?: string;
+  section?: 'projects' | 'about' | 'contact';
+}
+const { title, description = 'GIRI의 포트폴리오. 백엔드, 서버, 시스템을 공부하며 만든 프로젝트와 생각을 기록합니다.', section } = Astro.props;
+const navigation = [
+  { label: 'PROJECTS', href: '/#projects', section: 'projects', name: '프로젝트' },
+  { label: 'ABOUT', href: '/about/', section: 'about', name: '소개' },
+  { label: 'BLOG', href: 'https://velog.io/@giribuin', section: 'blog', name: '블로그 · Velog' },
+  { label: 'LET’S TALK', href: '/contact/', section: 'contact', name: '연락' },
+];
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#ffffff" />
+    <meta property="og:title" content={title + ' · GIRI'} />
+    <meta property="og:description" content={description} />
+    <meta property="og:type" content="website" />
+    <meta property="og:locale" content="ko_KR" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{title} · GIRI</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    <div class="page">
+      <header class="site-header">
+        <a class="site-title" href="/" aria-label="GIRI 홈">
+          <span>GIRIBUIN</span><span class="site-name" aria-hidden="true">(GIRI)</span>
+        </a>
+        <nav class="nav" aria-label="주 메뉴">
+          <ul>{navigation.map((item) => (
+            <li><a href={item.href} aria-label={item.name} aria-current={section === item.section ? (item.section === 'projects' ? 'location' : 'page') : undefined}>{item.label}</a></li>
+          ))}</ul>
+        </nav>
+      </header>
+      <main id="main" tabindex="-1"><slot /></main>
+      <footer class="site-footer">
+        <span>© {new Date().getFullYear()} GIRI</span>
+        <div><a href="https://github.com/GIRIBUIN">GitHub</a><a href="https://velog.io/@giribuin">Velog</a><a href="mailto:giribuin@gmail.com">Email</a></div>
+      </footer>
+    </div>
+  </body>
+</html>
