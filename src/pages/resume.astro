@@ -6,8 +6,22 @@ import '../styles/resume.css';
 
 <Layout title="이력서" section="resume">
   <div class="resume-page">
-    <h1>{resume.name}</h1>
-    <p class="resume-interests">{resume.interests}</p>
+    <div class="resume-header">
+      <div>
+        <h1>{resume.name}</h1>
+        <p class="resume-interests">{resume.interests}</p>
+      </div>
+
+      {resume.profileImage && (
+        <img
+          class="resume-profile-image"
+          src={resume.profileImage}
+          alt={`${resume.name} 프로필 사진`}
+          width="120"
+          height="120"
+        />
+      )}
+    </div>
 
     <section aria-labelledby="resume-heading">
       <div class="section-heading">

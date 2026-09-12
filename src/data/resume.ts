@@ -15,11 +15,13 @@ export const resume: {
   name: string;
   interests: string;
   pdfUrl: string | null;
+  profileImage: string | null;
   sections: ResumeSection[];
 } = {
   name: '최정길',
   interests: 'Backend · Server · Systems',
-  pdfUrl: "/files/resume.pdf",
+  pdfUrl: '/files/resume.pdf',
+  profileImage: '/imgs/profile.jpg',
   sections: [
     {
       id: 'education',
