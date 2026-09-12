@@ -32,6 +32,7 @@ const navigation = [
     <a class="skip-link" href="#main">본문으로 건너뛰기</a>
     <div class="page">
       <header class="site-header">
+        <a class="site-title" href="/" aria-label="GIRIBUIN 홈">GIRIBUIN</a>
         <nav class="nav" aria-label="주 메뉴">
           <ul>{navigation.map((item) => (
             <li><a href={item.href} aria-label={item.name} aria-current={section === item.section ? (item.section === 'projects' ? 'location' : 'page') : undefined}>{item.label}</a></li>

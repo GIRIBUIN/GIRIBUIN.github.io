@@ -18,6 +18,7 @@ a:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
 ::selection { background: var(--ink); color: var(--paper); }
 .page { width: min(800px, calc(100% - 48px)); margin-inline: auto; }
 .site-header { padding-top: 32px; margin-bottom: 44px; }
+.site-title { display: block; width: fit-content; max-width: 100%; margin: 0 auto 24px; font-size: clamp(2rem, 7vw, 3rem); line-height: 1.2; letter-spacing: .04em; text-decoration: none; }
 .nav ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; padding: 1px; margin: 0; list-style: none; background: #111; }
 .nav li { min-width: 0; }
 .nav a { display: flex; align-items: center; justify-content: center; min-height: 48px; height: 100%; padding: 12px 8px; background: var(--paper); color: #111; font-size: .875rem; font-weight: bold; line-height: 1.5; letter-spacing: .08em; text-decoration: none; }
