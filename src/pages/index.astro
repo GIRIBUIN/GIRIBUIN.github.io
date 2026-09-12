@@ -4,10 +4,11 @@ import { projects } from '../data/projects';
 ---
 <Layout title="포트폴리오" section="projects">
   <section class="intro" aria-labelledby="intro-heading">
-    <h1 id="intro-heading">안녕하세요, GIRI입니다.</h1>
-    <p>건국대학교 컴퓨터공학부에서 공부하고 있습니다.<br />백엔드, 서버, 시스템에 관심을 두고 프로젝트를 만들고 있습니다.</p>
-    <p>시스템이 왜 그렇게 설계되고, 어떻게 동작하는지 이해하는 것을 중요하게 생각합니다. 직접 만들며 배운 것들을 코드와 글로 남깁니다.</p>
+    <h1 id="intro-heading">안녕하세요, 최정길입니다.</h1>
+    <p>백엔드, 서버, 시스템에 관심을 두고 프로젝트를 만들고 있습니다.</p>
+    <p>시스템이 왜 그렇게 설계되고, 어떻게 동작하는지 이해하는 것을 중요하게 생각합니다.</p>
   </section>
+
   <section id="projects" aria-labelledby="projects-heading">
     <div class="section-heading"><h2 id="projects-heading">프로젝트</h2><span lang="en">SELECTED WORK</span></div>
     <ol class="project-list">
@@ -22,8 +23,26 @@ import { projects } from '../data/projects';
       ))}
     </ol>
   </section>
+
   <section class="contact-note" aria-labelledby="contact-heading">
     <h2 id="contact-heading">이야기를 나누고 싶다면</h2>
-    <p>소프트웨어나 프로젝트에 관한 이야기라면 반갑습니다.<br /><a href="mailto:giribuin@gmail.com">giribuin@gmail.com</a>으로 편하게 연락해 주세요.</p>
+    <p>편하게 연락해 주세요.</p>
+
+	<div class="social-links">
+		<a href="mailto:giribuin@gmail.com">
+			<img src="/icons/envelope.svg" alt="" width="24" height="24" />
+			<span>giribuin@gmail.com</span>
+		</a>
+		
+		<a href="https://www.instagram.com/giribuin">
+			<img src="/icons/instagram.svg" alt="" width="24" height="24" />
+			<span>Instagram</span>
+		</a>
+
+		<a href="https://www.linkedin.com/in/jeonggil-choi-a119b8400/">
+			<img src="/icons/linkedin.svg" alt="" width="24" height="24" />
+			<span>Linkedin</span>
+		</a>
+	</div>
   </section>
 </Layout>

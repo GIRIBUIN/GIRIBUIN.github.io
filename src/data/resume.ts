@@ -101,8 +101,8 @@ export const preparation: PreparationItem[] = [
     items: [],
   },
   {
-    title: '새로운 프로젝트',
-    status: '구상 중',
-    items: ['다음 프로젝트의 주제와 구현 범위를 구상하고 있습니다.'],
+    title: 'MoaOrder',
+    status: '개발 중',
+    items: ['평소 발주를 문자, 카카오톡, 전화로 하던 자영업자를 위한 서비스 입니다.', '재고를 체크하면서 필요한 품목을 주문하는데 편의성을 돕는 것을 목표로 하고 있습니다.', 'self-host 버전과 local 버전을 배포할 예정입니다.'],
   },
 ];

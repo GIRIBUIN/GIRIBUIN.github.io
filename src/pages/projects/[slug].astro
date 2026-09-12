@@ -16,16 +16,19 @@ const { project, previous, next } = Astro.props;
 ---
 
 <Layout title={project.title} description={project.summary} section="projects">
-  <article>
+  <article class="project-detail">
     <a class="back-link" href="/#projects">← 프로젝트 목록</a>
     <h1>{project.title}</h1>
     <p class="project-subtitle">{project.subtitle}</p>
+
     <dl class="project-facts">
       <dt>기술</dt><dd>{project.stack.join(' · ')}</dd>
       <dt>코드</dt><dd><a href={project.repository}>GitHub 저장소 ↗</a></dd>
     </dl>
+
     <h2>프로젝트 소개</h2>
     <p>{project.overview}</p>
+
     {project.sections.map((section) => (
       <section>
         <h2>{section.title}</h2>
@@ -33,19 +36,19 @@ const { project, previous, next } = Astro.props;
         {'items' in section && section.items && <ul class="text-list">{section.items.map((item) => <li>{item}</li>)}</ul>}
       </section>
     ))}
+
     <p class="project-source">프로젝트의 기능과 구현 현황은 <a href={project.repository + '#readme'}>저장소 README</a>를 바탕으로 정리했습니다.</p>
+
     {(previous || next) && (
       <nav class="project-pagination" aria-label="프로젝트 이전 및 다음">
         {previous && (
           <a href={`/projects/${previous.slug}/`} rel="prev">
-            <span>← 이전 프로젝트</span>
-            {previous.title}
+            <span>← Prev</span>
           </a>
         )}
         {next && (
           <a class="next-project" href={`/projects/${next.slug}/`} rel="next">
-            <span>다음 프로젝트 →</span>
-            {next.title}
+            <span>Next →</span>
           </a>
         )}
       </nav>
