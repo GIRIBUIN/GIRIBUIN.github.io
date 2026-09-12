@@ -3,9 +3,16 @@ import Layout from '../../layouts/Layout.astro';
 import { projects } from '../../data/projects';
 
 export function getStaticPaths() {
-  return projects.map((project, index) => ({ params: { slug: project.slug }, props: { project, next: projects[(index + 1) % projects.length] } }));
+  return projects.map((project, index) => ({
+    params: { slug: project.slug },
+    props: {
+      project,
+      previous: projects[index - 1],
+      next: projects[index + 1],
+    },
+  }));
 }
-const { project, next } = Astro.props;
+const { project, previous, next } = Astro.props;
 ---
 
 <Layout title={project.title} description={project.summary} section="projects">
@@ -27,6 +34,21 @@ const { project, next } = Astro.props;
       </section>
     ))}
     <p class="project-source">프로젝트의 기능과 구현 현황은 <a href={project.repository + '#readme'}>저장소 README</a>를 바탕으로 정리했습니다.</p>
-    <p class="next-project"><a href={`/projects/${next.slug}/`}>다음 프로젝트: {next.title} →</a></p>
+    {(previous || next) && (
+      <nav class="project-pagination" aria-label="프로젝트 이전 및 다음">
+        {previous && (
+          <a href={`/projects/${previous.slug}/`} rel="prev">
+            <span>← 이전 프로젝트</span>
+            {previous.title}
+          </a>
+        )}
+        {next && (
+          <a class="next-project" href={`/projects/${next.slug}/`} rel="next">
+            <span>다음 프로젝트 →</span>
+            {next.title}
+          </a>
+        )}
+      </nav>
+    )}
   </article>
 </Layout>

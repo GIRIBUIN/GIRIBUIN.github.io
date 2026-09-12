@@ -17,16 +17,12 @@ a:hover { text-decoration-thickness: 2px; }
 a:focus-visible { outline: 2px solid var(--ink); outline-offset: 5px; }
 ::selection { background: var(--ink); color: var(--paper); }
 .page { width: min(800px, calc(100% - 48px)); margin-inline: auto; }
-.site-header { padding-top: 22px; margin-bottom: 38px; }
-.site-title { display: flex; justify-content: center; align-items: flex-start; width: fit-content; max-width: 100%; margin-inline: auto; text-decoration: none; font-size: clamp(3.25rem, 9vw, 5.25rem); line-height: 1; letter-spacing: -.055em; }
-.site-name { margin: 4px 0 0 10px; font-size: .75rem; letter-spacing: 0; writing-mode: vertical-rl; }
-.nav { display: flex; align-items: center; gap: 12px; margin-top: 37px; }
-.nav::before, .nav::after { content: ''; flex: 1; height: 1px; background: var(--rule); }
-.nav ul { display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 12px; padding: 0; margin: 0; list-style: none; }
-.nav li { display: flex; align-items: center; gap: 12px; }
-.nav li + li::before { content: ''; width: 20px; height: 1px; background: var(--rule); }
-.nav a { display: inline-block; padding-block: 8px; font-size: .8125rem; font-weight: bold; line-height: 1.5; letter-spacing: .1em; text-decoration: none; }
-.nav a:hover, .nav a[aria-current] { text-decoration: underline; text-underline-offset: 6px; }
+.site-header { padding-top: 32px; margin-bottom: 44px; }
+.nav ul { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 1px; padding: 1px; margin: 0; list-style: none; background: #111; }
+.nav li { min-width: 0; }
+.nav a { display: flex; align-items: center; justify-content: center; min-height: 48px; height: 100%; padding: 12px 8px; background: var(--paper); color: #111; font-size: .875rem; font-weight: bold; line-height: 1.5; letter-spacing: .08em; text-decoration: none; }
+.nav a:hover, .nav a:focus-visible, .nav a[aria-current] { background: #111; color: #fff; }
+.nav a:focus-visible { position: relative; outline: 2px solid #111; outline-offset: 3px; z-index: 1; }
 main { padding-bottom: 60px; }
 h1, h2, h3 { font-weight: normal; line-height: 1.5; }
 h1 { margin: 0 0 28px; text-align: center; font-size: clamp(1.625rem, 4vw, 2rem); letter-spacing: -.045em; }
@@ -59,7 +55,10 @@ p { margin: 0 0 22px; }
 .text-list { padding-left: 24px; margin: 0 0 24px; }
 .text-list li { padding-left: 3px; margin-bottom: 8px; }
 .project-source { border-top: 1px solid #d8d8d8; margin-top: 38px; padding-top: 20px; font-size: .875rem; color: var(--muted); }
-.next-project { margin-top: 30px; }
+.project-pagination { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 16px 28px; margin-top: 30px; }
+.project-pagination a { display: flex; flex-direction: column; justify-content: center; min-height: 44px; max-width: 100%; }
+.project-pagination span { font-size: .8125rem; color: var(--muted); }
+.project-pagination .next-project { margin-left: auto; text-align: right; }
 .site-footer { display: flex; justify-content: space-between; flex-wrap: wrap; gap: 14px; border-top: 1px solid var(--rule); padding: 19px 0 28px; font-size: .8125rem; color: var(--muted); }
 .site-footer div { display: flex; gap: 22px; }
 .skip-link { position: fixed; top: 10px; left: 10px; padding: 8px 14px; background: var(--paper); border: 1px solid var(--ink); transform: translateY(-200%); z-index: 10; }
@@ -68,13 +67,8 @@ section[id] { scroll-margin-top: 20px; }
 @media (max-width: 540px) {
   body { font-size: 1rem; line-height: 1.9; }
   .page { width: calc(100% - 36px); }
-  .site-header { padding-top: 25px; margin-bottom: 29px; }
-  .site-title { font-size: clamp(2.75rem, 13vw, 4rem); }
-  .nav { gap: 8px; margin-top: 26px; }
-  .nav ul { gap: 5px 12px; }
-  .nav li { gap: 0; }
-  .nav li + li::before { display: none; }
-  .nav a { font-size: .75rem; letter-spacing: .04em; padding-block: 12px; }
+  .site-header { padding-top: 24px; margin-bottom: 32px; }
+  .nav ul { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .intro { margin-bottom: 34px; }
   .project-heading { gap: 10px; }
   .project-heading h3 { font-size: 1.3rem; }
@@ -82,9 +76,8 @@ section[id] { scroll-margin-top: 20px; }
   main { padding-bottom: 42px; }
 }
 @media print {
-  .nav, .skip-link, .back-link, .next-project { display: none; }
+  .nav, .skip-link, .back-link, .project-pagination { display: none; }
   .page { width: 100%; }
-  .site-title { font-size: 3rem; }
   .site-header { padding-top: 0; margin-bottom: 25px; }
   .project-entry { break-inside: avoid; }
 }
