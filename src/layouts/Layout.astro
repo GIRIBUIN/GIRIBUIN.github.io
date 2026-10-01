@@ -6,7 +6,7 @@ interface Props {
   description?: string;
   section?: 'projects' | 'resume' | 'contact';
 }
-const { title, description = 'GIRI의 포트폴리오. 백엔드, 서버, 시스템을 공부하며 만든 프로젝트와 생각을 기록합니다.', section } = Astro.props;
+const { title, description = '백엔드와 시스템 소프트웨어를 중심으로, API·데이터베이스·Linux·Raspberry Pi·Cloud를 연결한 프로젝트를 기록합니다.', section } = Astro.props;
 const navigation = [
   { label: 'PROJECTS', href: '/#projects', section: 'projects', name: '프로젝트' },
   { label: 'RESUME', href: '/resume/', section: 'resume', name: '이력서' },

@@ -1,6 +1,7 @@
 ---
 import Layout from '../../layouts/Layout.astro';
 import { projects } from '../../data/projects';
+import YouTubeDemo from '../../components/YouTubeDemo.astro';
 
 export function getStaticPaths() {
   return projects.map((project, index) => ({
@@ -15,29 +16,82 @@ export function getStaticPaths() {
 const { project, previous, next } = Astro.props;
 ---
 
-<Layout title={project.title} description={project.summary} section="projects">
+<Layout title={project.title} description={project.oneLine} section="projects">
   <article class="project-detail">
     <a class="back-link" href="/#projects">← 프로젝트 목록</a>
     <h1>{project.title}</h1>
     <p class="project-subtitle">{project.subtitle}</p>
 
     <dl class="project-facts">
+      <dt>기간</dt><dd>{project.period}</dd>
+      <dt>상태</dt><dd>{project.status}</dd>
+      <dt>팀</dt><dd>{project.type} · {project.teamSize}명</dd>
+      <dt>역할</dt><dd>{project.role}</dd>
       <dt>기술</dt><dd>{project.stack.join(' · ')}</dd>
-      <dt>코드</dt><dd><a href={project.repository}>GitHub 저장소 ↗</a></dd>
+      <dt>링크</dt>
+      <dd class="project-links">
+        <a href={project.repository}>GitHub 저장소 ↗</a>
+        {project.demo && <a href={project.demo}>YouTube ↗</a>}
+      </dd>
     </dl>
 
-    <h2>프로젝트 소개</h2>
-    <p>{project.overview}</p>
+    {project.media?.hero && (
+      <figure class="project-media project-hero">
+        <img src={project.media.hero} alt={project.media.heroAlt ?? ''} loading="eager" />
+        {project.media.heroCaption && <figcaption>{project.media.heroCaption}</figcaption>}
+      </figure>
+    )}
 
-    {project.sections.map((section) => (
+    <section>
+      <h2>프로젝트 개요</h2>
+      {project.overview.map((paragraph) => <p>{paragraph}</p>)}
+    </section>
+
+    {project.media?.architecture && (
       <section>
-        <h2>{section.title}</h2>
-        {section.paragraphs.map((paragraph) => <p>{paragraph}</p>)}
-        {'items' in section && section.items && <ul class="text-list">{section.items.map((item) => <li>{item}</li>)}</ul>}
+        <h2>Architecture</h2>
+        <figure class="project-media project-architecture">
+          <a href={project.media.architecture} aria-label={`${project.title} Architecture 원본 이미지 보기`}>
+            <img src={project.media.architecture} alt={project.media.architectureAlt ?? ''} loading="lazy" />
+          </a>
+          {project.media.architectureCaption && <figcaption>{project.media.architectureCaption}</figcaption>}
+        </figure>
       </section>
-    ))}
+    )}
 
-    <p class="project-source">프로젝트의 기능과 구현 현황은 <a href={project.repository + '#readme'}>저장소 README</a>를 바탕으로 정리했습니다.</p>
+    <section>
+      <h2>내 역할 / 기여</h2>
+      <ul class="text-list">{project.contributions.map((item) => <li>{item}</li>)}</ul>
+    </section>
+
+    <section>
+      <h2>주요 구현</h2>
+      <ul class="text-list">{project.implementation.map((item) => <li>{item}</li>)}</ul>
+    </section>
+
+    <section>
+      <h2>핵심 설계 결정 / 문제 해결</h2>
+      <div class="decision-list">
+        {project.technicalDecisions.map((decision) => (
+          <section>
+            <h3>{decision.title}</h3>
+            <p>{decision.description}</p>
+          </section>
+        ))}
+      </div>
+    </section>
+
+    <section>
+      <h2>한계 / 검증 범위</h2>
+      <ul class="text-list">{project.limitations.map((item) => <li>{item}</li>)}</ul>
+    </section>
+
+    {project.media?.youtubeId && (
+      <section>
+        <h2>Demo</h2>
+        <YouTubeDemo id={project.media.youtubeId} title={`${project.title} 시연 영상`} url={project.demo} />
+      </section>
+    )}
 
     {(previous || next) && (
       <nav class="project-pagination" aria-label="프로젝트 이전 및 다음">

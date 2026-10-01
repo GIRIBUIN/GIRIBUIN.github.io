@@ -19,7 +19,7 @@ export const resume: {
   sections: ResumeSection[];
 } = {
   name: '최정길',
-  interests: 'Backend · Server · Systems',
+  interests: 'Backend · Systems Software',
   pdfUrl: '/files/resume.pdf',
   profileImage: '/imgs/profile.jpg',
   sections: [
@@ -41,7 +41,8 @@ export const resume: {
         { title: 'Languages', items: ['JavaScript, Python, C, SQL'] },
         { title: 'Backend', items: ['Node.js, Express, Flask, REST API'] },
         { title: 'Database', items: ['MySQL, SQLite'] },
-        { title: 'System', items: ['Linux, Raspberry Pi, MQTT'] },
+        { title: 'Systems', items: ['Linux, Linux Kernel, Raspberry Pi, MQTT'] },
+        { title: 'Cloud / IoT', items: ['AWS IoT Core, Lambda, API Gateway, EC2'] },
         { title: 'API / Auth', items: ['OAuth 2.0, Google Health API'] },
       ],
     },
@@ -51,12 +52,12 @@ export const resume: {
       items: [
         {
           title: 'ZZZ',
-          meta: '웨어러블·환경 데이터 기반 수면 관리 서비스',
+          meta: '웨어러블·환경 데이터 기반 수면 지원 IoT 서비스',
           href: '/projects/zzz/',
           items: [
-            'Google Health OAuth 연동 API와 Access/Refresh Token 저장·갱신 흐름 구현',
-            '심박·걸음·수면·칼로리 데이터를 수집·정규화해 SQLite에 적재하고, 기존 Fitbit 데이터와 통합해 수면 분석 feature 생성에 활용',
-            '사용자별 Raspberry Pi 등록·조회 API와 사용자·기기·Topic 매핑 구조 구성',
+            '전체 구조와 DB schema를 설계하고 Express API·dashboard 및 팀별 계층 통합',
+            'On-Premise SQLite 구조를 MySQL/RDS와 AWS IoT Core·Lambda·API Gateway·EC2를 사용한 수업용 Cloud demo로 확장',
+            'Fitbit 기반 단계를 Google Health OAuth·token·data integration 구조로 전환',
           ],
         },
         {
@@ -64,17 +65,19 @@ export const resume: {
           meta: 'MQTT 기반 IoT 주차장 관리 시스템',
           href: '/projects/rpi-parking/',
           items: [
-            '공유 메모리 MQTT 수집 상태 전달을 위한 Character Device와 procfs 기반 Linux Kernel Status Interface 구현',
-            'MQTT Handler의 메시지 수신·오류·최근 Topic/Event 상태를 커널 인터페이스에 기록해 장애 원인 확인 구조 구성',
+            'RPi3의 Mosquitto broker·MQTT subscriber·SQLite·Flask dashboard와 local network 통합',
+            'heartbeat 및 /dev·/proc 기반 kernel status interface로 장치·메시지 상태 진단',
+            '팀원이 구현한 감지·게이트 장치를 포함해 Raspberry Pi 3대의 전체 system integration 수행',
           ],
         },
         {
           title: 'Review Analyzer',
-          meta: 'AI 기반 상품 리뷰 분석 웹 서비스',
+          meta: '키워드 기반 상품 리뷰 분석 웹 프로토타입',
           href: '/projects/review-analyzer/',
           items: [
-            '분석 결과와 추천 상품 정보를 함께 반환하도록 MySQL 저장·조회 로직을 확장하고 JSON 데이터 저장 처리 구현',
-            '저장 리뷰 삭제 후 새 데이터를 재조회하도록 동기화 흐름을 수정해 클라이언트와 서버 간 상태 불일치 문제 보완',
+            'MySQL schema·CRUD와 사용자 등록·login·Flask session·library route 구현',
+            'crawler·Gemini 분석 결과를 JavaScript 화면과 연결하고 팀 결과물 최종 통합',
+            'Docker 개발환경과 NHN Cloud/NKS 환경을 구성했으나 crawler 제약으로 local demo 범위에서 검증',
           ],
         },
       ],
