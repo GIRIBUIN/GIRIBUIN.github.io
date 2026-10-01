@@ -30,7 +30,7 @@ export const resume: {
         {
           title: '건국대학교 컴퓨터공학부',
           meta: '2021.03 – 2027.02 졸업 예정',
-          items: ['GPA 4.12 / 4.5'],
+          items: ['GPA 4.13 / 4.5'],
         },
       ],
     },
