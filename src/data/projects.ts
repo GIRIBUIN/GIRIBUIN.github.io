@@ -191,7 +191,7 @@ export const projects: Project[] = [
       'Docker',
     ],
     repository: 'https://github.com/GIRIBUIN/Review-Analyzer',
-    demo: 'https://www.youtube.com/watch?v=Dqj01tUyWdQ&list=PLAA0XetzSWBM',
+    demo: 'https://youtu.be/s0NdfQGYFL4?si=W9RDuQmD3eyppXs3',
     overview: [
       '사용자가 쿠팡 상품 URL과 관심 keyword를 입력하면 리뷰를 crawling하고 Gemini로 분석·요약한 뒤, 결과와 관련 상품 URL을 보여 주는 Flask 웹 프로토타입입니다.',
       '팀 전체 시스템은 crawler, AI 분석, Flask route, MySQL library, JavaScript 화면으로 구성됩니다. 관련 상품은 crawler가 수집한 URL이며 개인화 AI ranking으로 검증한 결과가 아닙니다.',
