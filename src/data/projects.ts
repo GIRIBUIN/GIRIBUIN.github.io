@@ -191,6 +191,7 @@ export const projects: Project[] = [
       'Docker',
     ],
     repository: 'https://github.com/GIRIBUIN/Review-Analyzer',
+    demo: 'https://www.youtube.com/watch?v=Dqj01tUyWdQ&list=PLAA0XetzSWBM',
     overview: [
       '사용자가 쿠팡 상품 URL과 관심 keyword를 입력하면 리뷰를 crawling하고 Gemini로 분석·요약한 뒤, 결과와 관련 상품 URL을 보여 주는 Flask 웹 프로토타입입니다.',
       '팀 전체 시스템은 crawler, AI 분석, Flask route, MySQL library, JavaScript 화면으로 구성됩니다. 관련 상품은 crawler가 수집한 URL이며 개인화 AI ranking으로 검증한 결과가 아닙니다.',
@@ -228,5 +229,14 @@ export const projects: Project[] = [
       'README에는 Docker 실행 절차가 남아 있지만 현재 local source에는 Dockerfile과 compose 파일이 없습니다.',
       'Cloud 배포 안정성과 추천 품질을 검증한 production 서비스가 아닙니다.',
     ],
+    media: {
+      hero: '/imgs/projects/review-analyzer/home.png',
+      heroAlt: '딸깍 리뷰의 상품 URL 및 키워드 입력 화면',
+      heroCaption: '딸깍 리뷰 웹 프로토타입 실행 화면',
+      architecture: '/imgs/projects/review-analyzer/architecture.png',
+      architectureAlt: '딸깍 리뷰의 웹, 인증, 크롤링, 데이터베이스, AI 분석 모듈 구성도',
+      architectureCaption: '딸깍 리뷰 시스템 구성도',
+      youtubeId: 'Dqj01tUyWdQ',
+    },
   },
 ];
