@@ -1,0 +1,16 @@
+---
+import { site } from '../data/site';
+const github = site.links.find(link => link.label === 'GitHub');
+const resume = site.links.find(link => link.label === 'Resume');
+---
+<section class="shell hero" aria-labelledby="hero-title">
+  <div class="hero-kicker"><span class="eyebrow">{site.name} — {site.role}</span><span class="prototype-label">WORK IN PROGRESS / V2</span></div>
+  <h1 id="hero-title">{site.positioning[0]}<br /><span>{site.positioning[1]}</span></h1>
+  <div class="hero-bottom"><p>{site.intro}</p><div class="hero-links">
+    <a class="button primary" href="#work">프로젝트 둘러보기 <span aria-hidden="true">↘</span></a>
+    {github?.href && <a href={github.href} target="_blank" rel="noreferrer">GitHub ↗</a>}
+    {resume?.href ? <a href={resume.href}>Resume ↗</a> : <span class="pending">Resume · 준비 중</span>}
+    <a href="#contact">Contact ↗</a>
+  </div></div>
+  <div class="hero-foot mono"><span>PROJECTS / PROCESS / PROOF</span><span>SCROLL TO EXPLORE ↓</span></div>
+</section>

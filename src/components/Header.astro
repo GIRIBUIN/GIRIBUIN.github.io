@@ -1,0 +1,11 @@
+---
+import { site } from '../data/site';
+const home = Astro.url.pathname === '/';
+const nav = [{ label: 'Work', id: 'work' }, { label: 'Tools', id: 'tools' }, { label: 'About', id: 'about' }, { label: 'Contact', id: 'contact' }];
+---
+<header class="header" id="top">
+  <div class="shell header-inner">
+    <a class="brand" href="/" aria-label="포트폴리오 홈"><span class="brand-mark" aria-hidden="true">g.</span>{site.handle}<span class="edition">/ 02</span></a>
+    <nav aria-label="주 메뉴"><ul>{nav.map(item => <li><a href={home ? '#' + item.id : '/#' + item.id}>{item.label}</a></li>)}</ul></nav>
+  </div>
+</header>

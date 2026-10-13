@@ -1,0 +1,14 @@
+---
+import type { Project } from '../lib/projects';
+import ProjectDemo from './ProjectDemo.astro';
+interface Props { project: Project; index: number; }
+const { project, index } = Astro.props;
+const { slug, title, type, summary, tech, links } = project.data;
+---
+<article class="tool-item" data-project={slug} aria-labelledby={'tool-' + slug}>
+  <span class="mono tool-index">{String(index + 1).padStart(2, '0')}</span>
+  <div class="tool-copy"><div class="tool-title"><h3 id={'tool-' + slug}>{title}</h3><span class="mono">{type}</span></div><p>{summary}</p><p class="tech mono">{tech.join(' / ')}</p>
+    <details class="tool-preview"><summary>Demo 미리보기</summary><ProjectDemo project={project} compact /></details>
+  </div>
+  <div class="tool-actions"><a href={'/work/' + slug + '/'} aria-label={title + ' 기록 보기'}>기록 보기 ↗</a>{links.source && <a href={links.source} target="_blank" rel="noreferrer">Source ↗</a>}</div>
+</article>

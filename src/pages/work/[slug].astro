@@ -1,0 +1,20 @@
+---
+import { render } from 'astro:content';
+import Layout from '../../layouts/Layout.astro';
+import ProjectDemo from '../../components/ProjectDemo.astro';
+import { getProjects, type Project } from '../../lib/projects';
+export async function getStaticPaths() {
+  return (await getProjects()).map(project => ({ params: { slug: project.data.slug }, props: { project } }));
+}
+interface Props { project: Project; }
+const { project } = Astro.props;
+const { Content } = await render(project);
+const { title, summary, tech, links, slug } = project.data;
+---
+<Layout title={title + ' — Project notes'} description={summary}>
+  <article class="shell detail-page" data-project={slug}>
+    <a class="back-link" href="/#work">← Back to portfolio</a><p class="eyebrow">PROJECT NOTES / CONTENT PROTOTYPE</p><h1>{title}</h1><p class="detail-summary">{summary}</p><p class="tech mono">{tech.join(' / ')}</p>
+    {links.source && <p><a href={links.source} target="_blank" rel="noreferrer">Source ↗</a></p>}
+    <ProjectDemo project={project} /><div class="prose detail-prose"><Content /></div>
+  </article>
+</Layout>

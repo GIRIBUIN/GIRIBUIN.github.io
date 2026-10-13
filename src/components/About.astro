@@ -1,0 +1,8 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { site } from '../data/site';
+const resume = site.links.find(link => link.label === 'Resume');
+---
+<section id="about" class="shell section about" aria-labelledby="about-heading"><SectionHeading number="04" title="A little about me" note="BEYOND THE PROJECTS" id="about-heading" />
+  <div class="about-body"><div><p class="about-name">{site.name}<span class="mono">{site.role}</span></p><p>{site.profile}</p>{resume?.href ? <a class="text-link" href={resume.href}>Resume ↗</a> : <span class="pending">Resume · 업데이트 준비 중</span>}</div><dl class="experience">{site.experience.map(item => <div><dt class="mono">{item.label}</dt><dd>{item.value}</dd></div>)}</dl></div>
+</section>

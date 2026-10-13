@@ -1,0 +1,25 @@
+---
+import '../styles/global.css';
+import Header from '../components/Header.astro';
+import { site } from '../data/site';
+interface Props { title?: string; description?: string; }
+const { title = 'Portfolio V2', description = '최정길의 포트폴리오 V2 — 프로젝트와 Demo를 위한 로컬 프로토타입.' } = Astro.props;
+---
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <meta name="description" content={description} />
+    <meta name="theme-color" content="#191a17" />
+    <meta name="robots" content="noindex, nofollow" />
+    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+    <title>{title} · {site.name}</title>
+  </head>
+  <body>
+    <a class="skip-link" href="#main">본문으로 건너뛰기</a>
+    <Header />
+    <main id="main" tabindex="-1"><slot /></main>
+    <footer class="shell footer"><span>© {new Date().getFullYear()} {site.handle}</span><span>Portfolio V2 · Local prototype</span><a href="#top">Back to top ↑</a></footer>
+  </body>
+</html>

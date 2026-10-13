@@ -1,0 +1,7 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { site } from '../data/site';
+---
+<section class="shell section process" aria-labelledby="process-heading"><SectionHeading number="03" title="How I build" note="FROM CONSTRAINTS TO EVIDENCE" id="process-heading" />
+  <ol class="process-flow">{site.process.map((step, index) => <li><span class="mono step-number">0{index + 1} <span aria-hidden="true">→</span></span><h3>{step.title}</h3><p class="step-label">{step.label}</p><p>{step.text}</p></li>)}</ol>
+</section>

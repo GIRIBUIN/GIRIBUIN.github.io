@@ -1,0 +1,7 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { site } from '../data/site';
+---
+<section id="contact" class="shell section contact" aria-labelledby="contact-heading"><SectionHeading number="05" title="Let’s connect." note="A CONVERSATION STARTS HERE" id="contact-heading" />
+  <div class="contact-body"><p>[임시] 프로젝트와 개발에 관한 이야기를 나눕니다.</p><ul>{site.links.map(link => <li>{link.href ? <a href={link.href} target={link.href.startsWith('http') ? '_blank' : undefined} rel={link.href.startsWith('http') ? 'noreferrer' : undefined}>{link.label}<span aria-hidden="true">↗</span></a> : <span class="pending">{link.label}<small>준비 중</small></span>}</li>)}</ul></div>
+</section>
