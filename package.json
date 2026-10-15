@@ -12,7 +12,8 @@
     "preview": "astro preview",
     "check": "astro check",
     "test": "node scripts/verify.mjs",
-    "test:browser": "node scripts/browser-check.mjs"
+    "test:browser": "node scripts/browser-check.mjs",
+    "test:project-media": "node scripts/project-media-check.mjs"
   },
   "dependencies": {
     "astro": "7.3.2"

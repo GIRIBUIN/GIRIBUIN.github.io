@@ -26,6 +26,7 @@ npm run dev -- --host 127.0.0.1
 npm run check
 npm test
 npm run test:browser
+npm run test:project-media
 ~~~
 
 npm test는 실제 프로덕션 빌드와 격리된 콘텐츠 fixture 빌드를 수행합니다. npm run build로 빌드만 실행할 수도 있습니다. 브라우저 검증은 생성된 dist와 fixture를 별도 임시 로컬 서버에서 열고, 종료 시 서버·브라우저를 정리합니다. 외부 요청은 차단합니다. 별도 lint 도구는 도입하지 않았고 Astro/TypeScript 진단은 npm run check로 수행합니다.
@@ -44,7 +45,11 @@ Projects는 640px 이상 2열, 639px 이하 1열입니다. 홈에는 order 순�
 
 기본 카드는 16:9 미디어·제목·짧은 설명만 표시하며 클릭하면 해당 언어의 상세 페이지로 이동합니다. 영상 프로젝트는 이미지 poster/thumbnail/visual을 사용하지 않고 원본 영상의 정지된 첫 프레임을 표시합니다. 홈에서는 영상이 화면 약 1.5개 높이 앞에 있을 때 metadata와 첫 프레임을 준비하고, 전체 목록에서는 약 1개 높이 앞에서 준비합니다. 홈에 표시하지 않는 프로젝트는 카드/video를 렌더링하지 않습니다. 영상이 없는 프로젝트는 기존 image/thumbnail/visual 또는 neutral placeholder를 사용합니다. KUROOM·ct의 제작된 SVG 포스터는 연결하지 않으며 새 미디어를 만들지 않았습니다.
 
-Floating Inspector는 제거했습니다. 640px 이상 fine pointer 환경에서 thumbnail 영역에 200ms hover하면 해당 영상만 muted/loop/playsinline으로 재생합니다. 제목·설명 hover나 keyboard focus로는 재생하지 않습니다. thumbnail을 벗어나거나 다른 영상에 이동하면 pause 후 첫 프레임으로 돌아갑니다. 언어 전환·화면 밖 이동·탭 비활성화·reduced-motion 변경 시에도 정지합니다. Mobile/touch와 reduced-motion에서는 자동재생하지 않습니다. 외부 액션은 기존 Deep Dive에서 제공합니다. Deep Dive 영상은 links.video의 YouTube 플레이어를 사용하며, 자체 확대 버튼이나 영상 위아래 안내 바 없이 플레이어의 기본 전체화면 기능을 사용합니다.
+Floating Inspector는 제거했습니다. 640px 이상 fine pointer 환경에서 thumbnail 영역에 200ms hover하면 해당 영상만 muted/loop/playsinline으로 재생합니다. 제목·설명 hover나 keyboard focus로는 재생하지 않습니다. thumbnail을 벗어나거나 다른 영상에 이동하면 pause 후 첫 프레임으로 돌아갑니다. 마우스 클릭과 키보드 활성화는 바로 Deep Dive로 이동합니다.
+
+Mobile/touch에서는 첫 탭으로 카드를 선택해 올림·그림자 효과와 무음 영상 미리보기를 표시합니다. 선택된 같은 카드를 한 번 더 탭하면 Deep Dive로 이동하며 두 탭 사이 시간 제한은 없습니다. 작은 안내 문구를 EN/KO로 표시하고 영상이 없는 카드도 같은 선택·상세 이동 규칙을 사용합니다. 다른 카드나 바깥을 탭하거나 선택 카드가 화면 밖으로 이동하면 선택과 재생을 해제합니다. 드래그·스크롤은 선택이나 상세 이동으로 처리하지 않습니다. 언어 전환·탭 비활성화·reduced-motion 변경 시에도 정지합니다. reduced-motion에서는 첫 탭으로 선택만 하고 영상 재생·올림 효과는 생략합니다. 열 개수와 무관하게 실제 터치 입력에 적용하며 마우스·키보드 동작은 유지합니다.
+
+외부 액션은 기존 Deep Dive에서 제공합니다. Deep Dive 영상은 links.video의 YouTube 플레이어를 사용하며, 자체 확대 버튼이나 영상 위아래 안내 바 없이 플레이어의 기본 전체화면 기능을 사용합니다. npm run test:project-media는 빌드된 dist로 터치 미리보기와 데스크톱 영상 동작만 검증합니다.
 
 정지된 첫 프레임은 원본 영상에서 canvas로 표시하고, 재생 중인 video 레이어만 보이게 합니다. thumbnail마다 paint/stacking 영역을 분리해 인접 영상이 가려지는 현상을 방지합니다. 별도 poster 파일은 만들지 않습니다.
 

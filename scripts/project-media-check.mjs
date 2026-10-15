@@ -1,0 +1,134 @@
+// Run after npm run build. Keep touch-preview regressions separate from the full UI audit.
+import { chromium } from 'playwright';
+import { createServer } from 'node:http';
+import { readFileSync, existsSync, statSync } from 'node:fs';
+import { resolve, join, extname, sep } from 'node:path';
+import assert from 'node:assert/strict';
+
+const dist = resolve('dist');
+const server = createServer((req, res) => {
+  let path = resolve(dist, '.' + new URL(req.url, 'http://localhost').pathname);
+  if (path !== dist && !path.startsWith(dist + sep)) return res.writeHead(403).end();
+  if (existsSync(path) && statSync(path).isDirectory()) path = join(path, 'index.html');
+  if (!existsSync(path)) return res.writeHead(404).end();
+  const types = { '.html': 'text/html; charset=utf-8', '.css': 'text/css', '.js': 'text/javascript', '.svg': 'image/svg+xml', '.mp4': 'video/mp4', '.woff2': 'font/woff2' };
+  res.writeHead(200, { 'Content-Type': types[extname(path)] || 'application/octet-stream' }).end(readFileSync(path));
+});
+await new Promise(done => server.listen(0, '127.0.0.1', done));
+const base = 'http://127.0.0.1:' + server.address().port;
+const browser = await chromium.launch(process.platform === 'win32' ? { channel: 'msedge', headless: true } : { headless: true });
+const errors = [];
+try {
+  for (const [width, height, touch] of [[1440, 1000, false], [390, 844, true], [844, 390, true], [1024, 768, true]]) {
+    const context = await browser.newContext({ viewport: { width, height }, isMobile: touch, hasTouch: touch });
+    await context.route('**/*', route => new URL(route.request().url()).hostname === '127.0.0.1' ? route.continue() : route.abort());
+    const page = await context.newPage();
+    page.on('pageerror', error => errors.push(error.message));
+    const card = slug => page.locator('[data-project="' + slug + '"] .project-card-link');
+    const paused = slug => card(slug).locator('video').evaluate(video => video.paused);
+    const playing = slug => page.waitForFunction(slug => {
+      const video = document.querySelector('[data-project="' + slug + '"] video');
+      return !video.paused && video.currentTime > .02;
+    }, slug);
+    await page.goto(base);
+    await page.evaluate(() => document.fonts.ready);
+    await card('zzz').scrollIntoViewIfNeeded();
+    await page.waitForFunction(() => document.querySelector('[data-project="zzz"] video').readyState >= 2);
+    assert.equal(await page.locator('video').evaluateAll(videos => videos.every(video => video.paused)), true);
+    if (!touch) {
+      await card('zzz').locator('.project-thumbnail').hover();
+      await playing('zzz');
+      assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '-5px');
+      await page.mouse.move(0, 0);
+      await page.waitForFunction(() => document.querySelector('[data-project="zzz"] video').paused);
+      await card('zzz').click();
+      await page.waitForURL(base + '/work/zzz/');
+      console.log('PASS desktop hover/leave and single-click navigation');
+      await context.close();
+      continue;
+    }
+    const columns = await page.locator('#projects-grid').evaluate(el => getComputedStyle(el).gridTemplateColumns.split(' ').length);
+    assert.equal(columns, width < 640 ? 1 : 2);
+    await card('zzz').hover();
+    assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '0px');
+    // A real touch drag must scroll without selecting or opening the card.
+    const box = await card('zzz').boundingBox();
+    const cdp = await context.newCDPSession(page);
+    const point = { x: box.x + box.width / 2, y: box.y + 100 };
+    const beforeDrag = await page.evaluate(() => scrollY);
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchStart', touchPoints: [point] });
+    for (const delta of [20, 50, 100]) await cdp.send('Input.dispatchTouchEvent', { type: 'touchMove', touchPoints: [{ x: point.x, y: point.y - delta }] });
+    await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
+    await page.waitForTimeout(150);
+    assert.ok(await page.evaluate(() => scrollY) > beforeDrag, 'touch drag still scrolls');
+    assert.equal(new URL(page.url()).pathname, '/');
+    assert.equal(await page.locator('.is-previewing').count(), 0);
+    assert.equal(await page.locator('video').evaluateAll(videos => videos.every(video => video.paused)), true);
+    // Isolate taps from the synthetic drag's very high inertial velocity.
+    await page.goto(base);
+    await page.evaluate(() => document.fonts.ready);
+    await card('zzz').tap();
+    await playing('zzz');
+    assert.equal(new URL(page.url()).pathname, '/');
+    await page.waitForTimeout(200);
+    assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '-5px');
+    assert.equal(await card('zzz').locator('.touch-preview-hint').isVisible(), true);
+    await card('zzz').locator('.project-thumbnail').dispatchEvent('pointerleave', { pointerType: 'touch' });
+    assert.equal(await paused('zzz'), false);
+    await card('smart-parking').tap();
+    await playing('smart-parking');
+    assert.equal(await paused('zzz'), true);
+    assert.equal(await page.locator('.is-previewing').count(), 1);
+    assert.equal(await page.locator('video').evaluateAll(videos => videos.filter(video => !video.paused).length), 1);
+    await card('smart-parking').tap();
+    await page.waitForURL(base + '/work/smart-parking/');
+    console.log('PASS touch ' + width + 'px: ' + columns + ' columns, drag ignored, first tap previews, switch pauses previous, second tap navigates');
+
+    if (width === 390) {
+      await page.goto(base);
+      await card('zzz').tap();
+      await playing('zzz');
+      await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+      await page.waitForFunction(() => !document.querySelector('.is-previewing'));
+      assert.equal(await paused('zzz'), true);
+      await card('zzz').tap();
+      await playing('zzz');
+      await page.locator('.header [data-locale="ko"]').evaluate(el => el.dispatchEvent(new MouseEvent('click', { bubbles: true })));
+      assert.equal(await page.locator('.is-previewing').count(), 0);
+      assert.equal(await paused('zzz'), true);
+      await card('zzz').tap();
+      await playing('zzz');
+      assert.equal(await card('zzz').locator('.touch-preview-hint').innerText(), '한 번 더 탭하면 상세 보기');
+      await card('zzz').tap();
+      await page.waitForURL(base + '/ko/work/zzz/');
+      await page.goto(base + '/projects/');
+      await card('kutodo').tap();
+      assert.equal(new URL(page.url()).pathname, '/projects/');
+      await card('kutodo').tap();
+      await page.waitForURL(base + '/work/kutodo/');
+      await page.goto(base);
+      await page.emulateMedia({ reducedMotion: 'reduce' });
+      await card('zzz').tap();
+      await page.waitForTimeout(250);
+      assert.equal(await paused('zzz'), true);
+      assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '0px');
+      await card('zzz').tap();
+      await page.waitForURL(base + '/work/zzz/');
+      await page.goto(base);
+      await card('zzz').focus();
+      await page.keyboard.press('Enter');
+      await page.waitForURL(base + '/work/zzz/');
+      await page.goto(base);
+      await page.emulateMedia({ reducedMotion: 'no-preference' });
+      await page.evaluate(() => { HTMLMediaElement.prototype.play = () => Promise.reject(new Error('Playback rejected fixture')); });
+      await card('zzz').tap();
+      assert.equal(await page.locator('.is-previewing').count(), 1);
+      await card('zzz').tap();
+      await page.waitForURL(base + '/work/zzz/');
+      console.log('PASS locale reset/KO route, no-video fallback, reduced motion, keyboard, rejected-play second tap');
+    }
+    assert.equal(await page.evaluate(() => document.body.scrollWidth > innerWidth), false);
+    await context.close();
+  }
+  assert.deepEqual(errors, []);
+} finally { await browser.close(); await new Promise(done => server.close(done)); }

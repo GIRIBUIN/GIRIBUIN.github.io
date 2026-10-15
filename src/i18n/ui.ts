@@ -24,7 +24,7 @@ const en = {
   contact: { title: 'Contact', intro: 'Have a question about a project, or a systems problem to discuss?\nI’d be happy to hear from you.', email: 'Email' },
   footer: { navigation: 'Footer links', projects: 'All Projects', home: 'Home' },
   rail: { navigation: 'Project navigation', hint: 'Scroll to explore', previous: 'Previous projects', next: 'Next projects' },
-  project: { problem: 'Problem', decision: 'Key decision', result: 'Result', demo: 'Demo', liveDemo: 'Live Demo', source: 'Source', caseStudy: 'Case Study', deepDive: 'Deep Dive', notes: 'Project notes', back: 'Back to Projects', untranslated: 'Detailed notes are currently available in Korean.' },
+  project: { problem: 'Problem', decision: 'Key decision', result: 'Result', demo: 'Demo', liveDemo: 'Live Demo', source: 'Source', caseStudy: 'Case Study', deepDive: 'Deep Dive', notes: 'Project notes', back: 'Back to Projects', untranslated: 'Detailed notes are currently available in Korean.', tapAgain: 'Tap again to open' },
   media: {
     labels: { iframe: 'Web preview', video: 'Video walkthrough', terminal: 'CLI preview', apk: 'App preview', image: 'Image preview', none: 'Project preview' },
     thumbnail: 'Project image', preview: 'Preview', pending: 'Demo coming soon', reference: 'Reference image', referencePending: 'Live demo not connected',
@@ -61,6 +61,7 @@ const ko: typeof en = {
   project: {
     ...en.project, problem: '해결할 문제', decision: '설계 판단', result: '결과',
     back: '프로젝트 목록으로', untranslated: '이 프로젝트의 상세 설명은 한국어로 제공됩니다.',
+    tapAgain: '한 번 더 탭하면 상세 보기',
   },
   media: {
     ...en.media, pending: 'Demo 준비 중', referencePending: '라이브 Demo는 아직 연결하지 않았습니다.',

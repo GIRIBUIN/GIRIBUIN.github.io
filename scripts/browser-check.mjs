@@ -475,14 +475,21 @@ try {
     return video.readyState >= 2 && video.paused && video.currentTime < .01;
   });
   assert.equal(await touchPage.locator('#project-inspector').count(), 0);
+  await touchPage.locator('[data-project="zzz"] .project-card-link').hover();
+  assert.equal(await touchPage.locator('[data-project="zzz"] .project-card-link').evaluate(el => getComputedStyle(el).top), '0px');
+  assert.equal(await touchPage.locator('[data-project="zzz"] .project-thumbnail').evaluate(el => getComputedStyle(el).boxShadow), 'none');
   assert.equal(await touchPage.locator('#projects-grid .media-enlarge,#projects-grid .project-actions').count(), 0);
+  await touchPage.locator('[data-project="zzz"] .project-card-link').tap({ position: { x: 25, y: 25 } });
+  assert.equal(new URL(touchPage.url()).pathname, '/');
+  assert.equal(await touchPage.locator('.project-card-link.is-previewing').count(), 1);
+  await touchPage.waitForFunction(() => !document.querySelector('[data-project="zzz"] video').paused);
   await touchPage.locator('[data-project="zzz"] .project-card-link').tap({ position: { x: 25, y: 25 } });
   await touchPage.waitForURL(base + '/work/zzz/');
   await touchContext.close(); await page.bringToFront();
   await page.setViewportSize({ width: 390, height: 844 }); await goto(base);
   await page.locator('[data-project="zzz"] .project-card-link').hover();
   await page.waitForTimeout(250); assert.equal(await video('zzz').evaluate(el => el.paused), true);
-  pass('touch/mobile has no Inspector or autoplay; tap opens Deep Dive');
+  pass('touch has no hover lift or initial autoplay; first tap previews, second tap opens Deep Dive; mouse behavior unchanged');
 
   for (const width of [1440, 390]) {
     await page.setViewportSize({ width, height: 1000 }); await goto(base);
