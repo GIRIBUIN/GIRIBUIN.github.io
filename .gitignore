@@ -2,5 +2,6 @@ node_modules/
 dist/
 .astro/
 .verification/
+/error.png
 .env*
 !.env.example

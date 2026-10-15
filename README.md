@@ -1,205 +1,181 @@
-# Portfolio V2 foundation
+# GIRIBUIN portfolio V2
 
-최종 포트폴리오 문구를 작성하기 전, 콘텐츠 구조·정보 위계·Demo 연결 방식을 검증하는 로컬 프로토타입입니다.
+Astro 포트폴리오입니다. 기본 언어는 English이며 /ko/에서 Korean을 제공합니다. 프로젝트는 하나의 responsive Projects Grid에서 탐색합니다.
 
-- 위치: `D:\10_proj\portfolio-v2` (기존 저장소 기준 `../portfolio-v2/`)
-- Astro 7.3.2 / TypeScript strict / Content Collections / 정적 생성
-- 기존 저장소는 read-only reference. 배포·원격 저장소 연결·GitHub Pages·DNS 변경은 수행하지 않습니다.
-- 소개, 경력, 프로젝트 설명·기술 목록은 검토 전 placeholder입니다. 참고 이미지는 실제 Demo와 구별합니다.
-- AI chatbot/RAG, 서버, DB, Cloudflare backend는 범위에 없습니다.
+## 배포
 
-## 로컬 실행
+- 저장소: GIRIBUIN/GIRIBUIN.github.io
+- 공개 주소: https://giribuin.github.io/
+- main에 push하면 GitHub Actions가 의존성·Mermaid 빌드용 Chromium을 설치하고 타입 검사·정적 빌드 후 dist를 GitHub Pages에 배포합니다.
+- 기존 포트폴리오의 커밋 이력은 보존합니다. V2 코드는 portfolio-v2 작업 폴더에서 관리합니다.
+- 로컬 개발에서는 noindex를 유지하고 공개 빌드에서는 검색 제한을 제거합니다.
+- 나중에 호스팅을 옮길 때 SITE_URL 환경 변수로 사이트 주소를 지정할 수 있습니다. 빌드 명령은 npm run build, 출력 폴더는 dist입니다. Mermaid 빌드에는 Chromium이 필요하므로 Cloudflare 전환 시에도 빌드 환경을 준비하거나 Actions에서 만든 dist를 업로드합니다.
 
-Node >=22.12.0, npm을 사용합니다. 이번 검증 환경은 Node 24.14.1 / npm 11.11.0입니다.
+## 시각 테마
 
-```powershell
-cd D:\10_proj\portfolio-v2
-npm ci
+채도를 낮춘 종이색 배경(#F2ECDE), charcoal 본문, terracotta/teal/coral/yellow/purple/green 포인트를 사용합니다. olive/sage와 sky 테마 토큰은 제거했습니다. 토큰은 src/styles/global.css의 :root에 모으고 기존 --ink/--panel은 호환 alias로 유지합니다. 주요 포인트의 점·선·글자·포커스는 #B85F4B로 통일하고 CTA는 yellow를 사용합니다.
+
+body에는 옅은 노란 종이색 gradient를 적용하고 상단 바는 별도의 옅은 청록색으로 구분합니다. Hero에만 terracotta(14%)/purple(10%) halo와 희미한 48px grid를 적용합니다. Hero 배경은 화면 전체 폭으로 이어지고 콘텐츠는 중앙 너비를 유지합니다. 양옆의 정적인 파스텔 원형 선은 잘리지 않게 배치하며 모바일에서는 halo와 grid만 남깁니다. 기존 카드에 얇은 border·작은 neutral shadow를 적용하고 Projects의 2열 미디어 중심 구성은 유지합니다. 프로젝트 순서에 따라 coral → teal → purple → green 색이 hover 테두리에 반복됩니다. 제목은 칩 없는 charcoal 텍스트입니다. code block은 github-light syntax palette와 밝은 surface를 사용합니다.
+
+## 실행과 검증
+
+Node >=22.12.0, npm을 사용합니다.
+
+~~~powershell
 npm run dev -- --host 127.0.0.1
-```
-
-기본 주소: http://127.0.0.1:4321
-
-```powershell
 npm run check
-npm run build
-npm run preview -- --host 127.0.0.1
 npm test
 npm run test:browser
-```
+~~~
 
-`npm test`는 실제 Astro 빌드를 수행하고 `.verification/content-*/`의 격리된 복사본에서만 콘텐츠를 변경합니다. 기존 저장소와 원본 Markdown은 변경하지 않습니다. 검증 산출물은 Git에서 제외됩니다.
-브라우저 검증은 로컬 Edge → Chrome → Playwright Chromium 순으로 이용하고 서버를 종료합니다. 설치된 브라우저가 없다면 `npx playwright install chromium`이 필요합니다. 이 작업의 브라우저 검증은 실제 로컬 브라우저로 수행합니다.
-별도 lint 도구는 도입하지 않았으며 `astro check`가 Astro/TypeScript 진단을 담당합니다.
+npm test는 실제 프로덕션 빌드와 격리된 콘텐츠 fixture 빌드를 수행합니다. npm run build로 빌드만 실행할 수도 있습니다. 브라우저 검증은 생성된 dist와 fixture를 별도 임시 로컬 서버에서 열고, 종료 시 서버·브라우저를 정리합니다. 외부 요청은 차단합니다. 별도 lint 도구는 도입하지 않았고 Astro/TypeScript 진단은 npm run check로 수행합니다.
 
-## 기존 포트폴리오 분석
+## 화면과 분류
 
-| 항목 | 확인 결과 |
-| --- | --- |
-| 기준 위치 | D:\10_proj\GIRIBUIN.github.io |
-| 기준 HEAD | 3d8869a9a3facee2a47476bad56e0843f3934095 |
-| 최초 상태 | git status clean |
-| Framework | Astro 7.3.2 설치, package.json ^7.3.2 |
-| 패키지 관리 | npm, package-lock.json |
-| 테마 | 현재 코드 기준 흰 배경 #fff, 텍스트 #202020, 문서형 레이아웃. Monokai 아님 |
-| 폰트 | Georgia, Times New Roman, Noto Serif KR 등 시스템 serif fallback. 로컬 폰트 파일 없음 |
-| 콘텐츠 | src/data/projects/entries/*.ts / typed project objects |
-| 등록 프로젝트 | ZZZ, Raspberry Pi 스마트 주차, Review Analyzer |
-| 기타 정보 | 이름·연락처·GitHub·LinkedIn·학력·개발 관심 분야·이력서 PDF·개발 중 항목 |
-| 자산 | ZZZ/Review Analyzer 화면·시스템 구성도, 스마트 주차 구성도, 프로필/연락 사진, SVG 아이콘, resume.pdf |
+Hero → About Me → Education → Skills → Projects → How I Build → Contact → Footer.
 
-재사용한 것은 확인된 이름·계정/연락 링크와 ZZZ/Review Analyzer 참고 이미지 두 개입니다. 이미지의 원본 경로와 맥락은 `public/images/reference/README.md`에 기록했습니다.
-학력/경력은 V2에서 placeholder로 두었고 기존 이력서 PDF는 최신 여부를 확정하지 않아 복사하지 않았습니다. 사진·구성도·아이콘은 재사용 가능한 후보지만 이번 화면에 필요하지 않아 복사하지 않았습니다.
-기존 페이지 구조, CSS, 컴포넌트, 상세 콘텐츠 구현은 복제하지 않았습니다. Astro 기본 Welcome 및 장식 자산도 가져오지 않았습니다.
+EN/KO를 전환해도 Header·Quick Trace Rail·섹션 제목은 영어로 유지합니다. 소개와 설명 본문은 선택한 언어로 표시합니다.
 
-## 디렉터리
+Hero에는 직무 라벨 없이 이름·소개·system trace·버튼을 표시합니다. Quick Trace Rail에는 섹션명만 표시하고 별도 상단 라벨은 두지 않습니다.
 
-```text
-portfolio-v2/
-  astro.config.mjs
-  package.json / package-lock.json
-  tsconfig.json
-  public/
-    favicon.svg
-    images/reference/           # 출처를 기록한 참고 이미지
-  src/
-    content.config.ts          # 프로젝트 schema, Markdown glob loader
-    content/projects/          # 프로젝트 콘텐츠 5개
-    data/site.ts               # 소개·경력·연락처·개발 과정
-    lib/projects.ts            # 공개 여부·그룹·순서 정책
-    layouts/Layout.astro
-    components/
-      Header.astro / Hero.astro / SectionHeading.astro
-      ProjectShowcase.astro / ProjectDemo.astro / ToolItem.astro
-      HowIBuild.astro / About.astro / Contact.astro
-    pages/
-      index.astro
-      work/[slug].astro        # 공개 프로젝트의 정적 상세 경로
-    styles/global.css
-  scripts/
-    verify.mjs                 # 콘텐츠 변경 실제 빌드 검증
-    browser-check.mjs          # 로컬 브라우저 검증
-    verify-reference.mjs       # 작업 시작 시 baseline과 기존 저장소 비교
-  docs/
-    VALIDATION.md
-  .verification/               # 미추적: 복사본·결과 JSON·스크린샷
-  dist/                        # 미추적: 정적 결과
-```
+섹션은 콘텐츠 높이를 유지하면서 화면 높이에 따라 간격을 조절합니다. Hero는 첫 화면을 기준으로 맞추고 About 사진은 최대 360px(mobile 280px) 너비로 제한합니다. 앵커 이동은 실제 Header 높이 + desktop 24px/mobile 16px를 비우며, Trace Rail은 제목 근처의 읽기 위치와 페이지 끝을 추적합니다. Contact는 내용 높이에 맞추고 링크 아래 여백만 유지합니다.
 
-## UX 결정
+Projects는 640px 이상 2열, 639px 이하 1열입니다. 홈에는 order 순서대로 첫 4개(ZZZ → Smart Parking → Review Analyzer → ct)를 표시합니다. 제목은 배경·패딩 없는 일반 텍스트입니다. 섹션 제목 오른쪽의 화살표 아이콘은 /projects/ 또는 /ko/projects/ 전체 목록 페이지로 이동합니다. 전체 목록과 프로젝트 상세의 집 아이콘은 홈 Projects로 돌아갑니다. 세 이동 아이콘과 Hero의 Resume PDF·Portfolio PDF 버튼, How I Build 닫기 버튼은 같은 밝은 기본 배경·테두리와 짙은 charcoal hover/누름 배경을 사용합니다. 이동 아이콘에는 localized aria-label/title이 있습니다. 전체 목록은 같은 카드와 Grid를 재사용하며 현재 7개와 향후 추가 프로젝트를 order 순서대로 모두 표시합니다. 홈 안에서 펼치지 않습니다.
 
-- Hero → Selected Work → Tools → How I Build → About → Contact의 one-page 흐름입니다.
-- 이름/role, 한 줄 positioning, 대표작 진입을 첫 화면에 배치했습니다.
-- 대표작은 번호·큰 제목·핵심 문장·문제/판단/결과·넓은 Demo를 가진 연속된 작품 영역입니다.
-- 작은 도구는 압축된 행과 접을 수 있는 Demo로 위계를 구분합니다.
-- 홈페이지의 native details로 Markdown 기록을 펼치거나 /work/[slug]/에서 읽습니다.
-- sticky 메뉴는 홈에서 #work/#tools/#about/#contact로 스크롤하고 상세 페이지에서는 홈의 해당 위치로 돌아갑니다.
-- charocal 배경, 따뜻한 off-white 텍스트, 절제된 연두 accent. 프로젝트 Demo가 시각적 중심입니다.
-- 외부 웹폰트·UI framework·애니메이션 라이브러리 없이 시스템 sans/mono를 사용합니다.
-- 모바일에서 대표작은 한 열로 전환합니다. 키보드 skip link, visible focus, semantic headings, image alt, reduced motion을 지원합니다.
+기본 카드는 16:9 미디어·제목·짧은 설명만 표시하며 클릭하면 해당 언어의 상세 페이지로 이동합니다. 영상 프로젝트는 이미지 poster/thumbnail/visual을 사용하지 않고 원본 영상의 정지된 첫 프레임을 표시합니다. 홈에서는 영상이 화면 약 1.5개 높이 앞에 있을 때 metadata와 첫 프레임을 준비하고, 전체 목록에서는 약 1개 높이 앞에서 준비합니다. 홈에 표시하지 않는 프로젝트는 카드/video를 렌더링하지 않습니다. 영상이 없는 프로젝트는 기존 image/thumbnail/visual 또는 neutral placeholder를 사용합니다. KUROOM·ct의 제작된 SVG 포스터는 연결하지 않으며 새 미디어를 만들지 않았습니다.
 
-## 콘텐츠 schema
+Floating Inspector는 제거했습니다. 640px 이상 fine pointer 환경에서 thumbnail 영역에 200ms hover하면 해당 영상만 muted/loop/playsinline으로 재생합니다. 제목·설명 hover나 keyboard focus로는 재생하지 않습니다. thumbnail을 벗어나거나 다른 영상에 이동하면 pause 후 첫 프레임으로 돌아갑니다. 언어 전환·화면 밖 이동·탭 비활성화·reduced-motion 변경 시에도 정지합니다. Mobile/touch와 reduced-motion에서는 자동재생하지 않습니다. 외부 액션은 기존 Deep Dive에서 제공합니다. Deep Dive 영상은 links.video의 YouTube 플레이어를 사용하며, 자체 확대 버튼이나 영상 위아래 안내 바 없이 플레이어의 기본 전체화면 기능을 사용합니다.
 
-필수는 `title`, `slug`, `summary`입니다. 나머지는 기본값 또는 선택 필드입니다.
+정지된 첫 프레임은 원본 영상에서 canvas로 표시하고, 재생 중인 video 레이어만 보이게 합니다. thumbnail마다 paint/stacking 영역을 분리해 인접 영상이 가려지는 현상을 방지합니다. 별도 poster 파일은 만들지 않습니다.
 
-| 필드 | 용도 / 기본값 |
-| --- | --- |
-| title / slug / summary | 이름 / 고유 경로 / 요약 |
-| oneLine | 홈페이지의 핵심 한 줄. 없으면 summary 사용 |
-| type | 화면의 프로젝트 분류 문구. 기본 project |
-| featured | Selected Work 여부, 기본 false |
-| section | work 또는 tools, 기본 work |
-| order | 오름차순, 기본 100. 같으면 slug 순 |
-| hidden | 홈과 정적 상세 경로에서 제외, 기본 false |
-| tech | 기술 문자열 배열, 기본 빈 배열 |
-| problem / decision / result | 홈페이지의 짧은 근거, 없으면 해당 행 생략 |
-| visual | 선택적 url, alt(필수), caption. Demo가 없을 때 참고 이미지 |
-| links | demo, source, release, video. 모두 null 허용 |
-| demo | type, url, poster, format, alt, caption |
-| Markdown body | 홈 펼치기와 상세 페이지에서 동일하게 렌더링 |
+## 공통 설정
 
-URL 필드는 http(s) 또는 `/images/example.png` 같은 사이트 기준 경로를 사용합니다. 이미지 Demo에는 alt를 작성합니다. slug는 소문자 영문/숫자/하이픈이고 공개 프로젝트 간 고유해야 합니다.
+src/data/site.ts에서 프로필과 링크를 관리합니다.
 
-### 추가
+- resumeUrl: /files/resume-public.pdf
+- portfolioPdfUrl: /files/portfolio.pdf
+- heroImage: /images/profile/githubprofile.png
+- profileImage: /images/profile/jeonggil.jpg (About 전용)
+- me.jpg는 본문에서 사용하지 않습니다.
+- profileAlt: EN/KO 대체 텍스트
+- name, intro, bio, focus, educationStatus, educationProgram: 언어별 문구
+- email, socials: Header·Contact가 공유하는 단일 URL 데이터
 
-`src/content/projects/new-project.md`를 추가합니다. UI 수정은 필요하지 않습니다.
+PDF 두 파일과 프로필 사진은 원본을 수정하지 않고 V2 public에 복사했습니다. PDF URL·사진 URL은 null을 허용하며 해당 요소를 생략합니다. socials의 url이 null인 항목도 숨깁니다. 현재 GitHub·LinkedIn·Velog를 표시하고 Instagram·Discord는 null입니다. Email은 기존 포폴과 공개 이력서에서 확인한 giribuin@gmail.com을 사용합니다.
 
-```yaml
+## Localization
+
+- src/i18n/ui.ts: UI 문구, 언어 목록, Locale 타입, localePath 함수
+- /: English 홈, /ko/: Korean 홈
+- /projects/: 전체 Projects 목록, /ko/projects/: Korean 전체 목록
+- /work/[slug]/: English 상세, /ko/work/[slug]/: Korean 상세
+- HomePage.astro·ProjectDetail.astro: 언어별 경로가 공유하는 구성
+- EN/KO 전환: 버튼으로 현재 DOM의 공통 UI·프로필·원칙 문구만 변경합니다. 페이지 reload, route 변경, scroll-to-top이 없습니다.
+- LanguageController.astro: 문서 scrollY·열린 모달 위치 보존, 언어별 텍스트·링크 영역 높이 확보. 홈/전체 목록에서 Projects DOM을 교체하지 않습니다.
+- i18n/runtime.ts: UI·프로필·Skills·원칙 데이터의 공통 문구 조회
+
+컴포넌트는 getUi(locale)와 공통 프로필 설정을 읽습니다. 최초 접속 /는 English입니다. 프로젝트 소개·trace는 translations.en/ko를 사용하며, 상세 본문은 기존 metadata/notes 구조를 사용합니다. 섹션 UI는 projectSection 키를 사용합니다. projects 키는 프로젝트별 문구 데이터이므로 섹션 제목 번역 키로 재사용하지 않습니다.
+
+Skills.astro는 data/skills.ts의 프로젝트 경험 기반 분류를 표시합니다. 기술 타일은 같은 크기이며 아이콘 아래에 이름을 표시합니다. 그룹 너비를 넘는 기술은 화면 크기와 관계없이 그룹 안에서 옆으로 스크롤합니다. HowIBuild.astro는 data/buildPrinciples.ts의 여섯 원칙을 native dialog로 열며, 이유·근거 프로젝트·기여 방식을 설명합니다. Escape·닫기·배경 클릭과 포커스 복귀를 지원합니다.
+
+## 프로젝트 콘텐츠
+
+src/content/projects/[slug].md 한 파일이 프로젝트 identity, 분류, 링크, 미디어와 기본 한국어 문구를 관리합니다. 영어 문구는 같은 파일의 translations.en에 둡니다.
+
+~~~yaml
 ---
-title: "New project"
-slug: "new-project"
-summary: "[임시] 프로젝트 요약"
+slug: example
+title: Example
+summary: 한국어 요약
 featured: true
-section: "work"
+section: work
 order: 10
+ownership:
+  type: personal
+category: Backend
+tech: [Go, Docker]
+cardTech: [Go, Docker]
+trace:
+  input: 짧은 입력 설명
+  decision: 짧은 설계 판단
+  output: 짧은 출력 설명
 hidden: false
-tech:
-  - TypeScript
+logo: null
+thumbnail: null
+translations:
+  en:
+    summary: A concise English summary.
+    oneLine: A short description.
+    type: Personal · Web
+    problem: The problem.
+    decision: The key decision.
+    result: The verified outcome.
+    trace:
+      input: Short input description.
+      decision: Short design decision.
+      output: Short output description.
 links:
   demo: null
+  liveDemo: null
   source: null
+  caseStudy: null
   release: null
   video: null
 demo:
-  type: "iframe"
+  type: none
   url: null
 ---
-## 문제와 제약
-[임시] 여기에 기록합니다.
-```
+## 한국어 상세 기록
+~~~
 
-### 숨김 / 제거 / 이동 / 순서
+- featured·section은 legacy metadata로 허용하지만 홈의 분류·노출에는 사용하지 않습니다. section의 허용 값은 기존 work/tools를 유지합니다.
+- order 오름차순이며 같은 값이면 slug 순입니다. order 미지정은 마지막입니다. 현재 순서는 10~70이며 중간 삽입은 order: 15처럼 지정합니다.
+- trace는 기존 optional metadata로 보존합니다. 홈 카드에서는 INPUT/DECISION/OUTPUT 또는 trace overlay를 렌더링하지 않습니다.
+- 새 Markdown 한 파일만 추가하면 전체 목록·홈 order 상위 4개·thumbnail hover에 자동 반영됩니다. 필수 필드는 title·slug·summary입니다.
+- hidden: true는 홈과 두 언어의 상세 생성에서 제외합니다. Demo 유무는 노출 조건이 아닙니다.
+- title·slug·summary가 필수입니다. 순서·노출·URL은 언어와 관계없이 공유하고 translations는 문구만 변경합니다.
+- translations.ko도 지원하므로 필요하면 기본 한국어 문구를 override할 수 있습니다.
+- logo·thumbnail에는 http(s) 또는 사이트 루트 기준 경로를 넣습니다. 로고가 없어도 제목 텍스트를 표시합니다. 현재 사용하는 Smart Parking cover는 public/images/projects/smart-parking/cover.webp에 둡니다. 기존 SVG dark/light 쌍은 보존합니다.
+- 기본 카드는 실제 영상이 있으면 영상 첫 프레임을 우선합니다. 영상이 없으면 thumbnail → 실제 image 미디어 → visual 순서로 이미지를 표시하며 모두 없으면 neutral placeholder를 표시합니다.
+- 상세 영상은 links.video의 YouTube 주소를 사용하며 MP4를 렌더링하지 않습니다. 이미지·웹 Demo·APK와 미디어가 없는 경우의 fallback은 기존 metadata를 사용합니다.
 
-- 숨김: `hidden: true`. 홈과 상세 생성에서 제외됩니다. 접근 제어 수단이 아니므로 비공개 정보를 파일에 보관하지 않습니다.
-- 제거: 해당 md 파일을 삭제한 뒤 재빌드합니다.
-- 대표작: `featured: true` + `section: work`.
-- 일반 목록: `featured: false`이면 section과 관계없이 Tools에 표시합니다.
-- Tools로 이동: `section: tools`가 featured보다 우선합니다.
-- 순서: 각 영역에서 `order` 오름차순. 값이 같으면 slug 순.
-- 상세 설명: Markdown body를 수정합니다. 링크: `links.source` 등을 수정합니다.
-- 소개/연락처/경력/Resume: `src/data/site.ts`에서 수정합니다. Resume는 기본 null이며 실제 PDF를 public에 추가한 뒤 href를 지정합니다.
+## Deep Dive와 Demo
 
-## Demo 연결
+기본 Markdown 본문은 한국어 상세 기록입니다. src/content/project-notes/en/[slug].md가 영어 상세 기록입니다. 향후 다른 언어의 본문도 해당 locale/slug 파일로 추가할 수 있습니다. 번역 본문이 없으면 한국어 원문과 번역 안내를 표시하고 원문에 lang=ko를 지정합니다.
 
-| demo.type | demo.url 연결 대상 | 표시 |
-| --- | --- | --- |
-| iframe | 임베드를 허용하는 웹 URL | 내부 iframe + Open Full Demo |
-| video | 직접 접근 가능한 MP4/WebM | native controls, preload none |
-| terminal | MP4/WebM 또는 GIF/image | format: video(기본) / image로 선택 |
-| apk | Demo Mode APK 다운로드 URL | 다운로드 버튼, 기기 wireframe |
-| image | PNG/JPG/WebP/SVG/GIF URL | alt와 함께 이미지 표시 |
-| none | null | 기록 준비 fallback |
+상세 화면은 최대 900px의 중앙 문서 열입니다. Astro의 기본 Markdown 렌더링과 github-light 코드 강조를 재사용합니다. 제목 구분선, 순서 목록, 인용, 표, 코드 블록을 README처럼 표시하며 긴 표·코드는 본문 안에서 가로 스크롤됩니다. 한국어 본문은 src/content/projects/[slug].md의 frontmatter 아래를, 영어 본문은 src/content/project-notes/en/[slug].md를 수정하면 됩니다.
 
-- URL null: visual이 있으면 참고 이미지를 표시하고, 없으면 유형에 맞는 wireframe 안내를 표시합니다. 빈 링크·깨진 src는 생성하지 않습니다.
-- `links.demo`: 별도 Full Demo 주소. iframe의 demo.url과 다르면 이 값을 우선합니다.
-- `links.video`: APK와 함께 시연 영상 링크를 둘 수 있습니다.
-- `links.release`: APK/GitHub Release/binary release 링크.
-- `demo.poster`: 영상 포스터, `demo.caption`: 설명, `demo.alt`: 이미지 설명.
-- YouTube 등 일반 재생 페이지 주소를 native video에 넣지 않습니다. embed 주소는 iframe, 일반 URL은 links.video에 둡니다.
-- iframe은 lazy loading과 제한된 sandbox를 사용합니다. 대상 서비스가 CSP frame-ancestors 또는 X-Frame-Options로 임베드를 금지하면 내부 표시가 제한되므로 Open Full Demo로 접근합니다. 이런 브라우저 차단은 iframe의 error 이벤트로 신뢰성 있게 감지할 수 없어 외부 버튼을 항상 제공합니다.
-- 이미지/영상 네트워크 로드 실패에는 안내 문구를 제공합니다. 원본 링크는 유지됩니다.
-- 현재는 실제 Demo backend/API를 연결하지 않았습니다.
+큰 구조는 `mermaid` 코드 블록으로 작성하면 빌드 시 SVG로 변환됩니다. 각 그래프에는 `accTitle`과 `accDescr`를 넣고, 자료로 확인한 주요 구성 요소와 관계만 그립니다. 클라이언트용 Mermaid 스크립트는 추가하지 않습니다.
 
-## 향후 Cloudflare Pages
+~~~mermaid
+flowchart TB
+  accTitle: 서비스 구조
+  accDescr: 수집한 데이터를 저장하고 API로 제공합니다.
+  A["데이터 수집"] --> B["저장"]
+  B --> C["API"]
+~~~
 
-현재 배포 설정이나 배포 명령은 추가하지 않았습니다. 아래는 사람이 나중에 수행할 작업입니다.
+빌드 렌더러는 Windows에서 설치된 Edge/Chrome을 찾습니다. 다른 환경에서는 Playwright Chromium을 설치하거나 `MERMAID_BROWSER_PATH`로 Chromium 계열 실행 파일을 지정합니다. 이는 빌드 환경에만 필요합니다.
 
-1. 실제 문구·기여 범위·이미지·Demo URL·이력서의 정확성과 사용 권한을 확인합니다.
-2. 도메인이 정해지면 필요에 따라 Astro site 값을 설정합니다.
-3. 공개 시 Layout의 noindex/nofollow를 재검토합니다.
-4. 이 독립 프로젝트용 Git 저장소와 Cloudflare Pages 프로젝트를 별도로 연결합니다.
-5. Build command: `npm run build`, output: `dist`, root: 이 프로젝트 루트. 지원 Node 버전을 지정합니다.
-6. 배포 전 check/build와 링크/임베드 접근성 검증을 다시 합니다.
-7. 정적 배포에는 Cloudflare adapter, Worker backend, DB가 필요하지 않습니다.
+links.video에 youtu.be 또는 youtube.com/watch·shorts·embed 주소를 넣으면 YouTube iframe으로 변환합니다. 자동재생하지 않고, lazy loading과 기본 플레이어 controls/fullscreen을 사용합니다. YouTube 주소가 없거나 유효하지 않은 영상 프로젝트는 MP4 대신 기존 정적 fallback을 표시합니다. 홈·전체 Projects의 MP4 첫 프레임/hover 재생 정책은 유지합니다.
 
-공식 참고: [Astro Content Collections](https://docs.astro.build/en/guides/content-collections/), [Cloudflare Pages Astro 가이드](https://developers.cloudflare.com/pages/framework-guides/deploy-an-astro-site/).
+ProjectActions.astro는 Source·Watch video·Release·Live Demo 중 URL이 있는 액션만 표시합니다. Live Demo는 links.liveDemo 또는 기존 links.demo를 사용합니다. Grid 카드의 Deep Dive는 항상 기존 언어별 /work/[slug]/ 상세 경로입니다. links.caseStudy는 legacy metadata로 보존합니다. How I Build 팝업에는 WHY/HOW/EVIDENCE 설명만 유지합니다.
 
-## 다음 사람이 결정할 사항
+| demo.type | 연결 대상 |
+| --- | --- |
+| iframe | 임베드 가능한 웹 URL |
+| video | 직접 접근 가능한 MP4/WebM |
+| terminal | video 또는 format: image 미디어 |
+| apk | APK 다운로드 URL |
+| image | alt를 포함한 이미지 |
+| none | 콘텐츠/typography fallback |
 
-- Hero의 최종 positioning과 한국어/영어 표현 비중
-- 실제 대표작 선정과 순서, 프로젝트별 기여·판단·결과의 밀도
-- 각 Demo의 기본 표현: 내장 웹 / 영상 / APK / 이미지
-- ZZZ의 과거 참고 화면을 새 샘플 데이터 Demo로 교체할 시점
-- 홈 펼치기와 상세 페이지를 모두 유지할지
-- 최종 타이포그래피·accent·작품 영역 크기, 최신 Resume
-- 공개 시 연락처·프로필 정보·검색 노출 정책
+현재 7개 모두 새 포트폴리오용 라이브 Demo는 미연결입니다. ZZZ·Smart Parking의 과거 시연 영상, ct v0.3.1과 KUTODO의 중간 beta release 링크는 기존 근거에 따라 제공합니다. 발주콜은 비공개 저장소이므로 공개 Source·APK 링크를 노출하지 않습니다. iframe 차단 정책과 실제 프로젝트 영상 재생·APK 실행은 URL 연결 후 별도 확인해야 합니다.
+
+## Header와 접근성
+
+Header.astro는 sticky header에 data-hidden을 적용합니다. requestAnimationFrame으로 스크롤을 묶고, 같은 방향의 누적 이동이 아래 36px·위 20px일 때 숨김·노출을 전환합니다. 최상단 24px 이내와 키보드 탐색 시에는 표시합니다. prefers-reduced-motion에서는 transition과 smooth scroll을 제거합니다.
+
+Projects·About·Contact는 홈에서 section anchor로, 상세에서는 같은 언어의 홈 section으로 연결됩니다. Projects의 canonical id는 #projects이며 기존 #work/#tools는 같은 위치의 호환 anchor입니다. 모든 상세 페이지의 돌아가기 링크도 #projects를 사용합니다. Footer는 @giribuin만 표시합니다. Skip link, visible focus와 이미지 alt를 지원합니다.
+
+콘텐츠 출처와 확인 범위는 docs/CONTENT_SOURCES.md, 검증 결과는 docs/VALIDATION.md를 참고하세요.

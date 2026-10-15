@@ -8,7 +8,7 @@ import assert from 'node:assert/strict';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const reference = resolve(root, '../GIRIBUIN.github.io');
 const artifacts = join(root, '.verification');
-const git = (...args) => execFileSync('git', ['-C', reference, ...args], { encoding: 'utf8' }).trim();
+const git = (...args) => execFileSync('git', ['--no-optional-locks', '-c', 'safe.directory=' + reference, '-C', reference, ...args], { encoding: 'utf8' }).trim();
 const head = readFileSync(join(artifacts, 'reference-head.txt'), 'utf8').trim();
 const status = readFileSync(join(artifacts, 'reference-status.txt'), 'utf8').trim();
 const hashes = JSON.parse(readFileSync(join(artifacts, 'reference-files.json'), 'utf8'));
