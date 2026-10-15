@@ -1,0 +1,12 @@
+---
+interface Props { title: string; logo?: string | null; id?: string; as?: 'h1' | 'h3'; }
+const { title, logo, id, as: Tag = 'h3' } = Astro.props;
+---
+<Tag id={id} class="project-name">{logo && <img class="project-logo" src={logo} alt="" width="40" height="40" loading="lazy" />}<span>{title}</span></Tag>
+<script>
+  document.querySelectorAll<HTMLImageElement>('.project-logo').forEach(logo => {
+    const hide = () => { logo.hidden = true; };
+    logo.addEventListener('error', hide, { once: true });
+    if (logo.complete && !logo.naturalWidth) hide();
+  });
+</script>

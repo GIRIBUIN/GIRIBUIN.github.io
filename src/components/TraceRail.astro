@@ -1,0 +1,74 @@
+---
+import { getUi, type Locale } from '../i18n/ui';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const ui = getUi(locale);
+const layers = [
+  { label: ui.about.title, key: 'about.title', target: 'about' },
+  { label: ui.about.education, key: 'about.education', target: 'education' },
+  { label: ui.skills.title, key: 'skills.title', target: 'skills' },
+  { label: ui.projectSection.title, key: 'projectSection.title', target: 'projects' },
+  { label: ui.process.title, key: 'process.title', target: 'process' },
+  { label: ui.contact.title, key: 'contact.title', target: 'contact' },
+];
+---
+<nav class="trace-rail" aria-label={ui.trace.navigation} data-i18n-aria-label="trace.navigation">
+  <ol>{layers.map((layer, index) => <li>
+    <a href={'#' + layer.target} data-trace-layer={layer.target} aria-current={index === 0 ? 'location' : undefined}>
+      <span class="trace-dot" aria-hidden="true"></span><span class="trace-label" data-i18n={layer.key}>{layer.label}</span>
+    </a>
+  </li>)}</ol>
+</nav>
+<style>
+  .trace-rail { display: none; }
+  @media (min-width: 1100px) {
+    .trace-rail { display: block; position: fixed; right: 10px; top: 50%; transform: translateY(-50%); width: 28px; z-index: 10; }
+    .trace-rail ol { margin: 0; }
+    .trace-rail li { position: relative; }
+    .trace-rail li:not(:last-child)::after { content: ''; position: absolute; width: 1px; top: 28px; bottom: -14px; left: 14px; background: var(--line); pointer-events: none; }
+    .trace-rail a { position: relative; display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--text-muted); }
+    .trace-dot { position: relative; z-index: 1; width: 5px; height: 5px; margin-left: 12px; border: 1px solid var(--muted); border-radius: 50%; background: var(--bg); flex: none; }
+    .trace-label { position: absolute; right: 28px; padding: 4px 8px; font-size: 9px; line-height: 1.4; white-space: nowrap; background: var(--bg); opacity: 0; pointer-events: none; }
+    .trace-rail a:hover .trace-label, .trace-rail a:focus-visible .trace-label { opacity: 1; }
+    .trace-rail a[aria-current] { color: var(--accent-ink); }
+    .trace-rail a[aria-current] .trace-dot { background: var(--accent); border-color: var(--accent-ink); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent); }
+  }
+  @media (min-width: 1440px) {
+    .trace-rail { width: 80px; right: 8px; }
+    .trace-rail li:not(:last-child)::after { left: 2px; }
+    .trace-dot { margin-left: 0; }
+    .trace-label { position: static; min-width: 0; padding: 0; opacity: 1; font-size: 9px; white-space: normal; background: transparent; }
+  }
+</style>
+<script>
+  const rail = document.querySelector<HTMLElement>('.trace-rail');
+  if (rail) {
+    const layers: Record<string, string> = {
+      hero: 'about', about: 'about', education: 'education', skills: 'skills',
+      projects: 'projects', process: 'process', contact: 'contact',
+    };
+    const sections = Object.keys(layers).map(id => document.getElementById(id)).filter((section): section is HTMLElement => Boolean(section));
+    const update = () => {
+      const readingLine = parseFloat(getComputedStyle(document.documentElement).scrollPaddingTop) + 32;
+      const atEnd = scrollY > 0 && scrollY + innerHeight >= document.documentElement.scrollHeight - 2;
+      const current = atEnd ? sections.at(-1)! : sections.findLast(section => section.getBoundingClientRect().top <= readingLine) || sections[0];
+      rail.querySelectorAll<HTMLAnchorElement>('[data-trace-layer]').forEach(link => {
+        if (link.dataset.traceLayer === layers[current.id]) link.setAttribute('aria-current', 'location');
+        else link.removeAttribute('aria-current');
+      });
+    };
+    // Native observation plus a frame-limited scroll update handles short sections,
+    // large jumps and the final section without depending on visibility ratios.
+    let pending = false;
+    const schedule = () => {
+      if (pending) return;
+      pending = true;
+      requestAnimationFrame(() => { pending = false; update(); });
+    };
+    const observer = new IntersectionObserver(schedule, { threshold: 0 });
+    sections.forEach(section => observer.observe(section));
+    addEventListener('scroll', schedule, { passive: true });
+    addEventListener('resize', schedule);
+    update();
+  }
+</script>

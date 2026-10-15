@@ -1,0 +1,20 @@
+---
+import Layout from '../layouts/Layout.astro';
+import Hero from './Hero.astro';
+import TraceRail from './TraceRail.astro';
+import Projects from './Projects.astro';
+import HowIBuild from './HowIBuild.astro';
+import About from './About.astro';
+import Education from './Education.astro';
+import Skills from './Skills.astro';
+import Contact from './Contact.astro';
+import { type Locale } from '../i18n/ui';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+---
+<Layout locale={locale}><TraceRail locale={locale} /><Hero locale={locale} /><About locale={locale} />
+  <Education locale={locale} />
+  <Skills locale={locale} />
+  <Projects locale={locale} />
+  <HowIBuild locale={locale} /><Contact locale={locale} />
+</Layout>

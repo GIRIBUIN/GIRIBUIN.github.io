@@ -1,49 +1,47 @@
 ---
 import type { Project } from '../lib/projects';
-interface Props { project: Project; compact?: boolean; }
-const { project, compact = false } = Astro.props;
-const { title, demo, visual, links } = project.data;
-const fullDemo = links.demo || (demo.type === 'iframe' ? demo.url : null);
-const mediaUrl = demo.url;
+import { getUi, type Locale } from '../i18n/ui';
+import { getYouTubeEmbedUrl } from '../lib/media';
+interface Props { project: Project; compact?: boolean; preview?: boolean; detail?: boolean; locale?: Locale; }
+const { project, compact = false, preview = false, detail = false, locale = 'en' } = Astro.props;
+const { title, thumbnail, demo, visual, links } = project.data;
+const ui = getUi(locale).media;
+const fullDemo = demo.type === 'iframe' ? links.demo || demo.url : null;
+const youtube = detail ? getYouTubeEmbedUrl(links.video) : null;
 const mediaIsImage = demo.type === 'image' || (demo.type === 'terminal' && demo.format === 'image');
-const canRender = Boolean(mediaUrl && ['iframe', 'video', 'terminal', 'image'].includes(demo.type));
-const labels = { iframe: 'WEB PREVIEW', video: 'VIDEO WALKTHROUGH', terminal: 'TERMINAL SESSION', apk: 'ANDROID DEMO', image: 'IMAGE PREVIEW', none: 'PROJECT PREVIEW' };
+const mediaIsVideo = demo.type === 'video' || (demo.type === 'terminal' && demo.format === 'video');
+// Local videos remain the gallery previews; detail pages use links.video only.
+const mediaUrl = detail && mediaIsVideo ? null : demo.url;
+const canRender = Boolean(youtube || (mediaUrl && ['iframe', 'video', 'terminal', 'image'].includes(demo.type)));
+const showThumbnail = Boolean(!youtube && thumbnail && (!canRender || (preview && !mediaIsVideo)));
+const hasCaption = showThumbnail || canRender || (!preview && ((demo.type === 'apk' && demo.url) || fullDemo));
+const poster = preview && mediaIsVideo ? undefined : demo.poster || thumbnail || visual?.url;
+const showChrome = !(detail && (youtube || mediaIsVideo));
 ---
-<div class:list={['demo', 'demo-' + demo.type, { compact }]} data-demo-type={demo.type} data-demo-state={canRender ? 'ready' : 'fallback'}>
-  <div class="demo-toolbar"><span class="window-dots" aria-hidden="true"><i></i><i></i><i></i></span><span>{labels[demo.type]}</span><span class="demo-status">{canRender ? 'PREVIEW' : 'PLACEHOLDER'}</span></div>
+<div class:list={['demo', 'demo-' + (youtube ? 'youtube' : demo.type), { compact, preview }]} data-demo-type={youtube ? 'youtube' : demo.type} data-demo-state={showThumbnail ? 'thumbnail' : canRender ? 'ready' : 'fallback'} data-media-error={ui.error}>
+  {showChrome && <div class="demo-toolbar"><span data-i18n={showThumbnail ? 'media.thumbnail' : 'media.labels.' + demo.type}>{showThumbnail ? ui.thumbnail : ui.labels[demo.type]}</span><span data-i18n={showThumbnail || canRender ? 'media.preview' : 'media.pending'}>{showThumbnail || canRender ? ui.preview : ui.pending}</span></div>}
   <div class="demo-stage">
-    {canRender && demo.type === 'iframe' ? (
-      <iframe src={mediaUrl!} title={title + ' 웹 Demo'} loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms" referrerpolicy="no-referrer" allow="fullscreen"></iframe>
-    ) : canRender && mediaIsImage ? (
-      <img src={mediaUrl!} alt={demo.alt!} loading="lazy" width="1200" height="750" />
-    ) : canRender ? (
-      <video src={mediaUrl!} poster={demo.poster || undefined} controls preload="none" playsinline aria-label={title + ' Demo 영상'}><a href={mediaUrl!}>Demo 영상 열기</a></video>
-    ) : visual ? (
-      <figure class="reference-image"><img src={visual.url} alt={visual.alt} loading="lazy" width="1200" height="750" /><figcaption>{visual.caption || '참고 이미지'} · Demo 연결 준비 중</figcaption></figure>
-    ) : (
-      <div class="demo-placeholder">
-        {demo.type === 'apk' ? <div class="phone-wireframe" aria-hidden="true"><div class="phone-notch"></div><div class="wire-line wide"></div><div class="wire-line"></div><div class="wire-row"></div><div class="wire-row"></div><div class="wire-row short"></div><div class="wire-nav"></div></div>
-        : demo.type === 'terminal' ? <div class="terminal-wireframe" aria-hidden="true"><span>~/demo $</span><div class="wire-line wide"></div><div class="wire-line"></div><div class="wire-line wide"></div><span class="terminal-cursor">▍</span></div>
-        : <div class="web-wireframe" aria-hidden="true"><div class="wire-sidebar"></div><div class="wire-content"><div class="wire-line"></div><div class="wire-line wide"></div><div class="wire-grid"><i></i><i></i></div><div class="wire-chart"></div></div></div>}
-        <div class="placeholder-copy"><span class="mono">PREVIEW / {demo.type.toUpperCase()}</span><p>{demo.type === 'none' ? '프로젝트 기록을 준비하고 있습니다.' : demo.type === 'apk' && demo.url ? 'Demo Mode APK를 내려받아 확인하세요.' : 'Demo를 연결할 자리입니다.'}</p><span>화면 구성용 placeholder</span></div>
-      </div>
-    )}
+    {youtube ? <iframe src={youtube} title={title + ' — YouTube'} loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    : showThumbnail ? <img src={thumbnail!} alt={title + ' ' + ui.imageAlt} loading="lazy" width="1600" height="900" />
+    : canRender && demo.type === 'iframe' ? <iframe src={mediaUrl!} title={title + ' ' + ui.frameTitle} loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms" referrerpolicy="no-referrer" allow="fullscreen"></iframe>
+    : canRender && mediaIsImage ? <img src={mediaUrl!} alt={demo.alt!} loading="lazy" width="1200" height="750" />
+    : canRender ? <video src={preview ? undefined : mediaUrl!} data-preview-src={preview ? mediaUrl : undefined} poster={poster || undefined} controls={!preview} disablepictureinpicture={preview} muted={preview} loop={preview} preload="none" playsinline data-preview-video={preview ? '' : undefined} aria-label={title + ' ' + ui.videoTitle}><a href={mediaUrl!}>{ui.videoOpen}</a></video>
+    : visual ? <figure class="reference-image"><img src={visual.url} alt={visual.alt} loading="lazy" width="1200" height="750" /><figcaption>{visual.caption || ui.reference} · {ui.referencePending}</figcaption></figure>
+    : <div class="demo-placeholder"><span class="placeholder-title" aria-hidden="true">{title}</span><p data-i18n={demo.type === 'apk' && demo.url ? 'media.apkReady' : 'media.pending'}>{demo.type === 'apk' && demo.url ? ui.apkReady : ui.pending}</p></div>}
   </div>
-  <div class="demo-caption"><span>{demo.caption || (canRender ? 'Demo 미리보기' : '실제 Demo는 아직 연결하지 않았습니다.')}</span><div>
-    {fullDemo && <a href={fullDemo} target="_blank" rel="noreferrer">Open Full Demo ↗</a>}
-    {demo.type === 'apk' && demo.url && <a href={demo.url} target="_blank" rel="noreferrer">Download APK ↗</a>}
-    {links.video && <a href={links.video} target="_blank" rel="noreferrer">Watch video ↗</a>}
-    {links.release && <a href={links.release} target="_blank" rel="noreferrer">Release ↗</a>}
-    {canRender && !fullDemo && <a href={mediaUrl!} target="_blank" rel="noreferrer">원본 열기 ↗</a>}
-  </div></div>
+  {showChrome && hasCaption && <div class="demo-caption">{(showThumbnail || canRender) && <span>{showThumbnail ? ui.thumbnail : demo.caption || ui.preview}</span>}{!preview && <div>
+    {fullDemo && <a href={fullDemo} target="_blank" rel="noreferrer"><span data-i18n="media.fullDemo">{ui.fullDemo}</span> ↗</a>}
+    {demo.type === 'apk' && demo.url && <a href={demo.url} target="_blank" rel="noreferrer"><span data-i18n="media.apk">{ui.apk}</span> ↗</a>}
+
+  </div>}</div>}
 </div>
 <script>
-  // 로드할 수 없는 미디어도 깨진 요소 대신 안내와 원본 링크를 남깁니다.
   document.querySelectorAll<HTMLMediaElement | HTMLImageElement>('.demo-stage video, .demo-stage img').forEach(media => {
     const fallback = () => {
       const message = document.createElement('p');
       message.className = 'media-error';
-      message.textContent = '미리보기를 불러오지 못했습니다. 원본 링크 또는 상세 기록을 확인해 주세요.';
+      message.dataset.i18n = 'media.error';
+      message.textContent = media.closest<HTMLElement>('.demo')?.dataset.mediaError || '';
       media.replaceWith(message);
     };
     media.addEventListener('error', fallback, { once: true });

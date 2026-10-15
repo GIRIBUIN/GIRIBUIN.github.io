@@ -1,22 +1,23 @@
 ---
-import { render } from 'astro:content';
-import type { Project } from '../lib/projects';
+import { getProjectCardMeta, getProjectDeepDiveLink, type Project } from '../lib/projects';
+import { getUi, type Locale } from '../i18n/ui';
+import ProjectTitle from './ProjectTitle.astro';
 import ProjectDemo from './ProjectDemo.astro';
-interface Props { project: Project; index: number; }
-const { project, index } = Astro.props;
-const { title, slug, type, oneLine, summary, tech, problem, decision, result, links } = project.data;
-const { Content } = await render(project);
-const facts = [{ label: 'Problem', text: problem }, { label: 'Decision', text: decision }, { label: 'Result', text: result }].filter(fact => fact.text);
+import ProjectActions from './ProjectActions.astro';
+interface Props { project: Project; locale?: Locale; }
+const { project, locale = 'en' } = Astro.props;
+const { title, logo, slug, oneLine, summary } = project.data;
+const meta = getProjectCardMeta(project);
+const deepDive = getProjectDeepDiveLink(project, locale);
+const deepDiveLabel = getUi(locale).project.deepDive;
 ---
 <article class="showcase" data-project={slug} aria-labelledby={'project-' + slug}>
-  <div class="showcase-title"><span class="project-index mono">{String(index + 1).padStart(2, '0')}</span><h3 id={'project-' + slug}>{title}</h3><span class="project-type mono">{type}</span></div>
-  <div class="showcase-body">
-    <div class="project-copy"><p class="one-line">{oneLine || summary}</p>{oneLine && <p class="summary">{summary}</p>}
-      {facts.length > 0 && <dl class="project-facts">{facts.map(fact => <div><dt class="mono">{fact.label}</dt><dd>{fact.text}</dd></div>)}</dl>}
-      {tech.length > 0 && <p class="tech mono">{tech.join(' / ')}</p>}
-      <div class="project-actions"><a class="text-link" href={'/work/' + slug + '/'}>Deep dive <span aria-hidden="true">↗</span></a>{links.source && <a href={links.source} target="_blank" rel="noreferrer">Source ↗</a>}</div>
-    </div>
-    <ProjectDemo project={project} />
+  <ProjectDemo project={project} locale={locale} preview />
+  <a class="project-card-link" href={deepDive.href} data-locale-path={deepDive.localPath || undefined} target={deepDive.external ? '_blank' : undefined} rel={deepDive.external ? 'noreferrer' : undefined} aria-label={title + ': ' + deepDiveLabel} title={deepDiveLabel} data-i18n-title="project.deepDive" data-project-title={title} data-action-copy="project.deepDive"><span class="visually-hidden" data-i18n="project.deepDive">{deepDiveLabel}</span></a>
+  <div class="showcase-copy">
+    <p class="project-type" data-i18n={'projects.' + slug + '.meta'} data-stable-copy>{meta}</p>
+    <ProjectTitle title={title} logo={logo} id={'project-' + slug} />
+    <p class="one-line" data-i18n={'projects.' + slug + '.oneLine'} data-stable-copy>{oneLine || summary}</p>
+    <ProjectActions project={project} locale={locale} />
   </div>
-  <details class="project-expand"><summary>프로젝트 기록 펼치기 <span aria-hidden="true">+</span></summary><div class="prose"><Content /></div></details>
 </article>

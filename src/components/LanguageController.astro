@@ -1,0 +1,104 @@
+---
+import { getProjects, localizeProject, getProjectCardMeta } from '../lib/projects';
+const projects = await getProjects();
+const projectCopy = Object.fromEntries((['en', 'ko'] as const).map(locale => [
+  locale,
+  Object.fromEntries(projects.map(entry => {
+    const project = localizeProject(entry, locale);
+    const { slug, oneLine, summary } = project.data;
+    return [slug, { oneLine: oneLine || summary, summary, meta: getProjectCardMeta(project), trace: project.data.trace }];
+  })),
+]));
+const serializedProjectCopy = JSON.stringify(projectCopy).replace(/</g, '\\u003c');
+---
+<script type="application/json" id="project-language-copy" set:html={serializedProjectCopy} />
+<div class="visually-hidden" aria-live="polite" data-language-announcement></div>
+<script>
+  import { getLanguageCopy, getCopyText, type ProjectCopy } from '../i18n/runtime';
+  import { localePath, type Locale } from '../i18n/ui';
+  const projectCopy = JSON.parse(document.querySelector('#project-language-copy')?.textContent || '{"en":{},"ko":{}}') as Record<Locale, ProjectCopy>;
+  let locale: Locale = document.documentElement.lang === 'ko' ? 'ko' : 'en';
+  const snapshot = () => ({
+    x: scrollX, y: scrollY,
+    rails: [...document.querySelectorAll<HTMLElement>('.rail-track')].map(element => ({ element, left: element.scrollLeft })),
+    dialogs: [...document.querySelectorAll<HTMLDialogElement>('dialog[open]')].map(element => ({ element, top: element.scrollTop })),
+  });
+  const restore = (position: ReturnType<typeof snapshot>) => {
+    position.rails.forEach(({ element, left }) => element.scrollTo({ left, behavior: 'instant' }));
+    position.dialogs.forEach(({ element, top }) => element.scrollTo({ top, behavior: 'instant' }));
+    window.scrollTo({ left: position.x, top: position.y, behavior: 'instant' });
+  };
+  // Reserve the larger text height in both languages, without replacing any scene or rail.
+  const reserveCopySpace = () => {
+    const position = snapshot();
+    const text = [...document.querySelectorAll<HTMLElement>('[data-i18n]')];
+    const elements = [...document.querySelectorAll<HTMLElement>('[data-stable-copy], [data-stable-layout]')];
+    const renderText = (language: Locale) => {
+      const copy = getLanguageCopy(language, projectCopy[language]);
+      text.forEach(element => { element.textContent = getCopyText(copy, element.dataset.i18n!); });
+    };
+    elements.forEach(element => { element.style.minHeight = ''; });
+    renderText('en');
+    const heights = elements.map(element => element.getBoundingClientRect().height);
+    renderText('ko');
+    const otherHeights = elements.map(element => element.getBoundingClientRect().height);
+    renderText(locale);
+    elements.forEach((element, index) => {
+      element.style.minHeight = Math.ceil(Math.max(heights[index], otherHeights[index])) + 'px';
+    });
+    restore(position);
+  };
+  const renderProjectBody = (language: Locale) => {
+    const body = document.querySelector<HTMLElement>('[data-project-body]');
+    const source = document.querySelector<HTMLTemplateElement>('template[data-project-body-copy="' + language + '"]');
+    if (!body || !source || body.dataset.renderedLocale === language) return;
+    const previousPageHeight = document.documentElement.scrollHeight;
+    const previousHeight = body.getBoundingClientRect().height;
+    body.replaceChildren(source.content.cloneNode(true));
+    body.lang = source.dataset.bodyLanguage || language;
+    body.dataset.renderedLocale = language;
+    // A shorter translation must not clamp the existing page scroll position.
+    body.style.minHeight = Math.ceil(Math.max(previousHeight, body.getBoundingClientRect().height)) + 'px';
+    const note = document.querySelector<HTMLElement>('[data-project-translation-note]');
+    if (note) note.hidden = body.lang === language;
+    const shrink = previousPageHeight - document.documentElement.scrollHeight;
+    if (shrink > 0) body.style.minHeight = Math.ceil(body.getBoundingClientRect().height + shrink) + 'px';
+  };
+  const applyLocale = (next: Locale) => {
+    if (next === locale) return;
+    document.dispatchEvent(new Event('portfolio:locale-change'));
+    const position = snapshot();
+    locale = next;
+    const copy = getLanguageCopy(locale, projectCopy[locale]);
+    document.querySelectorAll<HTMLElement>('[data-i18n]').forEach(element => {
+      element.textContent = getCopyText(copy, element.dataset.i18n!);
+    });
+    for (const attribute of ['aria-label', 'alt', 'title'] as const) {
+      document.querySelectorAll<HTMLElement>('[data-i18n-' + attribute + ']').forEach(element => {
+        element.setAttribute(attribute, getCopyText(copy, element.getAttribute('data-i18n-' + attribute)!));
+      });
+    }
+    document.querySelectorAll<HTMLAnchorElement>('[data-locale-path]').forEach(link => { link.href = localePath(link.dataset.localePath!, locale); });
+    document.querySelectorAll<HTMLElement>('[data-action-copy]').forEach(link => {
+      link.setAttribute('aria-label', link.dataset.projectTitle + ': ' + getCopyText(copy, link.dataset.actionCopy!));
+    });
+    document.querySelectorAll<HTMLElement>('[data-media-error]').forEach(element => { element.dataset.mediaError = copy.media.error; });
+    document.querySelectorAll<HTMLButtonElement>('[data-locale]').forEach(button => { button.setAttribute('aria-pressed', String(button.dataset.locale === locale)); });
+    renderProjectBody(locale);
+    document.documentElement.lang = locale;
+    document.title = 'GIRIBUIN · ' + copy.pageTitle;
+    document.querySelector('meta[name="description"]')?.setAttribute('content', copy.pageDescription);
+    const announcement = document.querySelector('[data-language-announcement]');
+    if (announcement) announcement.textContent = locale === 'en' ? 'English' : '한국어';
+    restore(position);
+    requestAnimationFrame(() => restore(position));
+  };
+  document.querySelectorAll<HTMLButtonElement>('[data-locale]').forEach(button => {
+    button.addEventListener('click', () => applyLocale(button.dataset.locale === 'ko' ? 'ko' : 'en'));
+  });
+  document.addEventListener('portfolio:dialog-open', reserveCopySpace);
+  document.addEventListener('portfolio:projects-expand', reserveCopySpace);
+  void document.fonts.ready.then(reserveCopySpace);
+  let resizeFrame = 0;
+  addEventListener('resize', () => { cancelAnimationFrame(resizeFrame); resizeFrame = requestAnimationFrame(reserveCopySpace); });
+</script>

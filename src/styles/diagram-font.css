@@ -1,0 +1,7 @@
+/* Used by the build renderer; visitors use the same face from global.css. */
+@font-face {
+  font-family: "Pretendard Variable";
+  src: url("../../public/fonts/PretendardVariable.woff2") format("woff2");
+  font-style: normal;
+  font-weight: 45 920;
+}

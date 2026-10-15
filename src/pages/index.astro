@@ -1,21 +1,4 @@
 ---
-import Layout from '../layouts/Layout.astro';
-import Hero from '../components/Hero.astro';
-import SectionHeading from '../components/SectionHeading.astro';
-import ProjectShowcase from '../components/ProjectShowcase.astro';
-import ToolItem from '../components/ToolItem.astro';
-import HowIBuild from '../components/HowIBuild.astro';
-import About from '../components/About.astro';
-import Contact from '../components/Contact.astro';
-import { getProjects, groupProjects } from '../lib/projects';
-const { work, tools } = groupProjects(await getProjects());
+import HomePage from '../components/HomePage.astro';
 ---
-<Layout><Hero />
-  <section id="work" class="shell section work" aria-labelledby="work-heading"><SectionHeading number="01" title="Selected work" note={'A CLOSER LOOK / ' + String(work.length).padStart(2, '0') + ' PROJECTS'} id="work-heading" />
-    {work.length ? work.map((project, index) => <ProjectShowcase project={project} index={index} />) : <p class="empty-state">대표 프로젝트를 준비하고 있습니다.</p>}
-  </section>
-  <section id="tools" class="shell section tools" aria-labelledby="tools-heading"><SectionHeading number="02" title="Tools & smaller work" note="SMALL SCOPE, CLEAR PURPOSE" id="tools-heading" />
-    <div class="tools-list">{tools.length ? tools.map((project, index) => <ToolItem project={project} index={index} />) : <p class="empty-state">작은 프로젝트와 도구를 준비하고 있습니다.</p>}</div>
-  </section>
-  <HowIBuild /><About /><Contact />
-</Layout>
+<HomePage locale="en" />

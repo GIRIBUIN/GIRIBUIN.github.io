@@ -1,0 +1,49 @@
+---
+import { getUi, type Locale } from '../i18n/ui';
+interface Props { id: string; labelledby: string; variant?: 'featured' | 'smaller'; locale?: Locale; }
+const { id, labelledby, variant = 'featured', locale = 'en' } = Astro.props;
+const ui = getUi(locale);
+---
+<div class="project-rail" data-project-rail>
+  <div class="rail-navigation" aria-label={ui.rail.navigation} data-i18n-aria-label="rail.navigation">
+    <span class="rail-hint" data-i18n="rail.hint">{ui.rail.hint}</span>
+    <button type="button" data-direction="-1" aria-controls={id} aria-label={ui.rail.previous} data-i18n-aria-label="rail.previous" disabled>←</button>
+    <button type="button" data-direction="1" aria-controls={id} aria-label={ui.rail.next} data-i18n-aria-label="rail.next" disabled>→</button>
+  </div>
+  <div id={id} class:list={['rail-track', 'rail-' + variant]} role="region" aria-labelledby={labelledby} tabindex="0"><slot /></div>
+</div>
+<script>
+  document.querySelectorAll<HTMLElement>('[data-project-rail]').forEach(rail => {
+    const track = rail.querySelector<HTMLElement>('.rail-track')!;
+    const previous = rail.querySelector<HTMLButtonElement>('[data-direction="-1"]')!;
+    const next = rail.querySelector<HTMLButtonElement>('[data-direction="1"]')!;
+    const update = () => {
+      previous.disabled = track.scrollLeft <= 2;
+      next.disabled = track.scrollLeft >= track.scrollWidth - track.clientWidth - 2;
+    };
+    const move = (direction: number) => {
+      // Advance to the next card's horizontal snap position.
+      const columns = [...new Set(Array.from(track.children, child =>
+        (child as HTMLElement).offsetLeft - (track.firstElementChild as HTMLElement).offsetLeft
+      ))];
+      const target = direction > 0
+        ? columns.find(left => left > track.scrollLeft + 2) ?? track.scrollWidth
+        : columns.findLast(left => left < track.scrollLeft - 2) ?? 0;
+      track.scrollTo({ left: target, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    };
+    previous.addEventListener('click', () => move(-1));
+    next.addEventListener('click', () => move(1));
+    track.addEventListener('scroll', update, { passive: true });
+    track.addEventListener('keydown', event => {
+      if (event.target !== track || !['ArrowLeft', 'ArrowRight', 'Home', 'End'].includes(event.key)) return;
+      event.preventDefault();
+      if (event.key === 'Home' || event.key === 'End') {
+        track.scrollTo({ left: event.key === 'Home' ? 0 : track.scrollWidth, behavior: 'instant' });
+      } else move(event.key === 'ArrowRight' ? 1 : -1);
+    });
+    const observer = new ResizeObserver(update);
+    observer.observe(track);
+    Array.from(track.children).forEach(child => observer.observe(child));
+    update();
+  });
+</script>

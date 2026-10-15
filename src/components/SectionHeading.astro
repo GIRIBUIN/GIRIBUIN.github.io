@@ -1,5 +1,5 @@
 ---
-interface Props { number: string; title: string; note?: string; id: string; }
-const { number, title, note, id } = Astro.props;
+interface Props { title: string; note?: string; id: string; titleKey?: string; noteKey?: string; }
+const { title, id, titleKey } = Astro.props;
 ---
-<div class="section-heading"><div><span class="eyebrow">{number} /</span><h2 id={id}>{title}</h2></div>{note && <p class="mono">{note}</p>}</div>
+<div class="section-heading"><h2 id={id} data-i18n={titleKey} data-stable-copy={titleKey ? true : undefined}>{title}</h2><slot name="action" /></div>

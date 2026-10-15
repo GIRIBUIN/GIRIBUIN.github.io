@@ -1,25 +1,28 @@
-// 프로젝트 이외의 문구와 연락처도 UI와 분리합니다. 소개·경력은 의도적인 임시 문구입니다.
-export const site = {
-  name: '최정길', handle: 'GIRIBUIN',
-  role: 'Backend / Systems Developer',
-  positioning: ['문제에서 출발해,', '동작하는 시스템으로.'],
-  intro: '[임시 소개] 만들고 연결하고 검증하는 개발자. 이곳에는 프로젝트의 결과와 그 결과를 만든 판단을 기록합니다.',
-  profile: '[임시 프로필] 관심 분야와 개발자로서의 방향을 두세 문장으로 정리할 자리입니다.',
-  links: [
-    { label: 'GitHub', href: 'https://github.com/GIRIBUIN' },
-    { label: 'Email', href: 'mailto:giribuin@gmail.com' },
-    { label: 'LinkedIn', href: 'https://www.linkedin.com/in/jeonggil-choi-a119b8400/' },
-    { label: 'Resume', href: null },
-  ],
-  experience: [
-    { label: 'Education', value: '[임시] 학력과 기간을 입력합니다.' },
-    { label: 'Experience', value: '[임시] 역할과 경험을 입력합니다.' },
-    { label: 'Focus', value: '[임시] Backend · Systems · Developer tools' },
-  ],
-  process: [
-    { title: 'Constraints', label: '제약을 먼저', text: '[임시] 해결할 문제와 바꿀 수 없는 조건을 구분합니다.' },
-    { title: 'Decision', label: '판단의 근거', text: '[임시] 대안을 비교하고 선택의 이유를 남깁니다.' },
-    { title: 'Implementation', label: '동작으로 연결', text: '[임시] 작은 단위로 만들고 전체 흐름을 연결합니다.' },
-    { title: 'Validation', label: '증거로 확인', text: '[임시] 실제 실행과 실패 조건으로 결과를 확인합니다.' },
+import type { Locale } from '../i18n/ui';
+type Localized = Record<Locale, string>;
+interface Social { id: string; label: string; url: string | null; contact: boolean; }
+export const site: {
+  handle: string; name: Localized; role: string; intro: Localized; bio: Localized;
+  focus: Localized; approach: Localized; aim: Localized; educationStatus: Localized; educationProgram: Localized;
+  heroImage: string | null; heroAlt: Localized; profileImage: string | null; profileAlt: Localized;
+  resumeUrl: string | null; portfolioPdfUrl: string | null; email: string | null; socials: Social[];
+} = {
+  handle: 'GIRIBUIN', name: { en: 'Jeong-gil Choi', ko: '최정길' }, role: 'Backend / Systems Developer',
+  intro: { en: 'I build APIs, data flows, and integrations across web applications and connected devices.', ko: 'API와 데이터베이스를 바탕으로 웹 서비스와 장치를 연결하는 기능을 개발합니다.' },
+  bio: { en: 'I’m interested in backend and systems software. My projects connect databases and APIs with Linux, Raspberry Pi, MQTT, and cloud services. I care about understanding why a system is designed a certain way and how it behaves.', ko: '백엔드와 시스템 소프트웨어에 관심 있는 개발자입니다. 데이터베이스와 API부터 Linux, Raspberry Pi, MQTT, 클라우드까지 여러 요소를 연결하는 프로젝트를 해왔습니다. 구현한 기능이 왜 그렇게 동작하는지 설명할 수 있는 개발을 지향합니다.' },
+  focus: { en: 'Backend · Systems software · Server infrastructure', ko: '백엔드 · 시스템 소프트웨어 · 서버 인프라' },
+  educationStatus: { en: 'Expected graduation: February 2027', ko: '2027년 2월 졸업 예정' },
+  educationProgram: { en: 'Computer Science & Engineering · Konkuk University', ko: '건국대학교 컴퓨터공학부' },
+  approach: { en: 'Understand the flow, separate responsibilities, and verify behavior.', ko: '데이터의 흐름을 먼저 파악하고, 기능별 책임을 나눈 뒤 실제 동작을 확인합니다.' },
+  aim: { en: 'Make complex data and device interactions easier to use and reason about.', ko: '여러 데이터 소스나 장치가 얽힌 시스템을 연결하고, 사용하기 쉽게 만드는 문제에 관심이 있습니다.' },
+  heroImage: '/images/profile/githubprofile.png', heroAlt: { en: 'GIRIBUIN robot avatar', ko: 'GIRIBUIN 로봇 아바타' },
+  profileImage: '/images/profile/jeonggil.jpg', profileAlt: { en: 'Portrait of Jeong-gil Choi', ko: '최정길 프로필 사진' },
+  resumeUrl: '/files/resume-public.pdf', portfolioPdfUrl: '/files/portfolio.pdf', email: 'giribuin@gmail.com',
+  socials: [
+    { id: 'github', label: 'GitHub', url: 'https://github.com/GIRIBUIN', contact: true },
+    { id: 'linkedin', label: 'LinkedIn', url: 'https://www.linkedin.com/in/jeonggil-choi-a119b8400/', contact: true },
+    { id: 'velog', label: 'Velog', url: 'https://velog.io/@giribuin', contact: true },
+    { id: 'instagram', label: 'Instagram', url: null, contact: false },
+    { id: 'discord', label: 'Discord', url: null, contact: false },
   ],
 };

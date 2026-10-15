@@ -19,7 +19,9 @@
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
-    "typescript": "^5.9.3",
-    "playwright": "^1.56.1"
+    "@astrojs/markdown-satteri": "0.4.1",
+    "playwright": "^1.56.1",
+    "rehype-mermaid": "3.0.0",
+    "typescript": "^5.9.3"
   }
 }

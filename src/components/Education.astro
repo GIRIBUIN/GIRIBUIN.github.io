@@ -1,0 +1,18 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { site } from '../data/site';
+import { getUi, type Locale } from '../i18n/ui';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const ui = getUi(locale);
+---
+<section id="education" class="shell section education-section" aria-labelledby="education-heading">
+  <SectionHeading title={ui.about.education} titleKey="about.education" id="education-heading" />
+  <div class="education-card">
+    <img src="/images/education/konkuk-authority-mark.jpg" alt="" width="1000" height="1000" />
+    <div class="education-copy">
+      <p class="education-status" data-i18n="profile.educationStatus" data-stable-copy>{site.educationStatus[locale]}</p>
+      <p class="education-program" data-i18n="profile.educationProgram" data-stable-copy>{site.educationProgram[locale]}</p>
+    </div>
+  </div>
+</section>

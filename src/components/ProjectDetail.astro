@@ -1,0 +1,33 @@
+---
+import { getCollection, render } from 'astro:content';
+import Layout from '../layouts/Layout.astro';
+import ProjectTitle from './ProjectTitle.astro';
+import ProjectDemo from './ProjectDemo.astro';
+import ProjectActions from './ProjectActions.astro';
+import { localizeProject, type Project } from '../lib/projects';
+import { getUi, localePath, type Locale } from '../i18n/ui';
+interface Props { project: Project; locale?: Locale; }
+const { project: entry, locale = 'en' } = Astro.props;
+const project = localizeProject(entry, locale);
+const { title, logo, summary, tech, slug } = project.data;
+const notes = await getCollection('projectNotes');
+const englishNotes = notes.find(note => note.id === 'en/' + slug);
+const koreanNotes = notes.find(note => note.id === 'ko/' + slug);
+const [{ Content: EnglishContent }, { Content: KoreanContent }] = await Promise.all([
+  render(englishNotes || entry),
+  render(koreanNotes || entry),
+]);
+const contentLocale = locale === 'en' && englishNotes ? 'en' : 'ko';
+const ui = getUi(locale);
+---
+<Layout title={title + ' — ' + ui.project.notes} description={summary} locale={locale}>
+  <article class="shell detail-page" data-project={slug}>
+    <a class="back-link project-nav-icon" data-locale-path="/#projects" href={localePath('/', locale) + '#projects'} aria-label={ui.project.back} title={ui.project.back} data-i18n-aria-label="project.back" data-i18n-title="project.back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" /></svg></a>
+    <p class="eyebrow" data-i18n="project.notes">{ui.project.notes}</p><ProjectTitle title={title} logo={logo} as="h1" /><p class="detail-summary" data-i18n={'projects.' + slug + '.summary'} data-stable-copy>{summary}</p><p class="tech">{tech.join(' · ')}</p>
+    <ProjectActions project={project} locale={locale} detail /><ProjectDemo project={project} locale={locale} detail />
+    {!englishNotes && <p class="translation-note" data-i18n="project.untranslated" data-project-translation-note hidden={contentLocale === locale}>{ui.project.untranslated}</p>}
+    <div class="prose detail-prose" lang={contentLocale} data-project-body data-rendered-locale={locale}>{locale === 'en' ? <EnglishContent /> : <KoreanContent />}</div>
+    <template data-project-body-copy="en" data-body-language={englishNotes ? 'en' : 'ko'}><EnglishContent /></template>
+    <template data-project-body-copy="ko" data-body-language="ko"><KoreanContent /></template>
+  </article>
+</Layout>

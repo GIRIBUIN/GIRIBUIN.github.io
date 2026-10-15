@@ -1,14 +1,20 @@
 ---
-import type { Project } from '../lib/projects';
+import { getProjectCardMeta, getProjectDeepDiveLink, type Project } from '../lib/projects';
+import { getUi, type Locale } from '../i18n/ui';
+import ProjectTitle from './ProjectTitle.astro';
 import ProjectDemo from './ProjectDemo.astro';
-interface Props { project: Project; index: number; }
-const { project, index } = Astro.props;
-const { slug, title, type, summary, tech, links } = project.data;
+import ProjectActions from './ProjectActions.astro';
+interface Props { project: Project; locale?: Locale; }
+const { project, locale = 'en' } = Astro.props;
+const { slug, title, logo, oneLine, summary } = project.data;
+const meta = getProjectCardMeta(project);
+const deepDive = getProjectDeepDiveLink(project, locale);
+const deepDiveLabel = getUi(locale).project.deepDive;
 ---
 <article class="tool-item" data-project={slug} aria-labelledby={'tool-' + slug}>
-  <span class="mono tool-index">{String(index + 1).padStart(2, '0')}</span>
-  <div class="tool-copy"><div class="tool-title"><h3 id={'tool-' + slug}>{title}</h3><span class="mono">{type}</span></div><p>{summary}</p><p class="tech mono">{tech.join(' / ')}</p>
-    <details class="tool-preview"><summary>Demo 미리보기</summary><ProjectDemo project={project} compact /></details>
+  <ProjectDemo project={project} locale={locale} compact preview />
+  <a class="project-card-link" href={deepDive.href} data-locale-path={deepDive.localPath || undefined} target={deepDive.external ? '_blank' : undefined} rel={deepDive.external ? 'noreferrer' : undefined} aria-label={title + ': ' + deepDiveLabel} title={deepDiveLabel} data-i18n-title="project.deepDive" data-project-title={title} data-action-copy="project.deepDive"><span class="visually-hidden" data-i18n="project.deepDive">{deepDiveLabel}</span></a>
+  <div class="tool-copy"><p class="project-type" data-i18n={'projects.' + slug + '.meta'} data-stable-copy>{meta}</p><ProjectTitle title={title} logo={logo} id={'tool-' + slug} /><p class="one-line" data-i18n={'projects.' + slug + '.oneLine'} data-stable-copy>{oneLine || summary}</p>
+    <ProjectActions project={project} locale={locale} />
   </div>
-  <div class="tool-actions"><a href={'/work/' + slug + '/'} aria-label={title + ' 기록 보기'}>기록 보기 ↗</a>{links.source && <a href={links.source} target="_blank" rel="noreferrer">Source ↗</a>}</div>
 </article>

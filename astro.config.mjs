@@ -1,2 +1,15 @@
 import { defineConfig } from 'astro/config';
-export default defineConfig({ output: 'static', trailingSlash: 'always', devToolbar: { enabled: false } });
+import { satteri } from '@astrojs/markdown-satteri';
+import rehypeDiagrams from './src/lib/rehype-diagrams.mjs';
+
+export default defineConfig({
+  site: process.env.SITE_URL || 'https://giribuin.github.io',
+  output: 'static',
+  trailingSlash: 'always',
+  devToolbar: { enabled: false },
+  markdown: {
+    shikiConfig: { theme: 'github-light' },
+    syntaxHighlight: { type: 'shiki', excludeLangs: ['mermaid', 'math'] },
+    processor: satteri({ hastPlugins: [rehypeDiagrams()] }),
+  },
+});

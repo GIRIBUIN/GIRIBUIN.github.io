@@ -1,0 +1,16 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import { skillGroups, skillIcons } from '../data/skills';
+import { getUi, type Locale } from '../i18n/ui';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const ui = getUi(locale);
+---
+<section id="skills" class="shell section skills" aria-labelledby="skills-heading">
+  <SectionHeading title={ui.skills.title} note={ui.skills.note} titleKey="skills.title" noteKey="skills.note" id="skills-heading" />
+  <p class="section-intro" data-i18n="skills.intro" data-stable-copy>{ui.skills.intro}</p>
+  <div class="skills-grid">{skillGroups.map(group => <article class="skill-group">
+    <h3>{group.title}</h3>
+    <ul class="skill-tags" tabindex="0" aria-label={`${group.title} technologies`}>{group.tech.map(tech => <li>{skillIcons[tech] && <img src={`/images/skills/${skillIcons[tech]}.svg`} alt="" width="32" height="32" />}<span>{tech}</span></li>)}</ul>
+  </article>)}</div>
+</section>

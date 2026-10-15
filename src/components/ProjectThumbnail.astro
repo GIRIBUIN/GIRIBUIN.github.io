@@ -1,0 +1,105 @@
+---
+import type { Project } from '../lib/projects';
+import { getUi, type Locale } from '../i18n/ui';
+interface Props { project: Project; locale?: Locale; }
+const { project, locale = 'en' } = Astro.props;
+const { title, thumbnail, demo, visual } = project.data;
+const ui = getUi(locale);
+const video = Boolean(demo.url && (demo.type === 'video' || (demo.type === 'terminal' && demo.format === 'video')));
+const image = demo.type === 'image' || (demo.type === 'terminal' && demo.format === 'image');
+const source = video ? undefined : thumbnail || (image ? demo.url : undefined) || visual?.url;
+const labelKey = video && demo.url ? 'media.labels.video' : 'projectSection.pending';
+---
+<div class="project-thumbnail">
+  {video ? <><canvas aria-hidden="true" /><video data-thumbnail-src={demo.url} preload="none" muted loop playsinline disablepictureinpicture aria-hidden="true" tabindex="-1" /></>
+  : source ? <img src={source} alt={title + ' ' + ui.media.imageAlt} loading="lazy" width="1600" height="900" /> : <div class="thumbnail-placeholder" aria-hidden="true">
+    <svg viewBox="0 0 32 32" width="32" height="32" fill="none" stroke="currentColor" stroke-width="1.2"><rect x="3" y="6" width="26" height="20" rx="3" />{video ? <path d="m13 11 8 5-8 5Z" /> : <><path d="m6 22 7-7 5 5 4-4 4 6" /><circle cx="22" cy="12" r="2" /></>}</svg>
+    <span data-i18n={labelKey}>{video && demo.url ? ui.media.labels.video : ui.projectSection.pending}</span>
+  </div>}
+</div>
+<style>
+  .project-thumbnail { position: relative; isolation: isolate; contain: paint; aspect-ratio: 16 / 9; overflow: hidden; border-radius: 10px; background: var(--surface); }
+  .project-thumbnail img, .project-thumbnail video, .project-thumbnail canvas { width: 100%; height: 100%; object-fit: contain; }
+  .project-thumbnail video, .project-thumbnail canvas { position: absolute; inset: 0; display: block; pointer-events: none; }
+  .project-thumbnail video { visibility: hidden; }
+  .project-thumbnail.is-playing video { visibility: visible; }
+  .thumbnail-placeholder { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; width: 100%; height: 100%; color: var(--text-muted); }
+  .thumbnail-placeholder svg { opacity: .6; }
+  .thumbnail-placeholder span { font-size: 12px; }
+</style>
+<script>
+  const pointer = matchMedia('(hover: hover) and (pointer: fine)');
+  const wide = matchMedia('(min-width: 640px)');
+  const motion = matchMedia('(prefers-reduced-motion: reduce)');
+  const videos = [...document.querySelectorAll<HTMLVideoElement>('video[data-thumbnail-src]')];
+  let active: HTMLVideoElement | null = null;
+  let hoverTimer: ReturnType<typeof setTimeout> | undefined;
+  const firstFrame = (video: HTMLVideoElement) => {
+    try { if (video.readyState >= 1) video.currentTime = .001; } catch { /* Keep the native initial frame. */ }
+  };
+  const stop = () => {
+    clearTimeout(hoverTimer);
+    if (!active) return;
+    active.closest('.project-thumbnail')?.classList.remove('is-playing');
+    active.pause(); firstFrame(active); active = null;
+  };
+  const captureFirstFrame = (video: HTMLVideoElement) => {
+    if (!video.paused || video.seeking || video.readyState < 2) return;
+    const canvas = video.previousElementSibling as HTMLCanvasElement;
+    canvas.width = video.videoWidth; canvas.height = video.videoHeight;
+    canvas.getContext('2d')?.drawImage(video, 0, 0);
+  };
+  const load = (video: HTMLVideoElement) => {
+    if (video.getAttribute('src')) return;
+    video.addEventListener('loadedmetadata', () => { if (video !== active) firstFrame(video); }, { once: true });
+    video.preload = 'metadata';
+    video.src = video.dataset.thumbnailSrc!;
+    video.load();
+  };
+  // Prepare the first frame before the Projects section enters view. The full
+  // listing uses a shorter lead to avoid requesting many videos at once.
+  const preloadDistance = Math.max(800, Math.round(innerHeight * (document.querySelector('.projects-page') ? 1 : 1.5)));
+  const observer = new IntersectionObserver(entries => {
+    entries.forEach(entry => {
+      if (!entry.isIntersecting) return;
+      const video = entry.target as HTMLVideoElement;
+      observer.unobserve(video);
+      load(video);
+    });
+  }, { rootMargin: `${preloadDistance}px 0px` });
+  videos.forEach(video => {
+    // Paused videos never expose hardware video surfaces over neighboring cards.
+    // The still image comes from this video at runtime, with no separate poster asset.
+    video.addEventListener('loadeddata', () => captureFirstFrame(video));
+    video.addEventListener('seeked', () => captureFirstFrame(video));
+    observer.observe(video);
+    const region = video.closest<HTMLElement>('.project-thumbnail')!;
+    video.addEventListener('playing', () => {
+      if (active === video) region.classList.add('is-playing');
+    });
+    region.addEventListener('pointerenter', event => {
+      if (event.pointerType !== 'mouse' || !pointer.matches || !wide.matches || motion.matches) return;
+      stop();
+      hoverTimer = setTimeout(() => {
+        if (!region.matches(':hover') || !pointer.matches || !wide.matches || motion.matches || document.hidden) return;
+        active = video; load(video);
+        void video.play().then(() => {
+          if (active !== video || motion.matches || document.hidden) { video.pause(); firstFrame(video); }
+        }).catch(() => { /* Autoplay rejection leaves the card's still frame available. */ });
+      }, 200);
+    });
+    region.addEventListener('pointerleave', stop);
+    video.closest('a')?.addEventListener('click', stop);
+  });
+  pointer.addEventListener('change', stop);
+  wide.addEventListener('change', stop);
+  motion.addEventListener('change', stop);
+  document.addEventListener('portfolio:locale-change', stop);
+  document.addEventListener('visibilitychange', () => { if (document.hidden) stop(); });
+  // Scrolling a hovered card offscreen must not leave an invisible video playing.
+  const visibility = new IntersectionObserver(entries => {
+    entries.forEach(entry => { if (!entry.isIntersecting && entry.target === active) stop(); });
+  });
+  videos.forEach(video => visibility.observe(video));
+  document.addEventListener('astro:before-swap', () => { stop(); observer.disconnect(); visibility.disconnect(); }, { once: true });
+</script>

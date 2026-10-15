@@ -1,0 +1,32 @@
+---
+import SectionHeading from './SectionHeading.astro';
+import ProjectCard from './ProjectCard.astro';
+import { getProjects, localizeProject } from '../lib/projects';
+import { getUi, localePath, type Locale } from '../i18n/ui';
+interface Props { locale?: Locale; all?: boolean; }
+const { locale = 'en', all = false } = Astro.props;
+const ui = getUi(locale);
+const collection = await getProjects();
+const projects = (all ? collection : collection.slice(0, 4)).map(project => localizeProject(project, locale));
+---
+<section id="projects" class:list={['shell section projects', { 'projects-page': all }]} aria-labelledby="projects-heading">
+  <span id="work" class="legacy-anchor" aria-hidden="true"></span><span id="tools" class="legacy-anchor" aria-hidden="true"></span>
+  {all ? <>
+    <a class="back-link project-nav-icon projects-home" href={localePath('/', locale) + '#projects'} data-locale-path="/#projects" aria-label={ui.projectSection.back} title={ui.projectSection.back} data-i18n-aria-label="projectSection.back" data-i18n-title="projectSection.back"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" /></svg></a>
+    <header class="section-heading"><h1 id="projects-heading" data-i18n="projectSection.title">{ui.projectSection.title}</h1></header>
+  </> : <SectionHeading title={ui.projectSection.title} titleKey="projectSection.title" id="projects-heading">
+    {collection.length > projects.length && <a slot="action" class="project-nav-icon projects-more" href={localePath('/projects/', locale)} data-locale-path="/projects/" data-projects-more aria-label={ui.projectSection.more} title={ui.projectSection.more} data-i18n-aria-label="projectSection.more" data-i18n-title="projectSection.more"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a>}
+  </SectionHeading>}
+  {projects.length ? <div id="projects-grid" class="projects-grid">{projects.map(project => <ProjectCard project={project} locale={locale} />)}</div> : <p class="empty-state" data-i18n="projectSection.empty">{ui.projectSection.empty}</p>}
+</section>
+<style>
+  .projects { position: relative; }
+  .legacy-anchor { position: absolute; top: 0; left: 0; }
+  .projects-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 30px 24px; }
+  .projects :global(.section-heading) { flex-direction: row; align-items: center; }
+  .projects-more { margin: 0; }
+  .projects-home { margin-bottom: 20px; }
+  .projects-page { margin-top: 64px; }
+  .projects-page h1 { font-size: clamp(36px, 4.5vw, 60px); font-weight: 600; }
+  @media (max-width: 639px) { .projects-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
+</style>

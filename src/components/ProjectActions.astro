@@ -1,0 +1,20 @@
+---
+import type { Project } from '../lib/projects';
+import { getUi, type Locale } from '../i18n/ui';
+import ProjectActionIcon from './ProjectActionIcon.astro';
+interface Props { project: Project; locale?: Locale; detail?: boolean; }
+const { project, locale = 'en' } = Astro.props;
+const { title, links } = project.data;
+const ui = getUi(locale);
+type Action = { url: string | null; key: string; label: string; icon: 'source' | 'video' | 'release' | 'liveDemo'; localPath?: string; external?: boolean };
+const actions: Action[] = [
+  { url: links.source, key: 'project.source', label: ui.project.source, icon: 'source' },
+  { url: links.video, key: 'media.video', label: ui.media.video, icon: 'video' },
+  { url: links.release, key: 'media.release', label: ui.media.release, icon: 'release' },
+  { url: links.liveDemo || links.demo, key: 'project.liveDemo', label: ui.project.liveDemo, icon: 'liveDemo' },
+];
+const availableActions = actions.filter(action => action.url);
+---
+{availableActions.length > 0 && <div class="project-actions" data-stable-layout>
+  {availableActions.map(action => <a href={action.url!} target={action.external === false ? undefined : '_blank'} rel={action.external === false ? undefined : 'noreferrer'} data-locale-path={action.localPath} aria-label={title + ': ' + action.label} title={action.label} data-i18n-title={action.key} class:list={{ 'icon-only': Boolean(action.icon) }} data-project-title={title} data-action-copy={action.key}><span class:list={{ 'visually-hidden': Boolean(action.icon) }} data-i18n={action.key}>{action.label}</span><ProjectActionIcon name={action.icon} /></a>)}
+</div>}

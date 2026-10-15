@@ -1,11 +1,47 @@
 ---
 import { site } from '../data/site';
-const home = Astro.url.pathname === '/';
-const nav = [{ label: 'Work', id: 'work' }, { label: 'Tools', id: 'tools' }, { label: 'About', id: 'about' }, { label: 'Contact', id: 'contact' }];
+import { getUi, languages, localePath, type Locale } from '../i18n/ui';
+import SocialIcon from './SocialIcon.astro';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const ui = getUi(locale);
+const homePath = localePath('/', locale);
+const home = Astro.url.pathname === homePath;
+const nav = ['about', 'projects', 'contact'] as const;
 ---
-<header class="header" id="top">
+<header class="header" id="top" data-hidden="false">
   <div class="shell header-inner">
-    <a class="brand" href="/" aria-label="포트폴리오 홈"><span class="brand-mark" aria-hidden="true">g.</span>{site.handle}<span class="edition">/ 02</span></a>
-    <nav aria-label="주 메뉴"><ul>{nav.map(item => <li><a href={home ? '#' + item.id : '/#' + item.id}>{item.label}</a></li>)}</ul></nav>
+    <nav class="main-nav" aria-label={ui.navigation} data-i18n-aria-label="navigation"><ul>{nav.map(id => <li><a href={(home ? '' : homePath) + '#' + id} data-locale-path={home ? undefined : '/#' + id}><span data-i18n={'nav.' + id}>{ui.nav[id]}</span></a></li>)}</ul></nav>
+    <div class="header-actions">
+      <div class="social-links" aria-label={ui.socialLinks} data-i18n-aria-label="socialLinks">{site.socials.filter(link => link.url).map(link => <a href={link.url!} target="_blank" rel="noreferrer" aria-label={link.label} title={link.label}><SocialIcon name={link.id} /></a>)}</div>
+      <div class="language-switch" role="group" aria-label={ui.language} data-i18n-aria-label="language">{languages.map(language => <button type="button" lang={language.code} aria-pressed={language.code === locale ? 'true' : 'false'} data-locale={language.code}>{language.label}</button>)}</div>
+    </div>
   </div>
 </header>
+<script>
+  const header = document.querySelector<HTMLElement>('.header');
+  if (header) {
+    // Keep anchor clearance in sync with the actual one/two-row header.
+    const measure = () => document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px');
+    new ResizeObserver(measure).observe(header);
+    measure();
+    let lastY = Math.max(0, scrollY), direction = 0, travel = 0, pending = false;
+    const reveal = () => { header.dataset.hidden = 'false'; lastY = Math.max(0, scrollY); travel = 0; };
+    const update = () => {
+      const y = Math.max(0, scrollY), delta = y - lastY, nextDirection = Math.sign(delta);
+      if (y <= 24) { reveal(); travel = 0; }
+      else if (delta !== 0) {
+        if (nextDirection !== direction) { direction = nextDirection; travel = 0; }
+        travel += Math.abs(delta);
+        if (travel >= (direction > 0 ? 36 : 20)) {
+          header.dataset.hidden = direction > 0 && y > header.offsetHeight ? 'true' : 'false';
+          travel = 0;
+        }
+      }
+      lastY = y; pending = false;
+    };
+    addEventListener('scroll', () => { if (!pending) { pending = true; requestAnimationFrame(update); } }, { passive: true });
+    header.addEventListener('focusin', reveal);
+    document.addEventListener('keydown', event => { if (event.key === 'Tab') reveal(); });
+  }
+</script>
