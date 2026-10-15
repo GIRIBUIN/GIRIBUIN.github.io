@@ -1,5 +1,13 @@
 # 로컬 검증
 
+## GitHub Pages 전환 준비 (2026-10-15)
+
+- 현재 V2를 GIRIBUIN/GIRIBUIN.github.io의 main으로 배포하도록 workflow를 구성했습니다. 기존 커밋은 V2 이력에 연결하며 강제 push를 사용하지 않습니다.
+- npm run check: 45개 파일, 오류·경고·힌트 0건. npm test: 실제 정적 빌드와 fixture를 포함한 콘텐츠 검사 20개 통과.
+- EN/KO 상세 14개, 1440·820·390·360px 중앙 배치, 모바일 overflow, Mermaid 접근성·키보드 스크롤, 언어 전환 시 위치·YouTube context 유지를 확인했습니다.
+- 실제 YouTube 재생·기본 전체화면 동작을 확인했습니다. 공개 빌드에서는 로컬용 noindex를 제거합니다.
+- workflow는 Ubuntu에서 Chromium을 설치한 뒤 타입 검사·빌드·Pages 배포를 수행합니다. 공개 반영 여부는 Actions 결과와 실제 URL에서 별도로 확인합니다.
+
 ## Hero 직무 라벨·Quick Trace 상단 라벨 제거 (2026-10-14)
 
 - Hero 중앙의 `Backend / Systems Developer`와 Quick Trace의 `ON THIS PAGE` 표시를 제거했습니다. 이름·소개·trace·섹션 이동·접근성 이름은 유지합니다.
