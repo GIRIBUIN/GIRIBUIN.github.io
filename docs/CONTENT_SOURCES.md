@@ -14,6 +14,8 @@
 | Review Analyzer | Career DB/04_Portfolio/projects/EXP-007_Review_Analyzer.md; 기존 github.io | MySQL·Flask session/routes·library·통합, 팀 담당 분리·local GUI 범위·schema 불일치 |
 | Smart Parking | Career DB/04_Portfolio/projects/EXP-015_Smart_Parking.md; 기존 github.io | RPi3 중앙 노드·MQTT·SQLite·Flask·kernel status·heartbeat·AP 통합 |
 
+Convoary 추가(2026-10-21): D:/_workspace/repos/chatgpt-explorer의 README.md, docs/SYNC.md, SECURITY.md, package.json, public/manifest.json, src/models/types.ts, src/storage/index.ts, src/sync/payload.ts를 확인했습니다. 탐색기형 ChatGPT 대화 정리·로컬 저장·선택적 Dropbox 암호화 동기화·v0.1 alpha 범위를 반영했습니다. README의 YouTube 영상(8-YvxsedAxQ)을 연결하고 assets/images/main.png를 카드에 원본 그대로 복사했습니다. 원본 프로젝트는 수정하지 않았습니다.
+
 Career DB 루트: D:/99_career_scan/00_Career DB.
 
 KUTODO에서 읽은 로컬 자료:

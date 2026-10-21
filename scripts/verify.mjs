@@ -19,7 +19,7 @@ const cards = html => [...html.matchAll(/<article[^>]*data-project="([^"]+)"[^>]
 const slugs = html => cards(html).map(match => match[1]);
 const passed = [];
 const test = (label, run) => { run(); passed.push(label); console.log('PASS ' + label); };
-const expected = ['zzz', 'smart-parking', 'review-analyzer', 'ct', 'kuroom', 'kutodo', 'baljucall'];
+const expected = ['zzz', 'smart-parking', 'review-analyzer', 'ct', 'kuroom', 'kutodo', 'baljucall', 'convoary'];
 build(root);
 const baseline = read(root);
 const gallery = read(root, 'projects/index.html');
@@ -113,7 +113,7 @@ test('Markdown-only additions render, insert by order, and leave missing order l
   const list = slugs(section(html));
   assert.deepEqual(list.slice(0, 4), ['ct', 'zzz', 'inserted', 'smart-parking']);
   assert.equal(list.at(-1), 'no-order');
-  assert.equal(list.length, 27);
+  assert.equal(list.length, 28);
   assert.ok(read(fixture, 'work/inserted/index.html').includes('AUTOMATIC_MARKDOWN_BODY'));
   const document = read(fixture, 'work/inserted/index.html');
   for (const element of ['<blockquote>', '<ol>', '<table>', 'class="astro-code']) assert.ok(document.includes(element));
@@ -127,9 +127,9 @@ test('hidden excludes home and both localized detail routes', () => {
   assert.ok(!slugs(html).includes('hidden-probe'));
   for (const prefix of ['', 'ko/']) assert.ok(!existsSync(join(fixture, 'dist', prefix + 'work/hidden-probe/index.html')));
 });
-test('27-project fixture has four home cards and all projects on the separate page', () => {
+test('28-project fixture has four home cards and all projects on the separate page', () => {
   assert.equal(cards(read(fixture)).length, 4);
-  assert.equal(cards(html).length, 27);
+  assert.equal(cards(html).length, 28);
   assert.ok(!html.includes('data-projects-more') && !html.includes('data-visible-count'));
   assert.ok(html.includes('data-thumbnail-src="/fixture.mp4"'));
   assert.ok(read(fixture).includes('href="/projects/"') && read(fixture, 'ko/index.html').includes('href="/ko/projects/"'));

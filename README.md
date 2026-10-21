@@ -41,7 +41,7 @@ Hero에는 직무 라벨 없이 이름·소개·system trace·버튼을 표시�
 
 섹션은 콘텐츠 높이를 유지하면서 화면 높이에 따라 간격을 조절합니다. Hero는 첫 화면을 기준으로 맞추고 About 사진은 최대 360px(mobile 280px) 너비로 제한합니다. 앵커 이동은 실제 Header 높이 + desktop 24px/mobile 16px를 비우며, Trace Rail은 제목 근처의 읽기 위치와 페이지 끝을 추적합니다. Contact는 내용 높이에 맞추고 링크 아래 여백만 유지합니다.
 
-Projects는 640px 이상 2열, 639px 이하 1열입니다. 홈에는 order 순서대로 첫 4개(ZZZ → Smart Parking → Review Analyzer → ct)를 표시합니다. 제목은 배경·패딩 없는 일반 텍스트입니다. 섹션 제목 오른쪽의 화살표 아이콘은 /projects/ 또는 /ko/projects/ 전체 목록 페이지로 이동합니다. 전체 목록과 프로젝트 상세의 집 아이콘은 홈 Projects로 돌아갑니다. 세 이동 아이콘과 Hero의 Resume PDF·Portfolio PDF 버튼, How I Build 닫기 버튼은 같은 밝은 기본 배경·테두리와 짙은 charcoal hover/누름 배경을 사용합니다. 이동 아이콘에는 localized aria-label/title이 있습니다. 전체 목록은 같은 카드와 Grid를 재사용하며 현재 7개와 향후 추가 프로젝트를 order 순서대로 모두 표시합니다. 홈 안에서 펼치지 않습니다.
+Projects는 640px 이상 2열, 639px 이하 1열입니다. 홈에는 order 순서대로 첫 4개(ZZZ → Smart Parking → Review Analyzer → ct)를 표시합니다. 제목은 배경·패딩 없는 일반 텍스트입니다. 섹션 제목 오른쪽의 화살표 아이콘은 /projects/ 또는 /ko/projects/ 전체 목록 페이지로 이동합니다. 전체 목록과 프로젝트 상세의 집 아이콘은 홈 Projects로 돌아갑니다. 세 이동 아이콘과 Hero의 Resume PDF·Portfolio PDF 버튼, How I Build 닫기 버튼은 같은 밝은 기본 배경·테두리와 짙은 charcoal hover/누름 배경을 사용합니다. 이동 아이콘에는 localized aria-label/title이 있습니다. 전체 목록은 같은 카드와 Grid를 재사용하며 현재 8개와 향후 추가 프로젝트를 order 순서대로 모두 표시합니다. 홈 안에서 펼치지 않습니다.
 
 기본 카드는 16:9 미디어·제목·짧은 설명만 표시하며 클릭하면 해당 언어의 상세 페이지로 이동합니다. 영상 프로젝트는 이미지 poster/thumbnail/visual을 사용하지 않고 원본 영상의 정지된 첫 프레임을 표시합니다. 홈에서는 영상이 화면 약 1.5개 높이 앞에 있을 때 metadata와 첫 프레임을 준비하고, 전체 목록에서는 약 1개 높이 앞에서 준비합니다. 홈에 표시하지 않는 프로젝트는 카드/video를 렌더링하지 않습니다. 영상이 없는 프로젝트는 기존 image/thumbnail/visual 또는 neutral placeholder를 사용합니다. KUROOM·ct의 제작된 SVG 포스터는 연결하지 않으며 새 미디어를 만들지 않았습니다.
 
@@ -134,7 +134,7 @@ demo:
 ~~~
 
 - featured·section은 legacy metadata로 허용하지만 홈의 분류·노출에는 사용하지 않습니다. section의 허용 값은 기존 work/tools를 유지합니다.
-- order 오름차순이며 같은 값이면 slug 순입니다. order 미지정은 마지막입니다. 현재 순서는 10~70이며 중간 삽입은 order: 15처럼 지정합니다.
+- order 오름차순이며 같은 값이면 slug 순입니다. order 미지정은 마지막입니다. 현재 순서는 10~80이며 중간 삽입은 order: 15처럼 지정합니다.
 - trace는 기존 optional metadata로 보존합니다. 홈 카드에서는 INPUT/DECISION/OUTPUT 또는 trace overlay를 렌더링하지 않습니다.
 - 새 Markdown 한 파일만 추가하면 전체 목록·홈 order 상위 4개·thumbnail hover에 자동 반영됩니다. 필수 필드는 title·slug·summary입니다.
 - hidden: true는 홈과 두 언어의 상세 생성에서 제외합니다. Demo 유무는 노출 조건이 아닙니다.
@@ -175,7 +175,7 @@ ProjectActions.astro는 Source·Watch video·Release·Live Demo 중 URL이 있�
 | image | alt를 포함한 이미지 |
 | none | 콘텐츠/typography fallback |
 
-현재 7개 모두 새 포트폴리오용 라이브 Demo는 미연결입니다. ZZZ·Smart Parking의 과거 시연 영상, ct v0.3.1과 KUTODO의 중간 beta release 링크는 기존 근거에 따라 제공합니다. 발주콜은 비공개 저장소이므로 공개 Source·APK 링크를 노출하지 않습니다. iframe 차단 정책과 실제 프로젝트 영상 재생·APK 실행은 URL 연결 후 별도 확인해야 합니다.
+현재 8개 모두 새 포트폴리오용 라이브 Demo는 미연결입니다. Convoary는 기존 화면 이미지를 카드에, README의 YouTube 영상을 상세에 연결합니다. ZZZ·Smart Parking의 과거 시연 영상, ct v0.3.1과 KUTODO의 중간 beta release 링크는 기존 근거에 따라 제공합니다. 발주콜은 비공개 저장소이므로 공개 Source·APK 링크를 노출하지 않습니다. iframe 차단 정책과 실제 프로젝트 영상 재생·APK 실행은 URL 연결 후 별도 확인해야 합니다.
 
 ## Header와 접근성
 

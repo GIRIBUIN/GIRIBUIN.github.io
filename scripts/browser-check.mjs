@@ -23,7 +23,7 @@ await new Promise(done => fixtureServer.listen(0, '127.0.0.1', done));
 await new Promise(done => mainServer.listen(0, '127.0.0.1', done));
 const fixtureUrl = 'http://127.0.0.1:' + fixtureServer.address().port;
 const base = 'http://127.0.0.1:' + mainServer.address().port;
-const expected = ['zzz', 'smart-parking', 'review-analyzer', 'ct', 'kuroom', 'kutodo', 'baljucall'];
+const expected = ['zzz', 'smart-parking', 'review-analyzer', 'ct', 'kuroom', 'kutodo', 'baljucall', 'convoary'];
 const passed = [];
 const pass = name => { passed.push(name); console.log('PASS ' + name); };
 let browser;
@@ -434,7 +434,7 @@ try {
   assert.equal(await page.locator('.projects-home').getAttribute('aria-label'), '홈으로 돌아가기');
   assert.equal(await page.locator('.projects-home').evaluate(el => getComputedStyle(el).backgroundColor), navigationIconBackground);
   assert.equal(await page.locator('[data-projects-more]').count(), 0);
-  assert.equal(await visibleCount(), 27);
+  assert.equal(await visibleCount(), 28);
   assert.deepEqual(await page.locator('#projects-grid > article').evaluateAll(items => items.slice(0, 4).map(el => el.dataset.project)), ['ct', 'zzz', 'inserted', 'smart-parking']);
   for (const [width, columns] of [[1440, 2], [820, 2], [390, 1]]) {
     await page.setViewportSize({ width, height: 1000 });
@@ -442,7 +442,7 @@ try {
     assert.ok(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth + 1));
     await page.locator('[data-project="ready-image"]').scrollIntoViewIfNeeded();
     const before = await page.evaluate(() => scrollY);
-    await locale('en'); assert.equal(await visibleCount(), 27);
+    await locale('en'); assert.equal(await visibleCount(), 28);
     assert.equal(await page.evaluate(() => scrollY), before);
     await locale('ko'); assert.equal(await page.evaluate(() => scrollY), before);
   }
@@ -455,7 +455,7 @@ try {
     const video = document.querySelector('[data-project="ready-video"] video');
     return video.paused && video.currentTime < .01;
   });
-  pass('More link navigates to localized all-projects page; 27 content-only additions, responsive grid and locale position');
+  pass('More link navigates to localized all-projects page; 28 projects, responsive grid and locale position');
   await goto(fixtureUrl + '/work/ready-image/');
   assert.equal(await page.locator('.demo-stage img').getAttribute('src'), '/fixture.svg');
   assert.equal(await page.locator('.media-enlarge,.media-lightbox').count(), 0);
