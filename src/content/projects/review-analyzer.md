@@ -13,8 +13,8 @@ summary: "MySQL, Flask 세션·라우트와 개인 라이브러리를 담당하�
 visual: {"url":"/images/projects/review-analyzer/reference.png","alt":"기존 포트폴리오의 Review Analyzer 상품 URL 및 키워드 입력 참고 화면","caption":"기존 포트폴리오 참고 화면 / 최종 구현 검증 자료 아님"}
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/Review-Analyzer","release":null,"video":"https://youtu.be/Dqj01tUyWdQ?si=Hp_Wj2bwxYAjc2qD","caseStudy":null}
 demo: {"type":"video","url":"/videos/projects/review-analyzer/demo.mp4"}
-logo: null
-thumbnail: null
+logo: "/images/projects/review-analyzer/icon.png"
+thumbnail: "/images/projects/review-analyzer/thumbnail.png"
 hidden: false
 oneLine: "상품 URL·키워드로 리뷰를 수집·요약하는 웹 프로토타입"
 problem: "많은 리뷰에서 관심 키워드의 장단점 파악"
