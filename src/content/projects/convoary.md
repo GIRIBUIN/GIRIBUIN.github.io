@@ -16,7 +16,7 @@ result: "Chrome·Edge·Firefox·Zen용 v0.1 alpha와 시연 영상 공개"
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/convoary","release":"https://github.com/GIRIBUIN/convoary/releases","video":"https://youtu.be/8-YvxsedAxQ","caseStudy":null}
 demo: {"type":"video","url":"/videos/projects/convoary/demo.mp4"}
 logo: null
-thumbnail: null
+thumbnail: "/images/projects/convoary/thumbnail.png"
 hidden: false
 translations:
   en:

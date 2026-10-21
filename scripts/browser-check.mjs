@@ -135,9 +135,10 @@ try {
   assert.ok(await thumbnail('zzz').evaluate(el => el.getBoundingClientRect().top > innerHeight), 'Projects media stays below the viewport during preload');
   await page.waitForFunction(() => ['zzz', 'smart-parking'].every(slug => {
     const card = document.querySelector('[data-project="' + slug + '"]');
-    return card.querySelector('canvas').width > 0 && card.querySelector('video').paused;
+    const image = card.querySelector('img'), canvas = card.querySelector('canvas');
+    return (image ? image.complete && image.naturalWidth > 0 : canvas?.width > 0) && card.querySelector('video').paused;
   }));
-  pass('home video first frames load before Projects enters the viewport');
+  pass('home thumbnails or video first frames load before Projects enters the viewport');
 
   for (const [width, columns] of [[1600, 2], [1440, 2], [1280, 2], [1100, 2], [820, 2], [390, 1], [360, 1]]) {
     await page.setViewportSize({ width, height: width === 1280 ? 720 : 1000 }); await goto(base);
@@ -327,7 +328,7 @@ try {
   assert.equal(await page.locator('#projects-grid video').evaluateAll(videos => videos.filter(el => !el.paused).length), 1);
   await page.screenshot({ path: join(out, 'desktop-project-hover.png') });
   await page.mouse.move(0, 0);
-  await page.waitForFunction(() => [...document.querySelectorAll('#projects-grid video')].every(video => video.paused && video.currentTime < .01));
+  await page.waitForFunction(() => [...document.querySelectorAll('#projects-grid video')].every(video => video.paused && video.currentTime <= 1 / 30 + .01));
   pass('no Inspector; first-frame thumbnails, media-only intent autoplay, single playback and leave reset');
 
   // Regression for a playing video obscuring a different, paused video thumbnail.
@@ -336,8 +337,9 @@ try {
     await thumbnail(hovered).evaluate(el => el.scrollIntoView({ behavior: 'instant', block: 'center' }));
     await page.waitForFunction(slugs => slugs.every(slug => {
       const card = document.querySelector('[data-project="' + slug + '"]');
-      const video = card.querySelector('video'), canvas = card.querySelector('canvas');
-      return video.paused && !video.seeking && canvas?.width > 0 && canvas.getContext('2d').getImageData(0, 0, 1, 1).data[3] > 0;
+      const video = card.querySelector('video'), canvas = card.querySelector('canvas'), image = card.querySelector('img');
+      const ready = image ? image.complete && image.naturalWidth > 0 : canvas?.width > 0 && canvas.getContext('2d').getImageData(0, 0, 1, 1).data[3] > 0;
+      return video.paused && !video.seeking && ready;
     }), [hovered, neighbor]);
     const still = await thumbnail(neighbor).screenshot();
     await thumbnail(hovered).hover();

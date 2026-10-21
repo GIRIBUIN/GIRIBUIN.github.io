@@ -43,15 +43,15 @@ Hero에는 직무 라벨 없이 이름·소개·system trace·버튼을 표시�
 
 Projects는 640px 이상 2열, 639px 이하 1열입니다. 홈에는 order 순서대로 첫 4개(ZZZ → Smart Parking → Review Analyzer → ct)를 표시합니다. 제목은 배경·패딩 없는 일반 텍스트입니다. 섹션 제목 오른쪽의 화살표 아이콘은 /projects/ 또는 /ko/projects/ 전체 목록 페이지로 이동합니다. 전체 목록과 프로젝트 상세의 집 아이콘은 홈 Projects로 돌아갑니다. 세 이동 아이콘과 Hero의 Resume PDF·Portfolio PDF 버튼, How I Build 닫기 버튼은 같은 밝은 기본 배경·테두리와 짙은 charcoal hover/누름 배경을 사용합니다. 이동 아이콘에는 localized aria-label/title이 있습니다. 전체 목록은 같은 카드와 Grid를 재사용하며 현재 8개와 향후 추가 프로젝트를 order 순서대로 모두 표시합니다. 홈 안에서 펼치지 않습니다.
 
-기본 카드는 16:9 미디어·제목·짧은 설명만 표시하며 클릭하면 해당 언어의 상세 페이지로 이동합니다. 영상 프로젝트는 이미지 poster/thumbnail/visual을 사용하지 않고 원본 영상의 정지된 첫 프레임을 표시합니다. 홈에서는 영상이 화면 약 1.5개 높이 앞에 있을 때 metadata와 첫 프레임을 준비하고, 전체 목록에서는 약 1개 높이 앞에서 준비합니다. 홈에 표시하지 않는 프로젝트는 카드/video를 렌더링하지 않습니다. 영상이 없는 프로젝트는 기존 image/thumbnail/visual 또는 neutral placeholder를 사용합니다. KUROOM·ct의 제작된 SVG 포스터는 연결하지 않으며 새 미디어를 만들지 않았습니다.
+기본 카드는 16:9 미디어·제목·짧은 설명만 표시하며 클릭하면 해당 언어의 상세 페이지로 이동합니다. 썸네일과 영상이 모두 있으면 썸네일을, 영상만 있으면 원본 영상의 정지된 첫 프레임을 표시합니다. 썸네일은 선택 사항이며 dark/light 구분 없이 한 장을 공통으로 사용할 수 있습니다. 홈에서는 영상이 화면 약 1.5개 높이 앞에 있을 때 metadata와 첫 프레임을 준비하고, 전체 목록에서는 약 1개 높이 앞에서 준비합니다. 홈에 표시하지 않는 프로젝트는 카드/video를 렌더링하지 않습니다. 영상이 없는 프로젝트는 기존 image/thumbnail/visual 또는 neutral placeholder를 사용합니다. KUROOM·ct의 제작된 SVG 포스터는 연결하지 않으며 새 미디어를 만들지 않았습니다.
 
-Floating Inspector는 제거했습니다. 640px 이상 fine pointer 환경에서 thumbnail 영역에 200ms hover하면 해당 영상만 muted/loop/playsinline으로 재생합니다. 제목·설명 hover나 keyboard focus로는 재생하지 않습니다. thumbnail을 벗어나거나 다른 영상에 이동하면 pause 후 첫 프레임으로 돌아갑니다. 마우스 클릭과 키보드 활성화는 바로 Deep Dive로 이동합니다.
+Floating Inspector는 제거했습니다. 640px 이상 fine pointer 환경에서 thumbnail 영역에 200ms hover하면 해당 영상만 muted/loop/playsinline으로 재생합니다. 제목·설명 hover나 keyboard focus로는 재생하지 않습니다. thumbnail을 벗어나거나 다른 영상에 이동하면 pause 후 영상 위치를 초기화하고, 등록된 썸네일 또는 영상 첫 프레임으로 돌아갑니다. 마우스 클릭과 키보드 활성화는 바로 Deep Dive로 이동합니다.
 
 Mobile/touch에서는 첫 탭으로 카드를 선택해 올림·그림자 효과와 무음 영상 미리보기를 표시합니다. 선택된 같은 카드를 한 번 더 탭하면 Deep Dive로 이동하며 두 탭 사이 시간 제한은 없습니다. 작은 안내 문구를 EN/KO로 표시하고 영상이 없는 카드도 같은 선택·상세 이동 규칙을 사용합니다. 다른 카드나 바깥을 탭하거나 선택 카드가 화면 밖으로 이동하면 선택과 재생을 해제합니다. 드래그·스크롤은 선택이나 상세 이동으로 처리하지 않습니다. 언어 전환·탭 비활성화·reduced-motion 변경 시에도 정지합니다. reduced-motion에서는 첫 탭으로 선택만 하고 영상 재생·올림 효과는 생략합니다. 열 개수와 무관하게 실제 터치 입력에 적용하며 마우스·키보드 동작은 유지합니다.
 
 외부 액션은 기존 Deep Dive에서 제공합니다. Deep Dive 영상은 links.video의 YouTube 플레이어를 사용하며, 자체 확대 버튼이나 영상 위아래 안내 바 없이 플레이어의 기본 전체화면 기능을 사용합니다. npm run test:project-media는 빌드된 dist로 터치 미리보기와 데스크톱 영상 동작만 검증합니다.
 
-정지된 첫 프레임은 원본 영상에서 canvas로 표시하고, 재생 중인 video 레이어만 보이게 합니다. thumbnail마다 paint/stacking 영역을 분리해 인접 영상이 가려지는 현상을 방지합니다. 별도 poster 파일은 만들지 않습니다.
+썸네일이 없는 영상의 정지된 첫 프레임은 원본 영상에서 canvas로 표시합니다. 썸네일이 있으면 image를 표시하고, 실제 재생 중에만 이를 숨기고 video 레이어를 보이게 합니다. thumbnail마다 paint/stacking 영역을 분리해 인접 영상이 가려지는 현상을 방지합니다. 별도 poster 파일은 만들지 않습니다.
 
 ## 공통 설정
 
@@ -141,20 +141,29 @@ demo:
 - title·slug·summary가 필수입니다. 순서·노출·URL은 언어와 관계없이 공유하고 translations는 문구만 변경합니다.
 - translations.ko도 지원하므로 필요하면 기본 한국어 문구를 override할 수 있습니다.
 - logo·thumbnail에는 http(s) 또는 사이트 루트 기준 경로를 넣습니다. 로고가 없어도 제목 텍스트를 표시합니다. 현재 사용하는 Smart Parking cover는 public/images/projects/smart-parking/cover.webp에 둡니다. 기존 SVG dark/light 쌍은 보존합니다.
-- 기본 카드는 실제 영상이 있으면 영상 첫 프레임을 우선합니다. 영상이 없으면 thumbnail → 실제 image 미디어 → visual 순서로 이미지를 표시하며 모두 없으면 neutral placeholder를 표시합니다.
+- 기본 카드는 thumbnail을 우선 표시하고, 영상만 있으면 영상 첫 프레임을 표시합니다. 영상이 없으면 thumbnail → 실제 image 미디어 → visual 순서이며 모두 없으면 neutral placeholder를 표시합니다. 썸네일만 등록한 프로젝트는 영상을 재생하지 않습니다.
 - 상세 영상은 links.video의 YouTube 주소를 사용하며 MP4를 렌더링하지 않습니다. 이미지·웹 Demo·APK와 미디어가 없는 경우의 fallback은 기존 metadata를 사용합니다.
 
 ## Deep Dive와 Demo
 
 ### 새 프로젝트의 영상 연결
 
-프로젝트에 시연 영상이 있으면 **카드는 영상의 정지된 첫 프레임을 표시하고, 썸네일 영역에 200ms 호버 시 무음으로 반복 재생**합니다. 마우스가 벗어나면 정지하고 첫 프레임으로 돌아갑니다. 영상 프로젝트에는 별도 이미지·포스터·로고가 필요 없습니다.
+썸네일과 영상은 모두 선택 항목입니다. 카드의 동작은 아래 등록 상태에 따릅니다.
+
+| 등록된 미디어 | 기본 표시 | 200ms 호버 | 호버 해제 |
+| --- | --- | --- | --- |
+| 썸네일 + 영상 | 썸네일 | 무음 영상 반복 재생 | 정지·위치 초기화 후 썸네일 |
+| 썸네일만 | 썸네일 | 재생 없음 | 썸네일 유지 |
+| 영상만 | 영상 첫 프레임 | 무음 영상 반복 재생 | 정지·첫 프레임 복귀 |
+| 둘 다 없음 | 기본 대체 화면 | 재생 없음 | 그대로 유지 |
+
+썸네일은 dark/light 구분 없이 한 장을 공통으로 사용합니다. 원본은 `public/images/projects/[slug]/`에 보관하고 `thumbnail`에 경로를 등록합니다. `dist/`는 빌드 출력이므로 자산을 여기에만 두면 다음 빌드에 반영되지 않습니다. 이미지·포스터·로고를 강제로 만들지 않습니다.
 
 `links.video`는 상세 화면의 YouTube 플레이어용이고, 카드 호버 재생은 `demo.url`의 MP4/WebM을 사용합니다. YouTube 링크만 넣어서는 카드 영상이 연결되지 않습니다. 프로젝트 추가 작업에는 같은 시연 영상의 미리보기 파일 준비까지 포함합니다.
 
 1. 같은 시연 영상의 원본을 확보하고, 비율을 유지해 압축·음성 제거한 H.264 MP4를 `public/videos/projects/[slug]/demo.mp4`에 둡니다. 원본 파일은 수정하지 않습니다.
 2. 프로젝트 Markdown에 아래 필드를 함께 설정합니다. CLI 영상은 기존 `terminal` 형식도 사용할 수 있습니다.
-3. 한·영 전체 목록의 첫 프레임·실제 호버 재생·정지 복귀와 상세의 YouTube 영상을 확인합니다. 영상을 확보하지 못하면 원본 경로를 확인하며, 이미지로 대신하지 않습니다.
+3. 썸네일이 있으면 `thumbnail`에 등록하고, 없으면 null로 둡니다. 한·영 전체 목록의 썸네일 또는 첫 프레임·실제 호버 재생·정지 후 원래 화면 복귀와 상세의 YouTube 영상을 확인합니다. 영상을 확보하지 못하면 원본 경로를 확인하며, 이미지로 대신하지 않습니다.
 
 ~~~yaml
 links:
@@ -195,7 +204,7 @@ ProjectActions.astro는 Source·Watch video·Release·Live Demo 중 URL이 있�
 | image | alt를 포함한 이미지 |
 | none | 콘텐츠/typography fallback |
 
-현재 8개 모두 새 포트폴리오용 라이브 Demo는 미연결입니다. Convoary는 음성을 제거·압축한 시연 영상을 카드의 첫 프레임·호버 재생에, README의 YouTube 영상을 상세에 연결합니다. ZZZ·Smart Parking의 과거 시연 영상, ct v0.3.1과 KUTODO의 중간 beta release 링크는 기존 근거에 따라 제공합니다. 발주콜은 비공개 저장소이므로 공개 Source·APK 링크를 노출하지 않습니다. iframe 차단 정책과 실제 프로젝트 영상 재생·APK 실행은 URL 연결 후 별도 확인해야 합니다.
+현재 8개 모두 새 포트폴리오용 라이브 Demo는 미연결입니다. Convoary는 제공된 공통 썸네일을 기본 표시하고, 음성을 제거·압축한 시연 영상을 호버 재생하며, README의 YouTube 영상을 상세에 연결합니다. ZZZ·Smart Parking의 과거 시연 영상, ct v0.3.1과 KUTODO의 중간 beta release 링크는 기존 근거에 따라 제공합니다. 발주콜은 비공개 저장소이므로 공개 Source·APK 링크를 노출하지 않습니다. iframe 차단 정책과 실제 프로젝트 영상 재생·APK 실행은 URL 연결 후 별도 확인해야 합니다.
 
 ## Header와 접근성
 

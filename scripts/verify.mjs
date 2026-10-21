@@ -33,12 +33,18 @@ test('home shows four projects in requested order and links to the complete Proj
   assert.ok(!/<button[^>]*data-projects-more/.test(baseline) && !baseline.includes('class="rail-track'));
   for (const [i, slug] of expected.entries()) assert.match(readFileSync(join(root, 'src/content/projects', slug + '.md'), 'utf8'), new RegExp('^order: ' + (i + 1) * 10 + '$', 'm'));
 });
-test('video cards use their own first frame with lazy sources and no Inspector', () => {
+test('video cards use optional thumbnails or their own first frame with lazy sources', () => {
   for (const slug of ['zzz', 'kuroom', 'ct', 'review-analyzer', 'smart-parking', 'convoary']) {
     const card = cards(gallery).find(match => match[1] === slug)[2];
     const thumbnail = card.match(/<video [^>]*>/)[0];
     assert.ok(thumbnail.includes('data-thumbnail-src="/videos/projects/' + slug + '/demo.mp4"'));
-    assert.ok(!/\ssrc=/.test(thumbnail) && !thumbnail.includes('autoplay') && !thumbnail.includes('poster=') && !card.includes('<img'));
+    assert.ok(!/\ssrc=/.test(thumbnail) && !thumbnail.includes('autoplay') && !thumbnail.includes('poster='));
+    const cover = { convoary: '/images/projects/convoary/thumbnail.png', 'smart-parking': '/images/projects/smart-parking/cover.webp' }[slug];
+    if (cover) {
+      assert.ok(card.includes('src="' + cover + '"') && !card.includes('<canvas'));
+    } else {
+      assert.ok(card.includes('<canvas') && !card.includes('<img'));
+    }
     assert.ok(thumbnail.includes('preload="none"') && thumbnail.includes('playsinline') && thumbnail.includes('loop'));
     const detail = read(root, 'work/' + slug + '/index.html');
     const videoId = readFileSync(join(root, 'src/content/projects', slug + '.md'), 'utf8').match(/"video":"https:\/\/youtu\.be\/([\w-]+)/)[1];
@@ -143,6 +149,7 @@ test('optional thumbnail and detail logo/media reuse the content schema', () => 
   for (const slug of ['ready-image', 'small-media']) {
     const card = cards(html).find(match => match[1] === slug)[2];
     assert.ok(card.includes('src="/thumbnail.svg"'));
+    assert.ok(!card.includes('<video'));
     assert.ok(read(fixture, 'work/' + slug + '/index.html').includes('class="project-logo"'));
   }
   assert.ok(read(fixture, 'work/ready-iframe/index.html').includes('<iframe'));
