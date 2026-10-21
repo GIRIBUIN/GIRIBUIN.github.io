@@ -14,9 +14,9 @@ problem: "길어진 대화 목록에서 필요한 대화를 다시 찾고 주제
 decision: "원본 대화와 정리 데이터를 분리하고 로컬 저장을 기본으로 선택적 암호화 동기화 제공"
 result: "Chrome·Edge·Firefox·Zen용 v0.1 alpha와 시연 영상 공개"
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/convoary","release":"https://github.com/GIRIBUIN/convoary/releases","video":"https://youtu.be/8-YvxsedAxQ","caseStudy":null}
-demo: {"type":"none","url":null}
+demo: {"type":"video","url":"/videos/projects/convoary/demo.mp4"}
 logo: null
-thumbnail: "/images/projects/convoary/main.png"
+thumbnail: null
 hidden: false
 translations:
   en:

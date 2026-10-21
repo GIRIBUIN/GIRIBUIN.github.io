@@ -34,7 +34,7 @@ test('home shows four projects in requested order and links to the complete Proj
   for (const [i, slug] of expected.entries()) assert.match(readFileSync(join(root, 'src/content/projects', slug + '.md'), 'utf8'), new RegExp('^order: ' + (i + 1) * 10 + '$', 'm'));
 });
 test('video cards use their own first frame with lazy sources and no Inspector', () => {
-  for (const slug of ['zzz', 'kuroom', 'ct', 'review-analyzer', 'smart-parking']) {
+  for (const slug of ['zzz', 'kuroom', 'ct', 'review-analyzer', 'smart-parking', 'convoary']) {
     const card = cards(gallery).find(match => match[1] === slug)[2];
     const thumbnail = card.match(/<video [^>]*>/)[0];
     assert.ok(thumbnail.includes('data-thumbnail-src="/videos/projects/' + slug + '/demo.mp4"'));
@@ -47,7 +47,7 @@ test('video cards use their own first frame with lazy sources and no Inspector',
     assert.ok(!detail.includes('class="demo-toolbar"') && !detail.includes('class="demo-caption"'));
   }
   assert.equal((baseline.match(/<video /g) || []).length, 4);
-  assert.equal((gallery.match(/<video /g) || []).length, 5);
+  assert.equal((gallery.match(/<video /g) || []).length, 6);
   assert.ok(!baseline.includes('id="project-inspector"') && !baseline.includes('data-inspector-project'));
 });
 test('optional Mermaid diagrams render to accessible static SVG in both locale bodies', () => {

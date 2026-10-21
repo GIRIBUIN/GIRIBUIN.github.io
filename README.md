@@ -146,6 +146,26 @@ demo:
 
 ## Deep Dive와 Demo
 
+### 새 프로젝트의 영상 연결
+
+프로젝트에 시연 영상이 있으면 **카드는 영상의 정지된 첫 프레임을 표시하고, 썸네일 영역에 200ms 호버 시 무음으로 반복 재생**합니다. 마우스가 벗어나면 정지하고 첫 프레임으로 돌아갑니다. 영상 프로젝트에는 별도 이미지·포스터·로고가 필요 없습니다.
+
+`links.video`는 상세 화면의 YouTube 플레이어용이고, 카드 호버 재생은 `demo.url`의 MP4/WebM을 사용합니다. YouTube 링크만 넣어서는 카드 영상이 연결되지 않습니다. 프로젝트 추가 작업에는 같은 시연 영상의 미리보기 파일 준비까지 포함합니다.
+
+1. 같은 시연 영상의 원본을 확보하고, 비율을 유지해 압축·음성 제거한 H.264 MP4를 `public/videos/projects/[slug]/demo.mp4`에 둡니다. 원본 파일은 수정하지 않습니다.
+2. 프로젝트 Markdown에 아래 필드를 함께 설정합니다. CLI 영상은 기존 `terminal` 형식도 사용할 수 있습니다.
+3. 한·영 전체 목록의 첫 프레임·실제 호버 재생·정지 복귀와 상세의 YouTube 영상을 확인합니다. 영상을 확보하지 못하면 원본 경로를 확인하며, 이미지로 대신하지 않습니다.
+
+~~~yaml
+links:
+  video: https://youtu.be/VIDEO_ID
+demo:
+  type: video
+  url: /videos/projects/example/demo.mp4
+thumbnail: null
+logo: null
+~~~
+
 기본 Markdown 본문은 한국어 상세 기록입니다. src/content/project-notes/en/[slug].md가 영어 상세 기록입니다. 향후 다른 언어의 본문도 해당 locale/slug 파일로 추가할 수 있습니다. 번역 본문이 없으면 한국어 원문과 번역 안내를 표시하고 원문에 lang=ko를 지정합니다.
 
 상세 화면은 최대 900px의 중앙 문서 열입니다. Astro의 기본 Markdown 렌더링과 github-light 코드 강조를 재사용합니다. 제목 구분선, 순서 목록, 인용, 표, 코드 블록을 README처럼 표시하며 긴 표·코드는 본문 안에서 가로 스크롤됩니다. 한국어 본문은 src/content/projects/[slug].md의 frontmatter 아래를, 영어 본문은 src/content/project-notes/en/[slug].md를 수정하면 됩니다.
@@ -175,7 +195,7 @@ ProjectActions.astro는 Source·Watch video·Release·Live Demo 중 URL이 있�
 | image | alt를 포함한 이미지 |
 | none | 콘텐츠/typography fallback |
 
-현재 8개 모두 새 포트폴리오용 라이브 Demo는 미연결입니다. Convoary는 기존 화면 이미지를 카드에, README의 YouTube 영상을 상세에 연결합니다. ZZZ·Smart Parking의 과거 시연 영상, ct v0.3.1과 KUTODO의 중간 beta release 링크는 기존 근거에 따라 제공합니다. 발주콜은 비공개 저장소이므로 공개 Source·APK 링크를 노출하지 않습니다. iframe 차단 정책과 실제 프로젝트 영상 재생·APK 실행은 URL 연결 후 별도 확인해야 합니다.
+현재 8개 모두 새 포트폴리오용 라이브 Demo는 미연결입니다. Convoary는 음성을 제거·압축한 시연 영상을 카드의 첫 프레임·호버 재생에, README의 YouTube 영상을 상세에 연결합니다. ZZZ·Smart Parking의 과거 시연 영상, ct v0.3.1과 KUTODO의 중간 beta release 링크는 기존 근거에 따라 제공합니다. 발주콜은 비공개 저장소이므로 공개 Source·APK 링크를 노출하지 않습니다. iframe 차단 정책과 실제 프로젝트 영상 재생·APK 실행은 URL 연결 후 별도 확인해야 합니다.
 
 ## Header와 접근성
 

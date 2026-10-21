@@ -14,7 +14,7 @@
 | Review Analyzer | Career DB/04_Portfolio/projects/EXP-007_Review_Analyzer.md; 기존 github.io | MySQL·Flask session/routes·library·통합, 팀 담당 분리·local GUI 범위·schema 불일치 |
 | Smart Parking | Career DB/04_Portfolio/projects/EXP-015_Smart_Parking.md; 기존 github.io | RPi3 중앙 노드·MQTT·SQLite·Flask·kernel status·heartbeat·AP 통합 |
 
-Convoary 추가(2026-10-21): D:/_workspace/repos/chatgpt-explorer의 README.md, docs/SYNC.md, SECURITY.md, package.json, public/manifest.json, src/models/types.ts, src/storage/index.ts, src/sync/payload.ts를 확인했습니다. 탐색기형 ChatGPT 대화 정리·로컬 저장·선택적 Dropbox 암호화 동기화·v0.1 alpha 범위를 반영했습니다. README의 YouTube 영상(8-YvxsedAxQ)을 연결하고 assets/images/main.png를 카드에 원본 그대로 복사했습니다. 원본 프로젝트는 수정하지 않았습니다.
+Convoary 추가(2026-10-21): D:/_workspace/repos/chatgpt-explorer의 README.md, docs/SYNC.md, SECURITY.md, package.json, public/manifest.json, src/models/types.ts, src/storage/index.ts, src/sync/payload.ts를 확인했습니다. 탐색기형 ChatGPT 대화 정리·로컬 저장·선택적 Dropbox 암호화 동기화·v0.1 alpha 범위를 반영했습니다. README의 YouTube 영상(8-YvxsedAxQ)을 상세에 연결했습니다. 사용자가 제공한 C:/Users/healt/Videos/convorary/demo.mkv를 음성·부가 스트림 제거, H.264/yuv420p·30fps·CRF 28·faststart로 변환해 public/videos/projects/convoary/demo.mp4에 연결했습니다. 카드에는 이미지 없이 영상 첫 프레임과 호버 재생을 사용합니다. 원본 영상과 원본 프로젝트는 수정하지 않았습니다.
 
 Career DB 루트: D:/99_career_scan/00_Career DB.
 
