@@ -10,7 +10,7 @@ order: 30
 trace: {"input":"상품 URL + 관심 키워드","decision":"분석 결과와 개인 저장 관계 분리","output":"리뷰 요약 + 개인 라이브러리"}
 tech: ["Python","Flask","MySQL","JavaScript"]
 summary: "MySQL, Flask 세션·라우트와 개인 라이브러리를 담당하고 팀의 수집·분석 결과를 UI에 통합했습니다."
-visual: {"url":"/images/reference/review-analyzer.png","alt":"기존 포트폴리오의 Review Analyzer 상품 URL 및 키워드 입력 참고 화면","caption":"기존 포트폴리오 참고 화면 / 최종 구현 검증 자료 아님"}
+visual: {"url":"/images/projects/review-analyzer/reference.png","alt":"기존 포트폴리오의 Review Analyzer 상품 URL 및 키워드 입력 참고 화면","caption":"기존 포트폴리오 참고 화면 / 최종 구현 검증 자료 아님"}
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/Review-Analyzer","release":null,"video":"https://youtu.be/Dqj01tUyWdQ?si=Hp_Wj2bwxYAjc2qD","caseStudy":null}
 demo: {"type":"video","url":"/videos/projects/review-analyzer/demo.mp4"}
 logo: null

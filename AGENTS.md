@@ -8,3 +8,10 @@
 - 썸네일 원본은 `public/images/projects/[slug]/`에 보관한다. `dist/`는 빌드 출력이므로 사용자가 여기에 자산을 추가하면 빌드 전에 `public/`으로 복사해 연결한다.
 - YouTube 링크만 받았으면 같은 영상의 재생 가능한 미리보기를 준비한다. 영상을 구할 수 없다면 원본 영상 경로를 확인하고, 정적 이미지로 조용히 대체하거나 미리보기 완료로 보고하지 않는다.
 - 한·영 목록과 상세, 등록된 썸네일 또는 실제 첫 프레임, 호버 재생·벗어날 때 원래 화면 복귀, 상세 YouTube 연결을 변경 범위에 맞춰 검증한다.
+
+## 폴더 관리
+
+- 프로젝트 이미지는 `public/images/projects/[slug]/`의 `icon.png`·`thumbnail.png`·선택적 `reference.png`로 통일한다. 영상은 `public/videos/projects/[slug]/demo.mp4`를 사용한다.
+- `dist/`·`.astro/`·`.verification/`는 생성물이므로 원본을 저장하거나 직접 수정하지 않는다. 정리는 `npm run clean`, 검증 자료만 지울 때는 `npm run clean:verification`을 사용한다.
+- `npm test`의 fixture는 `.verification/content-current/` 한 개만 재사용한다. 새 복사본 폴더를 계속 만들지 않는다.
+- 미사용 자산은 코드·콘텐츠의 참조와 출처 기록을 확인한 뒤 제거한다. 현재 관리 기준은 `docs/ASSETS.md`에 기록한다.

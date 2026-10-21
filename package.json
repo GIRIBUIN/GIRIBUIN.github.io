@@ -10,6 +10,8 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "astro preview",
+    "clean": "node scripts/clean.mjs",
+    "clean:verification": "node scripts/clean.mjs --verification",
     "check": "astro check",
     "test": "node scripts/verify.mjs",
     "test:browser": "node scripts/browser-check.mjs",

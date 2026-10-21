@@ -1,6 +1,6 @@
 # 콘텐츠와 재사용 자산의 근거
 
-모든 외부 자료는 읽기 전용으로 확인했습니다. 수정 범위는 D:/10_proj/portfolio-v2입니다.
+외부 원본은 읽기 전용으로 확인했습니다. 현재 작업 폴더는 D:/_workspace/repos/portfolio/portfolio-v2입니다.
 
 ## 프로젝트
 
@@ -41,7 +41,7 @@ KUTODO에서 읽은 로컬 자료:
 
 PDF 내용은 수정하지 않고 첫 페이지를 렌더링해 확인했습니다. 소개·관심 분야는 기존 Contact/Profile과 PDF에서 확인한 Backend·Systems 방향을 짧게 번역·정리했습니다. 학력은 공개 이력서와 기존 resume.ts의 건국대학교 컴퓨터공학부·2027년 2월 졸업 예정 정보를 사용했습니다. 이메일은 공개 이력서와 기존 사이트의 giribuin@gmail.com을 사용합니다. 제공한 Portfolio PDF 안의 다른 이메일 표기는 원문을 그대로 유지했습니다.
 
-GitHub·LinkedIn·Velog URL은 기존 사이트에서 확인한 값을 공통 config로 옮겼습니다. Instagram·Discord는 null로 두었습니다. 기존 프로젝트 참고 이미지의 출처는 public/images/reference/README.md에 유지합니다.
+GitHub·LinkedIn·Velog URL은 기존 사이트에서 확인한 값을 공통 config로 옮겼습니다. Instagram·Discord는 null로 두었습니다. 기존 프로젝트 참고 이미지의 현재 경로와 출처는 docs/ASSETS.md에 기록합니다.
 
 ## Skills와 개발 원칙
 
@@ -109,3 +109,9 @@ Career DB·원본 사이트·PDF·프로젝트 코드에는 쓰기 작업을 하
 - 사용자가 제공한 zzz, parking, ct, kuroom 저장소의 assets/icon.png·thumbnail.png를 public/images/projects/[slug]/에 원본 그대로 복사했습니다. parking은 smart-parking slug에 연결했습니다.
 - 아이콘은 기존 logo 필드에, 썸네일은 thumbnail 필드에 연결했습니다. 기존 MP4 호버 재생과 상세 YouTube 링크를 유지하며 dark/light 구분은 없습니다.
 - Review Analyzer·KUTODO·발주콜에는 새 자산을 추가하지 않았습니다.
+
+## 폴더·자산 정리 (2026-10-21)
+
+- 두 참고 이미지를 프로젝트별 reference.png로 이동했고 파일 내용은 유지했습니다.
+- 미사용 dark/light SVG 12개, 이전 Smart Parking cover.webp, 미사용 me.jpg와 마이그레이션 전용 검증 스크립트를 제거했습니다.
+- 출처와 원본·생성물의 구분은 ASSETS.md에서 관리합니다. 기존 제작 계획은 과거 기록으로 표시했습니다.

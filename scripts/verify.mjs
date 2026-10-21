@@ -1,13 +1,17 @@
 // Build real Astro output; mutations stay inside .verification.
-import { cpSync, mkdirSync, readFileSync, writeFileSync, existsSync, mkdtempSync } from 'node:fs';
+import { cpSync, mkdirSync, readFileSync, writeFileSync, existsSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { fileURLToPath } from 'node:url';
 import { spawnSync } from 'node:child_process';
 import assert from 'node:assert/strict';
+import { removeGenerated } from './clean.mjs';
 const root = fileURLToPath(new URL('../', import.meta.url));
 const artifacts = join(root, '.verification');
 mkdirSync(artifacts, { recursive: true });
-const fixture = mkdtempSync(join(artifacts, 'content-'));
+// Reuse one generated fixture instead of keeping a full site copy on every run.
+removeGenerated('.verification/content-current');
+const fixture = join(artifacts, 'content-current');
+mkdirSync(fixture);
 for (const entry of ['src', 'public', 'package.json', 'astro.config.mjs', 'tsconfig.json']) cpSync(join(root, entry), join(fixture, entry), { recursive: true });
 const build = cwd => {
   const result = spawnSync(process.execPath, [resolve(root, 'node_modules/astro/bin/astro.mjs'), 'build'], { cwd, encoding: 'utf8' });

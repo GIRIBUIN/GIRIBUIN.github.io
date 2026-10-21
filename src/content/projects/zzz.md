@@ -14,7 +14,7 @@ summary: "전체 구조, DB 스키마, Express API·대시보드와 AWS 단계 �
 problem: "센서·웨어러블 데이터의 수집과 피드백 흐름 통합"
 decision: "계층을 분리하고 SQLite를 MySQL/RDS로 확장"
 result: "실제 센서와 AWS 대시보드를 수업에서 시연"
-visual: {"url":"/images/reference/zzz-overview.png","alt":"ZZZ 초기 On-Premise 단계 대시보드 참고 화면","caption":"기존 포트폴리오 참고 화면 / On-Premise 단계"}
+visual: {"url":"/images/projects/zzz/reference.png","alt":"ZZZ 초기 On-Premise 단계 대시보드 참고 화면","caption":"기존 포트폴리오 참고 화면 / On-Premise 단계"}
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/zzz","release":null,"video":"https://youtu.be/eqvWtHHWINI","caseStudy":null}
 demo: {"type":"video","url":"/videos/projects/zzz/demo.mp4"}
 logo: "/images/projects/zzz/icon.png"
