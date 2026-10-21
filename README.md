@@ -140,7 +140,7 @@ demo:
 - hidden: true는 홈과 두 언어의 상세 생성에서 제외합니다. Demo 유무는 노출 조건이 아닙니다.
 - title·slug·summary가 필수입니다. 순서·노출·URL은 언어와 관계없이 공유하고 translations는 문구만 변경합니다.
 - translations.ko도 지원하므로 필요하면 기본 한국어 문구를 override할 수 있습니다.
-- logo·thumbnail에는 http(s) 또는 사이트 루트 기준 경로를 넣습니다. 로고가 없어도 제목 텍스트를 표시합니다. 현재 사용하는 Smart Parking cover는 public/images/projects/smart-parking/cover.webp에 둡니다. 기존 SVG dark/light 쌍은 보존합니다.
+- logo·thumbnail에는 http(s) 또는 사이트 루트 기준 경로를 넣습니다. 로고가 없어도 제목 텍스트를 표시합니다. ZZZ·Smart Parking·ct·KUROOM의 공통 아이콘과 썸네일은 public/images/projects/[slug]/icon.png·thumbnail.png에 둡니다. dark/light 파일을 나누지 않습니다.
 - 기본 카드는 thumbnail을 우선 표시하고, 영상만 있으면 영상 첫 프레임을 표시합니다. 영상이 없으면 thumbnail → 실제 image 미디어 → visual 순서이며 모두 없으면 neutral placeholder를 표시합니다. 썸네일만 등록한 프로젝트는 영상을 재생하지 않습니다.
 - 상세 영상은 links.video의 YouTube 주소를 사용하며 MP4를 렌더링하지 않습니다. 이미지·웹 Demo·APK와 미디어가 없는 경우의 fallback은 기존 metadata를 사용합니다.
 

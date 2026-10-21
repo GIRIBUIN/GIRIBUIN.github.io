@@ -16,8 +16,8 @@ decision: "정적 JSON 조회와 시간대 계산을 분리·검증"
 result: "강의실 404개·시간표 3,087개 구조 확인. 공개 배포 준비 중"
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/kuroom","release":null,"video":"https://youtu.be/iZvaG1DglfI?si=hF7h1nOkf_jBIxXl","caseStudy":null}
 demo: {"type":"video","url":"/videos/projects/kuroom/demo.mp4"}
-logo: null
-thumbnail: null
+logo: "/images/projects/kuroom/icon.png"
+thumbnail: "/images/projects/kuroom/thumbnail.png"
 hidden: false
 translations: {"en":{"oneLine":"A web app for building and room timetable lookup from normalized campus schedules.","summary":"Built data normalization, schedule lookup, responsive UI, and Python–TypeScript parity checks.","problem":"Find room schedules without scanning complex timetables.","decision":"Query static JSON and verify interval and timezone behavior.","result":"Verified a dataset of 404 rooms and 3,087 entries. Public launch pending.","trace":{"input":"Campus building + room schedules","decision":"Static JSON + verified time boundaries","output":"Weekly building + room timetables"}}}
 ---

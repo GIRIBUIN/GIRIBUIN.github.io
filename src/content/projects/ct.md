@@ -12,8 +12,8 @@ tech: ["Go","JSON","GitHub Actions","VS Code"]
 summary: "풀이 파일 생성, VS Code 연동과 환경 진단을 제공하는 개인 실사용 도구입니다. Windows·Linux 바이너리를 배포했습니다."
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/ct","release":"https://github.com/GIRIBUIN/ct/releases/tag/v0.3.1","video":"https://youtu.be/NN1xVfZOhDg?si=binFhCB4yua3H-Tc","caseStudy":null}
 demo: {"type":"terminal","url":"/videos/projects/ct/demo.mp4","format":"video"}
-logo: null
-thumbnail: null
+logo: "/images/projects/ct/icon.png"
+thumbnail: "/images/projects/ct/thumbnail.png"
 hidden: false
 oneLine: "풀이 파일 생성·VS Code 실행·환경 진단을 돕는 CLI"
 problem: "언어별 풀이 파일과 개발환경의 반복 준비"

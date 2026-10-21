@@ -17,8 +17,8 @@ result: "실제 센서와 AWS 대시보드를 수업에서 시연"
 visual: {"url":"/images/reference/zzz-overview.png","alt":"ZZZ 초기 On-Premise 단계 대시보드 참고 화면","caption":"기존 포트폴리오 참고 화면 / On-Premise 단계"}
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/zzz","release":null,"video":"https://youtu.be/eqvWtHHWINI","caseStudy":null}
 demo: {"type":"video","url":"/videos/projects/zzz/demo.mp4"}
-logo: null
-thumbnail: null
+logo: "/images/projects/zzz/icon.png"
+thumbnail: "/images/projects/zzz/thumbnail.png"
 hidden: false
 translations: {"en":{"oneLine":"A web dashboard for rule-based sleep risk and scores from sensor and wearable data.","summary":"Designed the system and database, built Express APIs and dashboards, and contributed to AWS integration.","problem":"Bring sensor and wearable data into one feedback flow.","decision":"Separate responsibilities; extend SQLite storage to MySQL/RDS.","result":"Demonstrated real sensor ingestion and the AWS dashboard in class.","visual":{"alt":"ZZZ dashboard from the early on-premise phase","caption":"Earlier on-premise reference screen"},"trace":{"input":"Room sensors + wearable data","decision":"Separate collection from storage","output":"Rule-based sleep risk + scores"}}}
 ---

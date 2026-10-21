@@ -39,7 +39,7 @@ test('video cards use optional thumbnails or their own first frame with lazy sou
     const thumbnail = card.match(/<video [^>]*>/)[0];
     assert.ok(thumbnail.includes('data-thumbnail-src="/videos/projects/' + slug + '/demo.mp4"'));
     assert.ok(!/\ssrc=/.test(thumbnail) && !thumbnail.includes('autoplay') && !thumbnail.includes('poster='));
-    const cover = { convoary: '/images/projects/convoary/thumbnail.png', 'smart-parking': '/images/projects/smart-parking/cover.webp' }[slug];
+    const cover = ['zzz', 'smart-parking', 'ct', 'kuroom', 'convoary'].includes(slug) ? '/images/projects/' + slug + '/thumbnail.png' : null;
     if (cover) {
       assert.ok(card.includes('src="' + cover + '"') && !card.includes('<canvas'));
     } else {

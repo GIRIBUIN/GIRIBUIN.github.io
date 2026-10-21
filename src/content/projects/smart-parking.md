@@ -16,8 +16,8 @@ decision: "MQTT 구독, heartbeat와 커널 상태 인터페이스"
 result: "실제 센서·모터를 포함한 3-node 수업 시연 완료"
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/RPI-Parking-service-driver","release":null,"video":"https://youtu.be/YD9IXrkSWf0","caseStudy":null}
 demo: {"type":"video","url":"/videos/projects/smart-parking/demo.mp4"}
-logo: null
-thumbnail: "/images/projects/smart-parking/cover.webp"
+logo: "/images/projects/smart-parking/icon.png"
+thumbnail: "/images/projects/smart-parking/thumbnail.png"
 hidden: false
 translations: {"en":{"title":"Smart Parking","oneLine":"A three-Pi MQTT prototype for parking sensors, gates, and monitoring.","summary":"Built the RPi3 MQTT/SQLite/Flask hub, kernel status diagnostics, and local network integration.","problem":"Collect states and events from sensing and gate devices.","decision":"Use MQTT subscriptions, heartbeats, and kernel status interfaces.","result":"Demonstrated the three-node system with real sensors and motors.","trace":{"input":"Sensor + gate node state","decision":"MQTT collection + heartbeat checks","output":"Central parking-model dashboard"}}}
 ---

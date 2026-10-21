@@ -103,3 +103,9 @@ Career DB·원본 사이트·PDF·프로젝트 코드에는 쓰기 작업을 하
 - 영어 문구는 읽은 근거의 번역·요약이며 사용자 최종 검토가 필요합니다.
 - 대표작 순서·선정, 카드 높이와 미리보기 비율, 모바일 Header의 두 줄 배치를 실제 사용감으로 판단할 수 있습니다.
 - PDF는 원문을 보존했으므로, 사이트의 기술·검증 범위·연락처와 PDF 문구의 최종 일치는 사람이 별도 검토할 수 있습니다.
+
+## 프로젝트 아이콘·썸네일 추가 (2026-10-21)
+
+- 사용자가 제공한 zzz, parking, ct, kuroom 저장소의 assets/icon.png·thumbnail.png를 public/images/projects/[slug]/에 원본 그대로 복사했습니다. parking은 smart-parking slug에 연결했습니다.
+- 아이콘은 기존 logo 필드에, 썸네일은 thumbnail 필드에 연결했습니다. 기존 MP4 호버 재생과 상세 YouTube 링크를 유지하며 dark/light 구분은 없습니다.
+- Review Analyzer·KUTODO·발주콜에는 새 자산을 추가하지 않았습니다.
