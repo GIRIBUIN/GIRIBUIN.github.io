@@ -12,8 +12,8 @@ tech: ["Flutter","Dart","SQLite"]
 summary: "아버지의 매장 요구를 Flutter·SQLite 앱으로 옮겼습니다. AI 생성·제안 코드를 적극 활용한 개인 프로젝트입니다."
 links: {"demo":null,"source":null,"release":null,"video":null,"caseStudy":null}
 demo: {"type":"apk","url":null}
-logo: null
-thumbnail: null
+logo: "/images/projects/kokchack/icon.png"
+thumbnail: "/images/projects/kokchack/thumbnail.png"
 hidden: false
 oneLine: "매장 재고·발주·납품·지급 내역을 SQLite에 기록하는 앱"
 problem: "재고 확인·거래처별 발주와 정산 업무 연결"

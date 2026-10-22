@@ -9,8 +9,8 @@ section: "work"
 order: 60
 trace: {"input":"eCampus HTML + 로컬 Task","decision":"원본 비교 후 선택 반영","output":"개인 일정과 학업 일정 통합"}
 hidden: false
-logo: null
-thumbnail: null
+logo: "/images/projects/kutodo/icon.png"
+thumbnail: "/images/projects/kutodo/thumbnail.png"
 tech: ["Flutter","Dart","WebView","Drift / SQLite","HTML parsing"]
 oneLine: "eCampus HTML 일정을 로컬 Task와 비교·선택 반영하는 Android 앱"
 summary: "로그인 세션, HTML 수집·파싱, sourceKey 비교와 로컬 데이터 계층을 담당하고 팀 UI를 실제 데이터에 연결했습니다."
