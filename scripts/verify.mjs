@@ -43,7 +43,7 @@ test('video cards use optional thumbnails or their own first frame with lazy sou
     const thumbnail = card.match(/<video [^>]*>/)[0];
     assert.ok(thumbnail.includes('data-thumbnail-src="/videos/projects/' + slug + '/demo.mp4"'));
     assert.ok(!/\ssrc=/.test(thumbnail) && !thumbnail.includes('autoplay') && !thumbnail.includes('poster='));
-    const cover = ['zzz', 'smart-parking', 'ct', 'kuroom', 'convoary'].includes(slug) ? '/images/projects/' + slug + '/thumbnail.png' : null;
+    const cover = readFileSync(join(root, 'src/content/projects', slug + '.md'), 'utf8').match(/^thumbnail: "([^"]+)"/m)?.[1] || null;
     if (cover) {
       assert.ok(card.includes('src="' + cover + '"') && !card.includes('<canvas'));
     } else {
@@ -164,11 +164,12 @@ test('optional thumbnail and detail logo/media reuse the content schema', () => 
   assert.ok(videoCard.includes('data-thumbnail-src="/fixture.mp4"') && !videoCard.includes('<img') && !videoCard.includes('poster='));
   assert.ok(read(fixture, 'work/ready-apk/index.html').includes('Download APK'));
 });
-test('basic cards omit metadata/tech/actions and detail pages keep real actions', () => {
+test('editorial cards show metadata without nested actions and detail pages keep real actions', () => {
   for (const card of cards(baseline)) {
     const markup = card[2];
     assert.ok(!markup.includes('project-type') && !markup.includes('project-tech') && !markup.includes('project-actions') && !markup.includes('data-media-enlarge'));
     assert.ok(markup.includes('data-action-copy="project.deepDive"'));
+    assert.ok(markup.includes('project-card-meta') && markup.includes('project-stack') && markup.includes('project-index'));
   }
   for (const slug of expected) {
     const markup = read(root, 'work/' + slug + '/index.html');

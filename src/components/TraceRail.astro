@@ -15,29 +15,29 @@ const layers = [
 <nav class="trace-rail" aria-label={ui.trace.navigation} data-i18n-aria-label="trace.navigation">
   <ol>{layers.map((layer, index) => <li>
     <a href={'#' + layer.target} data-trace-layer={layer.target} aria-current={index === 0 ? 'location' : undefined}>
-      <span class="trace-dot" aria-hidden="true"></span><span class="trace-label" data-i18n={layer.key}>{layer.label}</span>
+      <span class="trace-number" aria-hidden="true">{String(index + 1).padStart(2, '0')}</span><span class="trace-label" data-i18n={layer.key}>{layer.label}</span>
     </a>
   </li>)}</ol>
 </nav>
 <style>
   .trace-rail { display: none; }
   @media (min-width: 1100px) {
-    .trace-rail { display: block; position: fixed; right: 10px; top: 50%; transform: translateY(-50%); width: 28px; z-index: 10; }
+    .trace-rail { display: block; position: fixed; right: 12px; top: 50%; transform: translateY(-50%); width: 28px; z-index: 10; }
     .trace-rail ol { margin: 0; }
-    .trace-rail li { position: relative; }
-    .trace-rail li:not(:last-child)::after { content: ''; position: absolute; width: 1px; top: 28px; bottom: -14px; left: 14px; background: var(--line); pointer-events: none; }
-    .trace-rail a { position: relative; display: flex; align-items: center; gap: 8px; min-height: 44px; color: var(--text-muted); }
-    .trace-dot { position: relative; z-index: 1; width: 5px; height: 5px; margin-left: 12px; border: 1px solid var(--muted); border-radius: 50%; background: var(--bg); flex: none; }
-    .trace-label { position: absolute; right: 28px; padding: 4px 8px; font-size: 9px; line-height: 1.4; white-space: nowrap; background: var(--bg); opacity: 0; pointer-events: none; }
-    .trace-rail a:hover .trace-label, .trace-rail a:focus-visible .trace-label { opacity: 1; }
-    .trace-rail a[aria-current] { color: var(--accent-ink); }
-    .trace-rail a[aria-current] .trace-dot { background: var(--accent); border-color: var(--accent-ink); box-shadow: 0 0 0 4px color-mix(in srgb, var(--accent) 14%, transparent); }
+    .trace-rail a { display: flex; align-items: center; gap: 9px; min-height: 38px; color: var(--text-muted); transition: color 180ms ease; }
+    .trace-number { font: 10px/1 var(--mono); }
+    .trace-label { display: none; font-size: 9px; font-weight: 500; line-height: 1.4; text-transform: uppercase; letter-spacing: .035em; }
+    .trace-rail a::before { content: ''; width: 4px; height: 1px; background: var(--border); flex: none; transition: width 180ms ease, background 180ms ease; }
+    .trace-rail a:is(:hover, :focus-visible), .trace-rail a[aria-current] { color: var(--accent); }
+    .trace-rail a[aria-current] { font-weight: 600; }
+    .trace-rail a[aria-current]::before { background: var(--accent); width: 10px; }
   }
-  @media (min-width: 1440px) {
-    .trace-rail { width: 80px; right: 8px; }
-    .trace-rail li:not(:last-child)::after { left: 2px; }
-    .trace-dot { margin-left: 0; }
-    .trace-label { position: static; min-width: 0; padding: 0; opacity: 1; font-size: 9px; white-space: normal; background: transparent; }
+  @media (min-width: 1280px) {
+    .trace-rail { width: 136px; right: 16px; }
+    .trace-label { display: block; }
+    .trace-rail a { min-height: 40px; }
+    .trace-rail a::before { width: 8px; }
+    .trace-rail a[aria-current]::before { width: 16px; }
   }
 </style>
 <script>

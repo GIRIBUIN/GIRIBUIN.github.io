@@ -38,7 +38,7 @@ try {
     if (!touch) {
       await card('zzz').locator('.project-thumbnail').hover();
       await playing('zzz');
-      assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '-5px');
+      assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '-2px');
       await page.mouse.move(0, 0);
       await page.waitForFunction(() => document.querySelector('[data-project="zzz"] video').paused);
       await card('zzz').click();
@@ -100,7 +100,7 @@ try {
     await playing('zzz');
     assert.equal(new URL(page.url()).pathname, '/');
     await page.waitForTimeout(200);
-    assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '-5px');
+    assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '0px');
     assert.equal(await card('zzz').locator('.touch-preview-hint').isVisible(), true);
     await card('zzz').locator('.project-thumbnail').dispatchEvent('pointerleave', { pointerType: 'touch' });
     assert.equal(await paused('zzz'), false);

@@ -1,5 +1,6 @@
 ---
 interface Props { title: string; note?: string; id: string; titleKey?: string; noteKey?: string; }
 const { title, id, titleKey } = Astro.props;
+const indexes: Record<string, string> = { 'about-heading': '01', 'education-heading': '02', 'skills-heading': '03', 'projects-heading': '04', 'process-heading': '05', 'contact-heading': '06' };
 ---
-<div class="section-heading"><h2 id={id} data-i18n={titleKey} data-stable-copy={titleKey ? true : undefined}>{title}</h2><slot name="action" /></div>
+<div class="section-heading"><div class="section-title"><h2 id={id} data-i18n={titleKey} data-stable-copy={titleKey ? true : undefined}>{title}</h2>{indexes[id] && <span class="section-index" aria-hidden="true">/ {indexes[id]}</span>}</div><slot name="action" /></div>

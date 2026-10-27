@@ -1,0 +1,54 @@
+---
+// Put Blender exports in public/videos/hero/ and set the URLs below.
+// Keep the scene background #0D0E10 and the lunar ground near the lower edge.
+// A canvas renderer can replace the video inside .hero-scene-media.
+const scene: { webm: string | null; mp4: string | null; poster: string | null } = {
+  webm: null, // '/videos/hero/lunar-loop.webm'
+  mp4: null, // '/videos/hero/lunar-loop.mp4'
+  poster: null, // '/images/hero/lunar-poster.webp' — static reduced-motion frame
+};
+---
+<div class="hero-scene" aria-hidden="true">
+  <div class="scene-caption"><span>PERSONAL SPACE</span><span>01 / LUNAR STUDY</span></div>
+  <svg class="scene-landscape" viewBox="0 0 800 560" fill="none" preserveAspectRatio="xMidYMax meet">
+    <path d="M0 485 65 472 120 478 180 450 248 460 320 421 362 433 415 409 464 422 510 395 565 418 615 400 690 435 745 427 800 448V560H0Z" fill="var(--section-bg)" />
+    <g stroke="var(--border)" stroke-width="1">
+      <path d="M0 485 65 472 120 478 180 450 248 460 320 421 362 433 415 409 464 422 510 395 565 418 615 400 690 435 745 427 800 448" />
+      <path d="m0 509 121-15 75 9 133-40 85 8 102-32 107 30 80-6 97 26M0 537l182-14 98 8 112-28 110 4 87-17 122 28 89-9" />
+      <path d="m320 421 9 42 63 40 47 57m71-165 6 44-14 68 36 53m-358-110 16 53-14 20-35 37m468-160 8 69 88 49 33 42" opacity=".5" />
+    </g>
+    <path d="M396 268h12m-6-6v12" stroke="var(--accent)" />
+    <path d="M402 298v72" stroke="var(--border)" stroke-dasharray="2 8" />
+  </svg>
+  <div class="hero-scene-media">
+    {(scene.webm || scene.mp4) && <video data-hero-loop muted loop playsinline preload="none" poster={scene.poster || undefined} tabindex="-1">
+      {scene.webm && <source src={scene.webm} type="video/webm" />}
+      {scene.mp4 && <source src={scene.mp4} type="video/mp4" />}
+    </video>}
+  </div>
+</div>
+<style>
+  .hero-scene { position: relative; align-self: stretch; min-width: 0; min-height: 440px; overflow: hidden; }
+  .scene-caption { position: absolute; inset: 36px 0 auto 12%; display: flex; justify-content: space-between; gap: 16px; color: var(--text-muted); font: 10px/1.5 var(--mono); letter-spacing: .08em; }
+  .scene-landscape { position: absolute; inset: 0; width: 100%; height: 100%; }
+  .hero-scene-media { position: absolute; inset: 0; mask-image: linear-gradient(90deg, transparent, black 14%, black 92%, transparent); }
+  .hero-scene-media video, .hero-scene-media :global(canvas) { width: 100%; height: 100%; object-fit: cover; }
+  @media (max-width: 700px) {
+    .hero-scene { min-height: 0; height: clamp(210px, 62vw, 320px); }
+    .scene-caption { inset: 18px 0 auto; font-size: 9px; }
+  }
+</style>
+<script>
+  const video = document.querySelector<HTMLVideoElement>('[data-hero-loop]');
+  if (video) {
+    const motion = matchMedia('(prefers-reduced-motion: reduce)');
+    let visible = false;
+    const sync = () => {
+      if (!visible || document.hidden || motion.matches) { video.pause(); return; }
+      void video.play().catch(() => { /* Poster and landscape remain visible. */ });
+    };
+    new IntersectionObserver(entries => { visible = entries[0].isIntersecting; sync(); }).observe(video);
+    motion.addEventListener('change', sync);
+    document.addEventListener('visibilitychange', sync);
+  }
+</script>

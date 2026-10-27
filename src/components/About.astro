@@ -17,14 +17,13 @@ const facts = [
     {site.profileImage && <figure class="about-portrait"><img class="profile-photo" src={site.profileImage} alt={site.profileAlt[locale]} data-i18n-alt="profile.profileAlt" width="1080" height="1440" loading="lazy" /></figure>}
     <div class="about-copy">
       <h3 data-i18n="profile.name" data-stable-copy>{site.name[locale]}</h3>
+      <p class="about-role">{site.role}</p>
+      <p class="about-education" data-i18n="profile.educationProgram" data-stable-copy>{site.educationProgram[locale]}</p>
       <p class="about-bio" data-i18n="profile.bio" data-stable-copy>{site.bio[locale]}</p>
-      <dl class="profile-facts">{facts.map(fact => <div><dt>
-        <button class="fact-icon" type="button" aria-label={fact.label} data-i18n-aria-label={'about.' + fact.key}>
-          {fact.key === 'focus' ? <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="12" cy="12" r="8" /><circle cx="12" cy="12" r="3" /><path d="M12 2v3m0 14v3M2 12h3m14 0h3" /></svg>
-          : fact.key === 'approach' ? <svg viewBox="0 0 24 24" aria-hidden="true"><circle cx="5" cy="5" r="2" /><circle cx="19" cy="5" r="2" /><circle cx="12" cy="19" r="2" /><path d="M6.5 6.5 11 17m7.5-10.5L13 17M7 5h10" /></svg>
-          : <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 4H4v5h3a2 2 0 0 1 0 4H4v7h6v-3a2 2 0 0 1 4 0v3h6v-6h-3a2 2 0 0 1 0-4h3V4h-6v3a2 2 0 0 1-4 0V4H8Z" /></svg>}
-        </button><span class="fact-tooltip" aria-hidden="true" data-i18n={'about.' + fact.key}>{fact.label}</span>
-      </dt><dd data-i18n={'profile.' + fact.key} data-stable-copy>{fact.text}</dd></div>)}</dl>
+      <dl class="profile-facts">{facts.map(fact => <div>
+        <dt data-i18n={'about.' + fact.key}>{fact.label}</dt>
+        <dd data-i18n={'profile.' + fact.key} data-stable-copy>{fact.text}</dd>
+      </div>)}</dl>
     </div>
   </div>
 </section>

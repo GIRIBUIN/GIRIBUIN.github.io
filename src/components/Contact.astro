@@ -2,12 +2,13 @@
 import { site } from '../data/site';
 import { getUi, type Locale } from '../i18n/ui';
 import SocialIcon from './SocialIcon.astro';
+import SectionHeading from './SectionHeading.astro';
 interface Props { locale?: Locale; }
 const { locale = 'en' } = Astro.props;
 const ui = getUi(locale);
 ---
 <section id="contact" class="shell section contact" aria-labelledby="contact-heading">
-  <h2 id="contact-heading" data-i18n="contact.title" data-stable-copy>{ui.contact.title}</h2>
+  <SectionHeading title={ui.contact.title} titleKey="contact.title" id="contact-heading" />
   <p class="contact-intro" data-i18n="contact.intro" data-stable-copy>{ui.contact.intro}</p>
   <ul class="contact-socials">
     {site.email && <li><a href={'mailto:' + site.email} aria-label={site.email} title={site.email}><SocialIcon name="email" /></a></li>}

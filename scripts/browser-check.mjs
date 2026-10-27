@@ -70,7 +70,7 @@ try {
         return [values[0], values[1], values[2], values[3] ?? 1];
       };
       const luminance = color => color.slice(0, 3).map(value => value / 255).map(value => value <= .04045 ? value / 12.92 : ((value + .055) / 1.055) ** 2.4).reduce((total, value, i) => total + value * [.2126, .7152, .0722][i], 0);
-      // Use the darkest paper surface as a conservative background for page gradients.
+      // Use the brightest dark surface as a conservative background for light text.
       const paper = parse(getComputedStyle(document.documentElement).getPropertyValue('--surface-strong').trim());
       return elements.filter(el => el.getClientRects().length && el.textContent.trim()).map(el => {
         let background = paper;
@@ -102,13 +102,13 @@ try {
   const secondaryButton = page.locator('[data-action="resume"]');
   assert.equal(navigationIconBackground, await secondaryButton.evaluate(el => getComputedStyle(el).backgroundColor));
   assert.equal(navigationIconBackground, await page.locator('[data-action="portfolio-pdf"]').evaluate(el => getComputedStyle(el).backgroundColor));
-  const activeControlBackground = 'rgb(48, 52, 58)';
+  const activeControlBackground = 'rgb(27, 30, 35)';
   await secondaryButton.hover();
   assert.equal(await secondaryButton.evaluate(el => getComputedStyle(el).backgroundColor), activeControlBackground);
   await checkContrast('[data-action="resume"]:hover', 'secondary control hover text');
   await page.locator('[data-projects-more]').hover();
   assert.equal(await page.locator('[data-projects-more]').evaluate(el => getComputedStyle(el).backgroundColor), activeControlBackground);
-  await checkContrast('.main-nav a,.header .language-switch button,.hero h1,.hero-positioning,.hero-intro,.hero-trace-copy,.hero-trace-label,.hero .button,.about-bio,.profile-facts dt,.profile-facts dd,.education-status,.education-program,.skill-tags li,.project-card-title,.project-card-summary,[data-projects-more],.principle-title,.principle-hook,.principle-number,.contact h2,.contact-intro,.contact-socials a,.footer,.trace-rail a', 'warm home text');
+  await checkContrast('.main-nav a,.header .language-switch button,.hero h1,.hero-positioning,.hero-intro,.hero-kicker,.hero .button,.about-bio,.profile-facts dt,.profile-facts dd,.education-status,.education-program,.skill-tags li,.project-card-title,.project-card-summary,.project-card-meta,.project-stack,.project-view,[data-projects-more],.principle-title,.principle-hook,.principle-number,.contact h2,.contact-intro,.contact-socials a,.footer,.trace-rail a', 'dark editorial home text');
   await page.locator('.button.primary').hover();
   await checkContrast('.button.primary', 'primary hover text');
   await page.keyboard.press('Tab');
@@ -118,14 +118,14 @@ try {
   assert.equal(await page.locator('.dialog-close').evaluate(el => getComputedStyle(el).backgroundColor), navigationIconBackground);
   await page.locator('.dialog-close').hover();
   assert.equal(await page.locator('.dialog-close').evaluate(el => getComputedStyle(el).backgroundColor), activeControlBackground);
-  await checkContrast('#build-dialog [data-principle-panel]:not([hidden]) h3,#build-dialog [data-principle-panel]:not([hidden]) dt,#build-dialog [data-principle-panel]:not([hidden]) dd,#build-dialog [data-principle-panel]:not([hidden]) .principle-dialog-intro,#build-dialog .language-switch button', 'warm modal text');
+  await checkContrast('#build-dialog [data-principle-panel]:not([hidden]) h3,#build-dialog [data-principle-panel]:not([hidden]) dt,#build-dialog [data-principle-panel]:not([hidden]) dd,#build-dialog [data-principle-panel]:not([hidden]) .principle-dialog-intro,#build-dialog .language-switch button', 'dark modal text');
   await page.keyboard.press('Escape');
   await goto(base + '/work/ct/');
   assert.equal(await page.locator('.detail-page .project-nav-icon').evaluate(el => getComputedStyle(el).backgroundColor), navigationIconBackground);
   await page.locator('.detail-page .project-nav-icon').hover();
   assert.equal(await page.locator('.detail-page .project-nav-icon').evaluate(el => getComputedStyle(el).backgroundColor), activeControlBackground);
-  await checkContrast('.detail-page h1,.detail-summary,.tech,.prose p,.prose li,.prose pre span', 'warm detail text');
-  pass('warm theme text/hover contrast >=4.5:1 and visible focus >=3:1');
+  await checkContrast('.detail-page h1,.detail-summary,.tech,.prose p,.prose li,.prose pre span', 'dark detail text');
+  pass('dark theme text/hover contrast >=4.5:1 and visible focus >=3:1');
 
   await goto(base);
   await thumbnail('zzz').evaluate(el => {
@@ -148,13 +148,17 @@ try {
       return { left: rect.left, width: rect.width, body: document.body.getBoundingClientRect().width };
     });
     assert.ok(Math.abs(heroBounds.left) < 1 && Math.abs(heroBounds.width - heroBounds.body) < 1, 'Hero background spans the page at ' + width + ': ' + JSON.stringify(heroBounds));
-    if (width >= 820) assert.ok(await page.locator('#hero .hero-art span').evaluateAll(items => {
-      const hero = document.querySelector('#hero').getBoundingClientRect();
-      return items.every(item => {
-        const rect = item.getBoundingClientRect();
-        return rect.left >= hero.left && rect.right <= hero.right && rect.top >= hero.top && rect.bottom <= hero.bottom;
-      });
-    }), 'Pastel circles are not clipped at ' + width);
+    assert.equal(await page.locator('.hero-avatar,.hero-art,.hero-trace').count(), 0);
+    const heroLayout = await page.locator('.hero-layout').evaluate(el => ({
+      columns: getComputedStyle(el).gridTemplateColumns.split(' ').length,
+      content: el.querySelector('.hero-content').getBoundingClientRect().toJSON(),
+      scene: el.querySelector('.hero-scene').getBoundingClientRect().toJSON(),
+    }));
+    assert.equal(heroLayout.columns, width > 700 ? 2 : 1);
+    if (width > 700) assert.ok(heroLayout.scene.x >= heroLayout.content.right - 1);
+    else assert.ok(heroLayout.scene.y >= heroLayout.content.bottom - 1 && heroLayout.scene.height <= 320);
+    assert.equal(await page.locator('.trace-rail').isVisible(), width >= 1100);
+    if (width === 1440 || width === 390) await page.screenshot({ path: join(out, width === 1440 ? 'desktop-hero.png' : 'mobile-hero.png') });
     assert.equal(await page.locator('section#work,section#tools,.rail-track').count(), 0);
     assert.deepEqual(await page.locator('#projects-grid>article').evaluateAll(items => items.map(el => el.dataset.project)), expected.slice(0, 4));
     assert.equal(await visibleCount(), 4);
@@ -256,16 +260,13 @@ try {
   assert.ok(await page.locator('.skill-tags li').evaluateAll(items => items.every(item => {
     const image = item.querySelector('img')?.getBoundingClientRect();
     const name = item.querySelector('span')?.getBoundingClientRect();
-    return image && name && image.bottom < name.top && Math.abs((image.left + image.right) / 2 - (name.left + name.right) / 2) < 2;
+    return image && name && image.right < name.left && Math.abs((image.top + image.bottom) / 2 - (name.top + name.bottom) / 2) < 2;
   })));
-  assert.ok(await page.locator('.skill-tags li').evaluateAll(items => items.every(item => item.getBoundingClientRect().width === 88 && item.getBoundingClientRect().height === 96)));
-  assert.ok(await page.locator('.skill-tags').first().evaluate(el => {
-    const overflow = el.scrollWidth > el.clientWidth;
-    el.scrollLeft = el.scrollWidth;
-    return overflow && el.scrollLeft > 0 && document.documentElement.scrollWidth <= innerWidth + 1;
-  }));
+  assert.ok(await page.locator('.skill-tags li').evaluateAll(items => items.every(item => getComputedStyle(item).backgroundColor === 'rgba(0, 0, 0, 0)')));
+  assert.ok(await page.locator('.skill-tags').evaluateAll(items => items.every(el => el.scrollWidth <= el.clientWidth)));
   assert.equal(await page.locator('#contact a svg').count(), 4);
-  assert.equal((await page.locator('footer').textContent()).trim(), '@giribuin');
+  assert.equal((await page.locator('footer > span').textContent()).trim(), '@giribuin');
+  assert.equal(await page.locator('.footer-links a').count(), 4);
   for (const path of ['/files/resume-public.pdf', '/files/portfolio.pdf']) {
     const response = await page.request.get(base + path);
     assert.equal((await response.body()).subarray(0, 4).toString(), '%PDF');
@@ -341,11 +342,13 @@ try {
       const ready = image ? image.complete && image.naturalWidth > 0 : canvas?.width > 0 && canvas.getContext('2d').getImageData(0, 0, 1, 1).data[3] > 0;
       return video.paused && !video.seeking && ready;
     }), [hovered, neighbor]);
-    const still = await thumbnail(neighbor).screenshot();
+    const still = await thumbnail(neighbor).screenshot({ animations: 'disabled' });
     await thumbnail(hovered).hover();
     await page.waitForFunction(slug => !document.querySelector('[data-project="' + slug + '"] video').paused, hovered);
     await page.waitForTimeout(350);
-    assert.ok(still.equals(await thumbnail(neighbor).screenshot()), hovered + ' must not obscure ' + neighbor);
+    const after = await thumbnail(neighbor).screenshot({ animations: 'disabled' });
+    if (!still.equals(after)) { writeFileSync(join(out, 'neighbor-before.png'), still); writeFileSync(join(out, 'neighbor-after.png'), after); }
+    assert.ok(still.equals(after), hovered + ' must not obscure ' + neighbor);
     await page.screenshot({ path: join(out, 'overlap-' + hovered + '-page.png') });
   }
   await page.mouse.move(0, 0);

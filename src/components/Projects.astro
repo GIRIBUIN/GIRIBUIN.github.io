@@ -17,16 +17,16 @@ const projects = (all ? collection : collection.slice(0, 4)).map(project => loca
   </> : <SectionHeading title={ui.projectSection.title} titleKey="projectSection.title" id="projects-heading">
     {collection.length > projects.length && <a slot="action" class="project-nav-icon projects-more" href={localePath('/projects/', locale)} data-locale-path="/projects/" data-projects-more aria-label={ui.projectSection.more} title={ui.projectSection.more} data-i18n-aria-label="projectSection.more" data-i18n-title="projectSection.more"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M5 12h14m-6-6 6 6-6 6" /></svg></a>}
   </SectionHeading>}
-  {projects.length ? <div id="projects-grid" class="projects-grid">{projects.map(project => <ProjectCard project={project} locale={locale} />)}</div> : <p class="empty-state" data-i18n="projectSection.empty">{ui.projectSection.empty}</p>}
+  {projects.length ? <div id="projects-grid" class="projects-grid">{projects.map((project, index) => <ProjectCard project={project} locale={locale} index={index + 1} />)}</div> : <p class="empty-state" data-i18n="projectSection.empty">{ui.projectSection.empty}</p>}
 </section>
 <style>
   .projects { position: relative; }
   .legacy-anchor { position: absolute; top: 0; left: 0; }
-  .projects-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 30px 24px; }
+  .projects-grid { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); grid-auto-rows: 1fr; gap: 56px 32px; }
   .projects :global(.section-heading) { flex-direction: row; align-items: center; }
   .projects-more { margin: 0; }
   .projects-home { margin-bottom: 20px; }
   .projects-page { margin-top: 64px; }
   .projects-page h1 { font-size: clamp(36px, 4.5vw, 60px); font-weight: 600; }
-  @media (max-width: 639px) { .projects-grid { grid-template-columns: minmax(0, 1fr); gap: 20px; } }
+  @media (max-width: 639px) { .projects-grid { grid-template-columns: minmax(0, 1fr); gap: 40px; } }
 </style>

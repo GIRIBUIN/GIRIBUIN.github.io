@@ -8,7 +8,7 @@ export default defineConfig({
   trailingSlash: 'always',
   devToolbar: { enabled: false },
   markdown: {
-    shikiConfig: { theme: 'github-light' },
+    shikiConfig: { theme: 'github-dark' },
     syntaxHighlight: { type: 'shiki', excludeLangs: ['mermaid', 'math'] },
     processor: satteri({ hastPlugins: [rehypeDiagrams()] }),
   },
