@@ -31,6 +31,7 @@ public/
   videos/projects/[slug]/
     demo.mp4                  # 선택: 무음 카드 미리보기
   files/                      # 이력서·포트폴리오 PDF
+  models/pet.glb               # 홈 companion 원본 모델
   fonts/                      # 폰트와 라이선스
 ```
 
@@ -46,6 +47,8 @@ public/
 | `public/images/projects/review-analyzer/reference.png` | 기존 GIRIBUIN.github.io의 `public/imgs/projects/review-analyzer/home.png` |
 
 두 파일은 원본 바이트를 유지한 이전 구현 참고 자료입니다. ZZZ는 초기 On-Premise 단계이며 최종 AWS·Google Health 화면을 의미하지 않습니다. Review Analyzer는 기존 웹 프로토타입의 입력 화면이며 최종 분석 결과를 증명하지 않습니다.
+
+`public/models/pet.glb`는 2026-10-29 사용자 Downloads의 `pet.glb`를 원본 그대로 복사했다. 크기 1,366,392 bytes, SHA-256 `D61360CD559E0183D391D6D53D7DF17172F9D9BF1F4A6B34E91415392FEB59BE`. Blender glTF 2.0 모델이며 현재 animation clip은 없다. 수정본은 이 public 경로에 교체한다.
 
 프로필·PDF·프로젝트 아이콘과 썸네일의 상세 출처는 [CONTENT_SOURCES](CONTENT_SOURCES.md), 기술 아이콘 출처는 [TECH_ICON_SOURCES](TECH_ICON_SOURCES.md)에 기록합니다.
 

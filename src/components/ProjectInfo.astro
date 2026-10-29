@@ -1,0 +1,68 @@
+---
+import ProjectTitle from './ProjectTitle.astro';
+import ProjectActions from './ProjectActions.astro';
+import type { Project } from '../lib/projects';
+import type { Locale } from '../i18n/ui';
+interface Props { project: Project; locale: Locale; }
+const { project, locale } = Astro.props;
+const { title, logo, summary, tech, slug } = project.data;
+---
+<div class="project-hud-title">
+  <ProjectTitle title={title} logo={logo} as="h1" id="standalone-project-title" />
+  <button class="project-info-toggle" type="button" popovertarget="project-info" aria-controls="project-info" aria-expanded="false" aria-haspopup="dialog" aria-label={locale === 'ko' ? '프로젝트 정보' : 'Project information'}>
+    <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" aria-hidden="true"><circle cx="12" cy="12" r="9" /><path d="M12 11v6m0-10v1" /></svg>
+  </button>
+  <section id="project-info" class="project-info-panel" popover="auto" role="dialog" aria-labelledby="standalone-project-title" tabindex="-1">
+    <p class="project-info-summary" data-i18n={'projects.' + slug + '.summary'}>{summary}</p>
+    {tech.length > 0 && <p class="project-info-tech">{tech.join(' · ')}</p>}
+    <ProjectActions project={project} locale={locale} detail toolbar />
+  </section>
+</div>
+<script>
+  const plaque = document.querySelector<HTMLElement>('.project-hud-title');
+  const trigger = document.querySelector<HTMLButtonElement>('.project-info-toggle');
+  const panel = document.querySelector<HTMLElement>('#project-info');
+  if (plaque && trigger && panel) {
+    const label = new MutationObserver(() => trigger.setAttribute('aria-label', document.documentElement.lang === 'ko' ? '프로젝트 정보' : 'Project information'));
+    label.observe(document.documentElement, { attributes: true, attributeFilter: ['lang'] });
+    let pinned = false, closeTimer = 0;
+    const cancelClose = () => clearTimeout(closeTimer);
+    const close = () => { cancelClose(); if (panel.matches(':popover-open')) panel.hidePopover(); };
+    const place = () => {
+      const anchor = plaque.getBoundingClientRect(), width = Math.min(360, innerWidth - 40);
+      panel.style.width = width + 'px';
+      panel.style.left = Math.max(20, Math.min(anchor.left + anchor.width / 2 - width / 2, innerWidth - width - 20)) + 'px';
+      panel.style.top = Math.max(20, Math.min(anchor.bottom + 12, innerHeight - panel.offsetHeight - 20)) + 'px';
+    };
+    const scheduleClose = () => { cancelClose(); if (!pinned) closeTimer = window.setTimeout(close, 160); };
+    trigger.addEventListener('pointerenter', event => {
+      cancelClose();
+      if (event.pointerType === 'mouse' && matchMedia('(hover: hover)').matches && !panel.matches(':popover-open')) panel.showPopover();
+    });
+    trigger.addEventListener('pointerleave', scheduleClose);
+    panel.addEventListener('pointerenter', cancelClose);
+    panel.addEventListener('pointerleave', scheduleClose);
+    trigger.addEventListener('click', event => {
+      event.preventDefault(); cancelClose();
+      if (pinned && panel.matches(':popover-open')) { close(); return; }
+      pinned = true; if (!panel.matches(':popover-open')) panel.showPopover(); panel.focus({ preventScroll: true });
+    });
+    panel.addEventListener('beforetoggle', event => {
+      const open = (event as ToggleEvent).newState === 'open';
+      trigger.setAttribute('aria-expanded', String(open));
+      if (open) place(); else { pinned = false; cancelClose(); }
+    });
+    panel.addEventListener('toggle', () => { if (panel.matches(':popover-open')) place(); });
+    panel.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); close(); trigger.focus({ preventScroll: true }); }
+    });
+    const reposition = () => {
+      if (!panel.matches(':popover-open')) return;
+      const anchor = plaque.getBoundingClientRect();
+      if (anchor.bottom < 0 || anchor.top > innerHeight) close(); else place();
+    };
+    addEventListener('scroll', reposition, { passive: true }); addEventListener('resize', reposition);
+    addEventListener('popstate', close); addEventListener('hashchange', close);
+    document.addEventListener('portfolio:dialog-open', close);
+  }
+</script>

@@ -1,0 +1,27 @@
+---
+// Independent visual boundary: replace this component when the room scene is ready.
+---
+<div class="visual-scene" data-pet-scene data-model-src="/models/pet.glb" aria-hidden="true">
+  <canvas></canvas>
+</div>
+<script>
+  const host = document.querySelector<HTMLElement>('[data-pet-scene]');
+  if (host) {
+    const start = () => {
+      void import('../lib/pet-scene').then(module => module.mountPetScene(host)).catch(() => {
+        host.dataset.sceneState = 'unavailable';
+      });
+    };
+    // Keep the menu's hydration independent of the 3D bundle and model request.
+    const observer = new IntersectionObserver(entries => {
+      if (entries.some(entry => entry.isIntersecting)) { observer.disconnect(); start(); }
+    });
+    observer.observe(host);
+  }
+</script>
+<style>
+  .visual-scene { position: absolute; left: 50%; bottom: calc(50% + clamp(44px, 5vw, 90px) + 16px); translate: -50% 0; width: min(360px, 70vw); height: clamp(150px, 30dvh, 280px); pointer-events: none; }
+  .visual-scene canvas { display: block; width: 100%; height: 100%; opacity: 0; transition: opacity 180ms ease; }
+  .visual-scene[data-scene-state="ready"] canvas { opacity: 1; }
+  @media (prefers-reduced-motion: reduce) { .visual-scene canvas { transition: none; } }
+</style>

@@ -30,7 +30,7 @@ try {
       const video = document.querySelector('[data-project="' + slug + '"] video');
       return !video.paused && video.currentTime > .02;
     }, slug);
-    await page.goto(base);
+    await page.goto(base + '/projects/');
     await page.evaluate(() => document.fonts.ready);
     await card('zzz').scrollIntoViewIfNeeded();
     await page.waitForFunction(() => document.querySelector('[data-project="zzz"] video').readyState >= 2);
@@ -90,15 +90,15 @@ try {
     await cdp.send('Input.dispatchTouchEvent', { type: 'touchEnd', touchPoints: [] });
     await page.waitForTimeout(150);
     assert.ok(await page.evaluate(() => scrollY) > beforeDrag, 'touch drag still scrolls');
-    assert.equal(new URL(page.url()).pathname, '/');
+    assert.equal(new URL(page.url()).pathname, '/projects/');
     assert.equal(await page.locator('.is-previewing').count(), 0);
     assert.equal(await page.locator('video').evaluateAll(videos => videos.every(video => video.paused)), true);
     // Isolate taps from the synthetic drag's very high inertial velocity.
-    await page.goto(base);
+    await page.goto(base + '/projects/');
     await page.evaluate(() => document.fonts.ready);
     await card('zzz').tap();
     await playing('zzz');
-    assert.equal(new URL(page.url()).pathname, '/');
+    assert.equal(new URL(page.url()).pathname, '/projects/');
     await page.waitForTimeout(200);
     assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '0px');
     assert.equal(await card('zzz').locator('.touch-preview-hint').isVisible(), true);
@@ -114,15 +114,17 @@ try {
     console.log('PASS touch ' + width + 'px: ' + columns + ' columns, drag ignored, first tap previews, switch pauses previous, second tap navigates');
 
     if (width === 390) {
-      await page.goto(base);
+      await page.goto(base + '/projects/');
       await card('zzz').tap();
       await playing('zzz');
-      await page.evaluate(() => scrollTo({ top: 0, behavior: 'instant' }));
+      await page.evaluate(() => scrollTo({ top: document.documentElement.scrollHeight, behavior: 'instant' }));
       await page.waitForFunction(() => !document.querySelector('.is-previewing'));
       assert.equal(await paused('zzz'), true);
       await card('zzz').tap();
       await playing('zzz');
-      await page.locator('.header [data-locale="ko"]').evaluate(el => el.dispatchEvent(new MouseEvent('click', { bubbles: true })));
+      await page.locator('#settings-toggle').tap();
+      await page.locator('#settings-panel [data-locale="ko"]').tap();
+      await page.keyboard.press('Escape');
       assert.equal(await page.locator('.is-previewing').count(), 0);
       assert.equal(await paused('zzz'), true);
       await card('zzz').tap();
@@ -142,7 +144,7 @@ try {
       assert.equal(await card('convoary').locator('img').isVisible(), false);
       await page.locator('.project-card-title').filter({ hasText: 'Convoary' }).tap();
       await page.waitForURL(base + '/work/convoary/');
-      await page.goto(base);
+      await page.goto(base + '/projects/');
       await page.emulateMedia({ reducedMotion: 'reduce' });
       await card('zzz').tap();
       await page.waitForTimeout(250);
@@ -150,11 +152,11 @@ try {
       assert.equal(await card('zzz').evaluate(el => getComputedStyle(el).top), '0px');
       await card('zzz').tap();
       await page.waitForURL(base + '/work/zzz/');
-      await page.goto(base);
+      await page.goto(base + '/projects/');
       await card('zzz').focus();
       await page.keyboard.press('Enter');
       await page.waitForURL(base + '/work/zzz/');
-      await page.goto(base);
+      await page.goto(base + '/projects/');
       await page.emulateMedia({ reducedMotion: 'no-preference' });
       await page.evaluate(() => { HTMLMediaElement.prototype.play = () => Promise.reject(new Error('Playback rejected fixture')); });
       await card('zzz').tap();

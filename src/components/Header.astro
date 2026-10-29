@@ -1,26 +1,24 @@
 ---
 import { site } from '../data/site';
-import { getUi, languages, localePath, type Locale } from '../i18n/ui';
+import { getUi, localePath, type Locale } from '../i18n/ui';
 import SocialIcon from './SocialIcon.astro';
-interface Props { locale?: Locale; }
-const { locale = 'en' } = Astro.props;
+import SettingsHud from './SettingsHud.astro';
+interface Props { locale?: Locale; menuHome?: boolean; }
+const { locale = 'en', menuHome = false } = Astro.props;
 const ui = getUi(locale);
 const homePath = localePath('/', locale);
-const home = Astro.url.pathname === homePath;
-const nav = ['about', 'projects', 'contact'] as const;
+
 ---
 <header class="header" id="top" data-hidden="false">
   <div class="shell header-inner">
-    <nav class="main-nav" aria-label={ui.navigation} data-i18n-aria-label="navigation"><ul>{nav.map(id => <li><a href={(home ? '' : homePath) + '#' + id} data-locale-path={home ? undefined : '/#' + id}><span data-i18n={'nav.' + id}>{ui.nav[id]}</span></a></li>)}</ul></nav>
-    <div class="header-actions">
-      <div class="social-links" aria-label={ui.socialLinks} data-i18n-aria-label="socialLinks">{site.socials.filter(link => link.url).map(link => <a href={link.url!} target="_blank" rel="noreferrer" aria-label={link.label} title={link.label}><SocialIcon name={link.id} /></a>)}</div>
-      <div class="language-switch" role="group" aria-label={ui.language} data-i18n-aria-label="language">{languages.map(language => <button type="button" lang={language.code} aria-pressed={language.code === locale ? 'true' : 'false'} data-locale={language.code}>{language.label}</button>)}</div>
-    </div>
+    <a class="header-brand" href={homePath} data-locale-path="/" aria-label={ui.home} data-i18n-aria-label="home"><img src="/favicon.svg" alt="" width="28" height="28" /><span>GIRIBUIN</span></a>
+    {!menuHome && <div class="header-actions"><div class="social-links" aria-label={ui.socialLinks} data-i18n-aria-label="socialLinks">{site.socials.filter(link => link.url).map(link => <a href={link.url!} target="_blank" rel="noreferrer" aria-label={link.label} title={link.label}><SocialIcon name={link.id} /></a>)}</div></div>}
   </div>
 </header>
+<SettingsHud locale={locale} />
 <script>
   const header = document.querySelector<HTMLElement>('.header');
-  if (header) {
+  if (header && !document.body.classList.contains('menu-home')) {
     // Keep anchor clearance in sync with the actual one/two-row header.
     const measure = () => document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px');
     new ResizeObserver(measure).observe(header);
@@ -45,3 +43,9 @@ const nav = ['about', 'projects', 'contact'] as const;
     document.addEventListener('keydown', event => { if (event.key === 'Tab') reveal(); });
   }
 </script>
+
+<style>
+  .header-brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text); }
+  .header-brand img { width: 28px; height: 28px; }
+  .header-brand span { font-size: 12px; font-weight: 600; letter-spacing: .04em; }
+</style>

@@ -1,0 +1,35 @@
+---
+import Layout from '../layouts/Layout.astro';
+import VisualScene from './VisualScene.astro';
+import PortfolioExplorer from './explorer/PortfolioExplorer';
+import ProfilePanel from './explorer/ProfilePanel.astro';
+import DocumentsPanel from './explorer/DocumentsPanel.astro';
+import ContactPanel from './explorer/ContactPanel.astro';
+import ProjectActionIcon from './ProjectActionIcon.astro';
+import { getProjects } from '../lib/projects';
+import { projectToExplorer } from '../lib/explorer-data';
+import { site } from '../data/site';
+import { localePath, type Locale } from '../i18n/ui';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const projects = (await getProjects()).map(projectToExplorer);
+---
+<Layout locale={locale} menuHome>
+  <section id="hero" class="title-screen" aria-labelledby="hero-title">
+    <div class="title-screen-copy">
+      <h1 id="hero-title">{site.handle}</h1>
+    </div>
+    <VisualScene />
+    <PortfolioExplorer projects={projects} locale={locale} client:load>
+      <ProfilePanel slot="about" locale={locale} />
+      <DocumentsPanel slot="resume" />
+      <ContactPanel slot="contact" locale={locale} />
+      <ProjectActionIcon slot="detailsIcon" name="deepDive" />
+      <ProjectActionIcon slot="demoIcon" name="liveDemo" />
+      <ProjectActionIcon slot="sourceIcon" name="source" />
+      <ProjectActionIcon slot="downloadIcon" name="release" />
+      <ProjectActionIcon slot="videoIcon" name="video" />
+    </PortfolioExplorer>
+    <noscript><p class="no-script-navigation"><a href={localePath('/projects/', locale)}>All projects ↗</a> · {site.email && <a href={'mailto:' + site.email}>{site.email}</a>}</p></noscript>
+  </section>
+</Layout>

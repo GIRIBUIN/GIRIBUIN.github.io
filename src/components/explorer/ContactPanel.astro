@@ -1,0 +1,15 @@
+---
+import { site } from '../../data/site';
+import SocialIcon from '../SocialIcon.astro';
+import type { Locale } from '../../i18n/ui';
+interface Props { locale: Locale; }
+const links = [
+  ...(site.email ? [{ id: 'email', label: 'Email', url: 'mailto:' + site.email, external: false }] : []),
+  ...site.socials.filter(link => link.url && link.contact).map(link => ({ ...link, external: true })),
+];
+---
+<div class="contact-list">
+  {links.map(link => <a class="contact-action game-item" href={link.url!} target={link.external ? '_blank' : undefined} rel={link.external ? 'noreferrer' : undefined} aria-label={link.label}>
+    <span class="contact-icon" aria-hidden="true"><SocialIcon name={link.id} /></span><span>{link.label}</span>
+  </a>)}
+</div>

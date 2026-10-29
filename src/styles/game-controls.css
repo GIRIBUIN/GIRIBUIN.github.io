@@ -1,0 +1,8 @@
+/* Shared physical controls for the menu window and the global Settings HUD. */
+.game-control { display: grid; place-items: center; width: 48px; height: 48px; padding: 0; border: 3px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); box-shadow: var(--shadow-md); cursor: pointer; transition: transform var(--game-duration, 180ms) var(--game-ease, ease), border-color var(--game-duration, 180ms), background var(--game-duration, 180ms), box-shadow var(--game-duration, 180ms); }
+.game-control:is(:hover, :focus-visible) { border-color: var(--border-highlight, var(--accent-hover)); background: var(--surface-strong); }
+.game-control:focus-visible { outline: 2px solid var(--accent); outline-offset: 5px; }
+.game-control.game-control:active { transform: scale(.94); box-shadow: 1px 2px 0 #11120e; }
+@media (prefers-reduced-motion: reduce) {
+  .game-control, .game-control.game-control:is(:hover, :focus-visible, :active) { transform: none; transition: none; }
+}

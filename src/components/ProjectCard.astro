@@ -3,7 +3,7 @@ import { getProjectCardMeta, getProjectCardTech, type Project } from '../lib/pro
 import { getUi, localePath, type Locale } from '../i18n/ui';
 import ProjectThumbnail from './ProjectThumbnail.astro';
 interface Props { project: Project; locale?: Locale; hidden?: boolean; index?: number; }
-const { project, locale = 'en', hidden = false, index = 1 } = Astro.props;
+const { project, locale = 'en', hidden = false } = Astro.props;
 const { title, slug, oneLine, summary } = project.data;
 const ui = getUi(locale);
 const detailPath = '/work/' + slug + '/';
@@ -11,7 +11,7 @@ const detailPath = '/work/' + slug + '/';
 <article class="project-card" data-project={slug} hidden={hidden} aria-labelledby={'project-' + slug}>
   <a class="project-card-link" href={localePath(detailPath, locale)} data-locale-path={detailPath} aria-label={title + ': ' + ui.project.deepDive} data-project-title={title} data-action-copy="project.deepDive">
     <ProjectThumbnail project={project} locale={locale} />
-    <div class="project-card-heading"><span class="project-index" aria-hidden="true">{String(index).padStart(2, '0')} /</span><h3 class="project-card-title" id={'project-' + slug}>{title}</h3><span class="project-arrow" aria-hidden="true">↗</span></div>
+    <div class="project-card-heading"><h3 class="project-card-title" id={'project-' + slug}>{title}</h3><span class="project-arrow" aria-hidden="true">↗</span></div>
     <p class="project-card-meta" data-i18n={'projects.' + slug + '.meta'} data-stable-copy>{getProjectCardMeta(project)}</p>
     <p class="project-card-summary" data-i18n={'projects.' + slug + '.oneLine'} data-stable-copy>{oneLine || summary}</p>
     <div class="project-card-footer"><span class="project-stack">{getProjectCardTech(project).join(' / ')}</span><span class="project-view" data-i18n="project.deepDive">{ui.project.deepDive}</span></div>
@@ -23,7 +23,6 @@ const detailPath = '/work/' + slug + '/';
   .project-card-link { position: relative; top: 0; display: flex; flex-direction: column; height: 100%; border-radius: 4px; touch-action: manipulation; transition: top 180ms ease; }
   .project-card-link:focus-visible { outline-offset: 6px; }
   .project-card-heading { display: flex; align-items: baseline; gap: 12px; margin-top: 22px; }
-  .project-index { font: 11px/1 var(--mono); color: var(--accent); flex: none; }
   .project-card-title { font-size: clamp(22px, 2.3vw, 30px); font-weight: 600; line-height: 1.3; letter-spacing: -.03em; color: var(--text); }
   .project-arrow { margin-left: auto; color: var(--text-muted); font-size: 22px; transition: color 180ms ease, transform 180ms ease; }
   .project-card-meta { color: var(--text-muted); font-size: 11px; margin-top: 10px; }

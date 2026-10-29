@@ -1,0 +1,62 @@
+---
+import About from '../About.astro';
+import Education from '../Education.astro';
+import Skills from '../Skills.astro';
+import HowIBuild from '../HowIBuild.astro';
+import { getDocuments } from '../../lib/documents.mjs';
+import { getUi, type Locale } from '../../i18n/ui';
+import './profile-menu.css';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const ui = getUi(locale);
+const tabs = [
+  { id: 'overview', label: ui.about.title, key: 'about.title', icon: 'M20 21v-2a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v2M16 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z' },
+  { id: 'skills', label: ui.skills.title, key: 'skills.title', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
+  { id: 'approach', label: ui.process.title, key: 'process.title', icon: 'm8 5-6 7 6 7m8-14 6 7-6 7m-3-16-2 20' },
+];
+---
+<div class="profile-menu" data-profile-menu>
+  <div class="profile-tabs" role="tablist" aria-label={ui.about.title} data-i18n-aria-label="about.title">
+    {tabs.map((tab, index) => <button class="profile-tab game-control" type="button" role="tab" id={'profile-tab-' + tab.id} aria-controls={'profile-page-' + tab.id} aria-selected={index === 0 ? 'true' : 'false'} tabindex={index === 0 ? 0 : -1} data-profile-tab={tab.id}>
+      <svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={tab.icon} /></svg>
+      <span data-i18n={tab.key}>{tab.label}</span>
+    </button>)}
+  </div>
+  <div class="profile-pages">
+    <div class="profile-page" id="profile-page-overview" role="tabpanel" aria-labelledby="profile-tab-overview" tabindex="0" data-profile-page="overview">
+      <About locale={locale} /><Education locale={locale} />
+      <div class="profile-documents">{getDocuments().map(doc => <a class="game-control profile-document" href={doc.url} target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h9l5 5v13H5zM14 3v6h5M9 13h6M9 17h6" /></svg><span data-i18n={doc.key}>{doc.label}</span></a>)}</div>
+    </div>
+    <div class="profile-page" id="profile-page-skills" role="tabpanel" aria-labelledby="profile-tab-skills" tabindex="0" data-profile-page="skills" hidden><Skills locale={locale} /></div>
+    <div class="profile-page" id="profile-page-approach" role="tabpanel" aria-labelledby="profile-tab-approach" tabindex="0" data-profile-page="approach" hidden><HowIBuild locale={locale} /></div>
+  </div>
+</div>
+<script>
+  const menu = document.querySelector<HTMLElement>('[data-profile-menu]');
+  if (menu) {
+    const tabs = [...menu.querySelectorAll<HTMLButtonElement>('[data-profile-tab]')];
+    const pages = [...menu.querySelectorAll<HTMLElement>('[data-profile-page]')];
+    const activate = (tab: HTMLButtonElement) => {
+      if (tab.getAttribute('aria-selected') === 'true') return;
+      tabs.forEach(button => {
+        const selected = button === tab;
+        button.setAttribute('aria-selected', String(selected)); button.tabIndex = selected ? 0 : -1;
+      });
+      pages.forEach(page => { page.hidden = page.dataset.profilePage !== tab.dataset.profileTab; });
+      menu.querySelector('.profile-pages')?.scrollTo({ top: 0, behavior: 'instant' });
+      document.dispatchEvent(new Event('portfolio:dialog-open'));
+    };
+    tabs.forEach((tab, index) => {
+      tab.addEventListener('click', () => activate(tab));
+      tab.addEventListener('keydown', event => {
+        let next: number;
+        if (event.key === 'ArrowRight') next = (index + 1) % tabs.length;
+        else if (event.key === 'ArrowLeft') next = (index + tabs.length - 1) % tabs.length;
+        else if (event.key === 'Home') next = 0;
+        else if (event.key === 'End') next = tabs.length - 1;
+        else return;
+        event.preventDefault(); activate(tabs[next]); tabs[next].focus({ preventScroll: true });
+      });
+    });
+  }
+</script>

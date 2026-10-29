@@ -1,0 +1,10 @@
+---
+import { getDocuments } from '../../lib/documents.mjs';
+const documents = getDocuments();
+---
+<div class="document-list">{documents.map(doc => <a class="document-action game-item" href={doc.url} target="_blank" rel="noreferrer">
+  <svg class="document-icon" viewBox="0 0 40 48" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" aria-hidden="true"><path d="M7 3h17l9 9v33H7zM24 3v10h9M13 23h14M13 29h14M13 35h9" /></svg>
+  <span class="document-filename">{doc.url!.split('/').pop()}</span>
+  <span class="document-label" data-i18n={doc.key}>{doc.label}</span>
+</a>)}</div>
+{documents.length === 0 && <p class="empty-documents"><span lang="en">No documents available.</span><span lang="ko">등록된 문서가 없습니다.</span></p>}

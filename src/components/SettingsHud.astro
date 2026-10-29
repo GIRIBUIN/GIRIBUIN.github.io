@@ -1,0 +1,69 @@
+---
+import { getUi, languages, type Locale } from '../i18n/ui';
+import '../styles/game-controls.css';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
+const ui = getUi(locale);
+---
+<div class="settings-hud">
+  <button id="settings-toggle" type="button" class="game-control settings-toggle" popovertarget="settings-panel" aria-label="Settings" aria-haspopup="dialog" aria-expanded="false" aria-controls="settings-panel">
+    <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round" aria-hidden="true"><path d="m10 2-.5 3-2 1.2-2.8-1-2 3.5 2.3 2v2.6l-2.3 2 2 3.5 2.8-1 2 1.2.5 3h4l.5-3 2-1.2 2.8 1 2-3.5-2.3-2v-2.6l2.3-2-2-3.5-2.8 1-2-1.2-.5-3z" /><circle cx="12" cy="12" r="3" /></svg>
+  </button>
+  <section id="settings-panel" class="settings-panel" popover="auto" role="dialog" aria-labelledby="settings-title" data-settings-panel>
+    <h2 id="settings-title">SETTINGS</h2>
+    <div class="settings-group">
+      <p id="settings-language" data-i18n="language">{ui.language}</p>
+      <div class="language-switch" role="group" aria-labelledby="settings-language">
+        {[...languages].reverse().map(language => <button type="button" lang={language.code} data-locale={language.code} aria-pressed={language.code === locale ? 'true' : 'false'}>{language.code === 'ko' ? '한국어' : 'English'}</button>)}
+      </div>
+    </div>
+  </section>
+</div>
+<script>
+  const trigger = document.querySelector<HTMLButtonElement>('#settings-toggle');
+  const panel = document.querySelector<HTMLElement>('#settings-panel');
+  if (trigger && panel) {
+    panel.addEventListener('beforetoggle', event => {
+      trigger.setAttribute('aria-expanded', String((event as ToggleEvent).newState === 'open'));
+    });
+    panel.addEventListener('toggle', () => {
+      if (panel.matches(':popover-open')) panel.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus({ preventScroll: true });
+    });
+    panel.addEventListener('keydown', event => {
+      if (event.key !== 'Escape') return;
+      event.preventDefault(); event.stopPropagation();
+      panel.hidePopover(); trigger.focus({ preventScroll: true });
+    });
+    panel.addEventListener('focusout', event => {
+      if (event.relatedTarget instanceof Node && !panel.contains(event.relatedTarget) && event.relatedTarget !== trigger && panel.matches(':popover-open')) panel.hidePopover();
+    });
+    const dismiss = () => { if (panel.matches(':popover-open')) panel.hidePopover(); };
+    addEventListener('popstate', dismiss); addEventListener('hashchange', dismiss);
+  }
+</script>
+<style is:global>
+  .settings-hud { --settings-control: #455a67; position: fixed; top: 24px; right: 28px; z-index: 45; width: 48px; height: 48px; }
+  .settings-toggle { background: var(--settings-control); border-color: color-mix(in srgb, var(--settings-control) 55%, var(--text)); }
+  .settings-toggle:is(:hover, :focus-visible) { transform: scale(1.08) rotate(14deg); background: color-mix(in srgb, var(--settings-control) 85%, var(--text)); }
+  .settings-panel { position: fixed; inset: 86px 28px auto auto; width: min(300px, calc(100% - 40px)); margin: 0; padding: 22px; border: 3px solid var(--border); border-radius: var(--radius-md); background: var(--panel); color: var(--text); box-shadow: var(--shadow-md); }
+  .settings-panel:popover-open { animation: settings-enter 180ms ease both; }
+  .settings-panel::backdrop { background: transparent; }
+  .settings-panel h2 { margin-bottom: 24px; font: 600 13px/1.4 var(--mono); letter-spacing: .06em; }
+  .settings-group + .settings-group { margin-top: 22px; padding-top: 22px; border-top: 1px solid var(--line); }
+  .settings-group > p { margin-bottom: 12px; font-size: 14px; color: var(--text-soft); }
+  .settings-panel .language-switch { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; padding: 0; border: 0; }
+  .settings-panel .language-switch button { min-height: 44px; padding: 8px 12px; border: 2px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); color: var(--text); font-size: 14px; font-weight: 600; cursor: pointer; transition: background 180ms, border-color 180ms, transform 180ms; }
+  .settings-panel .language-switch button[aria-pressed="true"] { border-color: var(--accent); background: var(--surface-strong); text-decoration: none; }
+  .settings-panel .language-switch button:is(:hover, :focus-visible) { border-color: var(--border-highlight, var(--accent-hover)); }
+  .settings-panel .language-switch button:active { transform: scale(.96); }
+  @keyframes settings-enter { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+  @media (max-width: 700px) {
+    .settings-hud { top: 16px; right: 18px; width: 44px; height: 44px; }
+    .settings-toggle { width: 44px; height: 44px; }
+    .settings-panel { inset: auto auto 24px 50%; width: min(360px, calc(100% - 40px)); translate: -50% 0; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .settings-panel:popover-open { animation: none; }
+    .settings-panel .language-switch button:active { transform: none; }
+  }
+</style>

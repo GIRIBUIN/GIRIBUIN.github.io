@@ -1,0 +1,32 @@
+.detail-standalone { --header-height: 96px; min-height: 100dvh; }
+.detail-standalone main { display: flow-root; padding-top: var(--header-height); }
+.detail-toolbar { position: fixed; inset: 0 0 auto; z-index: 35; display: grid; grid-template-columns: 1fr auto 1fr; align-items: center; gap: 20px; min-height: var(--header-height); padding: 24px 28px 20px; background: var(--bg); }
+.detail-toolbar .settings-hud { position: static; grid-column: 3; grid-row: 1; justify-self: end; }
+.detail-hud-links { grid-column: 1; display: flex; gap: 12px; }
+.project-info-panel .project-toolbar-actions { display: flex; flex-wrap: wrap; align-items: center; gap: 10px; margin-top: 18px; }
+.explorer-open .detail-standalone .project-hud-title { z-index: 0; }
+.detail-home { background: var(--previous-control); border-color: color-mix(in srgb, var(--previous-control) 55%, var(--text)); }
+.detail-projects { background: var(--title-plaque); border-color: var(--border-highlight); }
+.detail-hud-links .game-control:is(:hover, :focus-visible) { transform: translateY(-2px) rotate(-2deg); }
+.project-hud-title { grid-column: 2; position: relative; z-index: 20; width: max-content; min-width: 190px; max-width: 100%; padding: 10px 42px 10px 20px; border: 3px solid var(--border-highlight); border-radius: var(--radius-sm); background: var(--title-plaque); box-shadow: var(--shadow-md); }
+.project-hud-title .project-name { justify-content: center; gap: 12px; margin: 0; font: 650 17px/1.4 var(--mono); letter-spacing: -.02em; }
+.project-hud-title .project-logo { width: 26px; height: 26px; }
+.project-info-toggle { position: absolute; inset: 0; width: 100%; height: 100%; padding: 0; border: 0; border-radius: var(--radius-sm); background: transparent; color: var(--text); cursor: pointer; }
+.project-info-toggle > svg { position: absolute; right: 13px; top: 50%; translate: 0 -50%; }
+.project-info-toggle:is(:hover, :focus-visible) { color: var(--accent); }
+.project-info-panel { position: fixed; inset: auto; width: min(360px, calc(100% - 40px)); max-height: calc(100dvh - 40px); overflow-y: auto; margin: 0; padding: 20px; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--panel); color: var(--text); box-shadow: var(--shadow-md); }
+.project-info-summary { font-size: 15px; line-height: 1.85; }
+.project-info-tech { margin-top: 14px; padding-top: 14px; border-top: 1px solid var(--line); color: var(--text-soft); font-size: 13px; line-height: 1.8; }
+.detail-standalone .detail-page { width: min(980px, calc(100% - 96px)); max-width: none; margin-inline: auto; padding: 48px 0; }
+.detail-standalone .detail-page > .demo { margin-top: 0; }
+@media (max-width: 700px) {
+  .detail-standalone { --header-height: 146px; }
+  .detail-toolbar { grid-template-rows: 44px auto; gap: 22px 10px; padding: 16px 18px; }
+  .detail-hud-links { grid-row: 1; gap: 10px; }
+  .detail-hud-links .game-control { width: 44px; height: 44px; }
+  .project-hud-title { grid-column: 1 / -1; grid-row: 2; justify-self: center; min-width: 170px; padding: 9px 40px 9px 20px; }
+  .project-hud-title .project-name { font-size: 15px; }
+  .project-hud-title .project-logo { width: 24px; height: 24px; }
+  .detail-standalone .detail-page { width: calc(100% - 40px); padding: 32px 0; }
+}
+@media (prefers-reduced-motion: reduce) { .detail-hud-links .game-control:is(:hover, :focus-visible) { transform: none; } }

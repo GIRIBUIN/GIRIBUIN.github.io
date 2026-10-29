@@ -1,7 +1,7 @@
 ---
 import SectionHeading from './SectionHeading.astro';
 import { buildPrinciples } from '../data/buildPrinciples';
-import { getUi, type Locale } from '../i18n/ui';
+import { getUi, localePath, type Locale } from '../i18n/ui';
 interface Props { locale?: Locale; }
 const { locale = 'en' } = Astro.props;
 const ui = getUi(locale);
@@ -11,10 +11,8 @@ const firstId = principles[0]?.id;
 <section id="process" class="shell section process" aria-labelledby="process-heading">
   <SectionHeading title={ui.process.title} note={ui.process.note} titleKey="process.title" noteKey="process.note" id="process-heading" />
   <p class="section-intro" data-i18n="process.intro" data-stable-copy>{ui.process.intro}</p>
-  <p class="principles-heading" data-i18n="trace.principles">{ui.trace.principles}</p>
   <ol class="principles-list">{principles.map(principle => <li class="principle-item">
     <button type="button" class="principle-trigger" data-principle={principle.id} aria-haspopup="dialog" aria-controls="build-dialog">
-      <span class="principle-number" aria-hidden="true">{String(principle.order).padStart(2, '0')}</span>
       <span class="principle-copy">
         <span class="principle-title" data-i18n={'principles.' + principle.id + '.title'} data-stable-copy>{principle.title}</span>
         <span class="principle-hook" data-i18n={'principles.' + principle.id + '.shortDescription'} data-stable-copy>{principle.shortDescription[locale]}</span>
@@ -22,9 +20,8 @@ const firstId = principles[0]?.id;
     </button>
   </li>)}</ol>
   <dialog id="build-dialog" class="build-dialog" aria-labelledby={firstId && 'principle-' + firstId + '-title'} aria-describedby={firstId && 'principle-' + firstId + '-description'}>
-    <button type="button" class="dialog-close" data-dialog-close aria-label={ui.process.close} data-i18n-aria-label="process.close" autofocus><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg></button>
+    <a class="header-brand principle-home" href={localePath('/', locale)} data-locale-path="/" aria-label={ui.home} data-i18n-aria-label="home"><img src="/favicon.svg" alt="" width="28" height="28" /><span>GIRIBUIN</span></a>
     {principles.map(principle => <article data-principle-panel={principle.id} hidden>
-      <p class="eyebrow" data-i18n="process.title">{ui.process.title}</p>
       <h3 id={'principle-' + principle.id + '-title'} data-i18n={'principles.' + principle.id + '.title'}>{principle.title}</h3>
       <p class="principle-dialog-intro" id={'principle-' + principle.id + '-description'} data-i18n={'principles.' + principle.id + '.shortDescription'} data-stable-copy>{principle.shortDescription[locale]}</p>
       <dl>
@@ -38,11 +35,9 @@ const firstId = principles[0]?.id;
 </section>
 <style>
   .process > .section-intro { max-width: none; }
-  .principles-heading { padding-bottom: 16px; color: var(--text-muted); font-size: 10px; letter-spacing: .14em; }
   .principles-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; margin: 0; border-bottom: 1px solid var(--line); }
   .principle-item { min-width: 0; border-top: 1px solid var(--line); }
   .principle-trigger { display: flex; align-items: flex-start; gap: 22px; min-width: 0; width: 100%; height: 100%; padding: 28px 8px 28px 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
-  .principle-number { padding-top: 6px; color: var(--text-muted); font-size: 11px; flex: none; }
   .principle-copy { min-width: 0; }
   .principle-title { display: block; font-size: clamp(23px, 2.3vw, 32px); font-weight: 600; line-height: 1.2; letter-spacing: -.025em; }
   .principle-hook { display: block; margin-top: 10px; color: var(--text-soft); font-size: 14px; line-height: 1.6; }
@@ -89,7 +84,6 @@ const firstId = principles[0]?.id;
         event.preventDefault(); first.focus({ preventScroll: true });
       }
     });
-    dialog.querySelector('[data-dialog-close]')?.addEventListener('click', () => dialog.close());
     dialog.addEventListener('click', event => {
       if (event.target !== dialog) return;
       const rect = dialog.getBoundingClientRect();

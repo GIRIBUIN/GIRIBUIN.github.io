@@ -21,19 +21,20 @@ const read = (dir, path = 'index.html') => readFileSync(join(dir, 'dist', path),
 const section = html => html.split('<section id="projects"')[1]?.split('<section id="process"')[0] || '';
 const cards = html => [...html.matchAll(/<article[^>]*data-project="([^"]+)"[^>]*>([\s\S]*?)<\/article>/g)];
 const slugs = html => cards(html).map(match => match[1]);
+const collection = html => [...html.matchAll(/data-collection-project="([^"]+)"/g)].map(match => match[1]);
 const passed = [];
 const test = (label, run) => { run(); passed.push(label); console.log('PASS ' + label); };
 const expected = ['zzz', 'smart-parking', 'review-analyzer', 'ct', 'kuroom', 'kutodo', 'baljucall', 'convoary'];
 build(root);
 const baseline = read(root);
 const gallery = read(root, 'projects/index.html');
-test('home shows four projects in requested order and links to the complete Projects page', () => {
-  assert.deepEqual(slugs(section(baseline)), expected.slice(0, 4));
+test('menu home projects are derived from the collection in requested order', () => {
+  assert.deepEqual(collection(baseline), expected);
   assert.deepEqual(slugs(gallery), expected);
-  assert.equal((baseline.match(/<section id="projects"/g) || []).length, 1);
+  assert.ok(baseline.includes('class="collection-panel"'));
   assert.ok(!baseline.includes('<section id="work"') && !baseline.includes('<section id="tools"'));
   assert.ok(!baseline.includes('Featured Projects') && !baseline.includes('Tools &amp; Side Projects'));
-  assert.ok(/<a[^>]*href="\/projects\/"[^>]*data-projects-more/.test(baseline));
+  assert.ok(baseline.includes('href="/projects/"'));
   assert.ok(!/<button[^>]*data-projects-more/.test(baseline) && !baseline.includes('class="rail-track'));
   for (const [i, slug] of expected.entries()) assert.match(readFileSync(join(root, 'src/content/projects', slug + '.md'), 'utf8'), new RegExp('^order: ' + (i + 1) * 10 + '$', 'm'));
 });
@@ -53,10 +54,11 @@ test('video cards use optional thumbnails or their own first frame with lazy sou
     const detail = read(root, 'work/' + slug + '/index.html');
     const videoId = readFileSync(join(root, 'src/content/projects', slug + '.md'), 'utf8').match(/"video":"https:\/\/youtu\.be\/([\w-]+)/)[1];
     assert.ok(detail.includes('src="https://www.youtube-nocookie.com/embed/' + videoId + '?playsinline=1"'));
-    assert.ok(detail.includes('allowfullscreen') && !detail.includes('<video'));
+    const article = detail.slice(detail.indexOf('<article class="shell detail-page"'), detail.indexOf('</article>'));
+    assert.ok(article.includes('allowfullscreen') && !article.includes('<video'));
     assert.ok(!detail.includes('class="demo-toolbar"') && !detail.includes('class="demo-caption"'));
   }
-  assert.equal((baseline.match(/<video /g) || []).length, 4);
+  assert.equal((baseline.match(/<video /g) || []).length, 6);
   assert.equal((gallery.match(/<video /g) || []).length, 6);
   assert.ok(!baseline.includes('id="project-inspector"') && !baseline.includes('data-inspector-project'));
 });
@@ -91,7 +93,7 @@ const probe = (slug, demo, extra = {}) => {
   const frontmatter = Object.entries(data).filter(([, value]) => value !== undefined).map(([key, value]) => key + ': ' + JSON.stringify(value)).join('\n');
   writeFileSync(join(fixture, 'src/content/projects', slug + '.md'), '---\n' + frontmatter + '\n---\n\n## Fixture body\n\nAUTOMATIC_MARKDOWN_BODY\n');
 };
-probe('inserted', { type: 'none', url: null }, { order: 15 });
+probe('inserted', { type: 'none', url: null }, { order: 15, summary: 'Fixture description for independent pane scrolling. '.repeat(50), links: { demo: '/demo-fixture.html' } });
 const insertedPath = join(fixture, 'src/content/projects/inserted.md');
 writeFileSync(insertedPath, readFileSync(insertedPath, 'utf8') + '\n> MARKDOWN_QUOTE\n\n1. FIRST_STEP\n2. SECOND_STEP\n\n| Item | Value |\n| --- | --- |\n| code | `inline` |\n\n```js\nconst longLine = "' + 'markdown-width-probe-'.repeat(20) + '";\n```\n');
 probe('no-order', { type: 'none', url: null }, { order: undefined });
@@ -137,8 +139,8 @@ test('hidden excludes home and both localized detail routes', () => {
   assert.ok(!slugs(html).includes('hidden-probe'));
   for (const prefix of ['', 'ko/']) assert.ok(!existsSync(join(fixture, 'dist', prefix + 'work/hidden-probe/index.html')));
 });
-test('28-project fixture has four home cards and all projects on the separate page', () => {
-  assert.equal(cards(read(fixture)).length, 4);
+test('28-project fixture populates the menu collection and standalone archive', () => {
+  assert.equal(collection(read(fixture)).length, 28);
   assert.equal(cards(html).length, 28);
   assert.ok(!html.includes('data-projects-more') && !html.includes('data-visible-count'));
   assert.ok(html.includes('data-thumbnail-src="/fixture.mp4"'));
@@ -159,17 +161,18 @@ test('optional thumbnail and detail logo/media reuse the content schema', () => 
   assert.ok(read(fixture, 'work/ready-iframe/index.html').includes('<iframe'));
   assert.ok(read(fixture, 'work/ready-video/index.html').includes('src="https://www.youtube-nocookie.com/embed/eqvWtHHWINI?playsinline=1"'));
   const noYouTube = read(fixture, 'work/ready-terminal/index.html');
-  assert.ok(!noYouTube.includes('<video') && noYouTube.includes('data-demo-state="fallback"'));
+  const fallbackArticle = noYouTube.slice(noYouTube.indexOf('<article class="shell detail-page"'), noYouTube.indexOf('</article>'));
+  assert.ok(!fallbackArticle.includes('<video') && fallbackArticle.includes('data-demo-state="fallback"'));
   const videoCard = cards(html).find(match => match[1] === 'ready-video')[2];
   assert.ok(videoCard.includes('data-thumbnail-src="/fixture.mp4"') && !videoCard.includes('<img') && !videoCard.includes('poster='));
   assert.ok(read(fixture, 'work/ready-apk/index.html').includes('Download APK'));
 });
 test('editorial cards show metadata without nested actions and detail pages keep real actions', () => {
-  for (const card of cards(baseline)) {
+  for (const card of cards(gallery)) {
     const markup = card[2];
     assert.ok(!markup.includes('project-type') && !markup.includes('project-tech') && !markup.includes('project-actions') && !markup.includes('data-media-enlarge'));
     assert.ok(markup.includes('data-action-copy="project.deepDive"'));
-    assert.ok(markup.includes('project-card-meta') && markup.includes('project-stack') && markup.includes('project-index'));
+    assert.ok(markup.includes('project-card-meta') && markup.includes('project-stack') && !markup.includes('project-index'));
   }
   for (const slug of expected) {
     const markup = read(root, 'work/' + slug + '/index.html');
@@ -191,7 +194,7 @@ test('EN/KO content and existing localized detail routes remain available', () =
   for (const [locale, language] of [['', 'en'], ['ko/', 'ko']]) {
     const home = read(root, locale + 'index.html');
     assert.ok(home.includes('<html lang="' + language + '"'));
-    for (const slug of expected.slice(0, 4)) assert.ok(home.includes('href="/' + locale + 'work/' + slug + '/"'));
+    for (const slug of expected) assert.ok(home.includes('href="#projects/' + slug + '"'));
     const page = read(root, locale + 'projects/index.html');
     assert.ok(page.includes('<h1 id="projects-heading"'));
     for (const slug of expected) assert.ok(page.includes('href="/' + locale + 'work/' + slug + '/"'));
@@ -201,18 +204,24 @@ test('EN/KO content and existing localized detail routes remain available', () =
   assert.ok(cards(html).find(match => match[1] === 'ready-image')[2].includes('href="/work/ready-image/"'));
 });
 test('canonical Projects navigation and legacy hash anchors exist', () => {
-  for (const id of ['projects', 'work', 'tools']) assert.ok(baseline.includes('id="' + id + '"'));
+  for (const id of ['projects', 'about', 'resume', 'contact']) assert.ok(baseline.includes('href="#' + id + '"'));
   assert.ok(baseline.includes('href="#projects"'));
-  for (const slug of expected) assert.ok(read(root, 'work/' + slug + '/index.html').includes('href="/#projects"'));
+  for (const slug of expected) {
+    const detail = read(root, 'work/' + slug + '/index.html');
+    assert.ok(detail.includes('class="game-control detail-home" data-locale-path="/" href="/"'));
+    assert.ok(detail.includes('data-project-explorer-trigger') && detail.includes('data-locale-path="/projects/" href="/projects/"'));
+    assert.ok(!detail.includes('data-i18n="project.notes"') && !detail.includes('class="detail-intro"'));
+    assert.ok(detail.includes('class="project-info-summary"') && detail.includes('popover="auto"'));
+  }
 });
-test('profile flow and footer PDF, Projects, Hero links remain intact', () => {
-  const order = ['id="hero-title"', 'id="about"', 'id="education"', 'id="skills"', 'id="projects"', 'id="process"', 'id="contact"'];
+test('static profile, real documents and favicon home links remain without a footer', () => {
+  const order = ['id="hero-title"', 'id="about"', 'id="education"', 'id="skills"', 'id="process"'];
   assert.ok(order.every((key, i) => i === 0 || baseline.indexOf(key) > baseline.indexOf(order[i - 1])));
   for (const file of ['resume-public.pdf', 'portfolio.pdf']) assert.equal(readFileSync(join(root, 'dist/files', file)).subarray(0, 4).toString(), '%PDF');
-  assert.match(baseline, /<footer[^>]*><span>@giribuin<\/span>/);
-  for (const href of ['/files/resume-public.pdf', '/files/portfolio.pdf', '/projects/', '/#hero']) assert.ok(baseline.includes('href="' + href + '"'));
+  assert.ok(!baseline.includes('<footer'));
+  for (const href of ['/files/resume-public.pdf', '/files/portfolio.pdf', '/projects/', '/']) assert.ok(baseline.includes('href="' + href + '"'));
   const korean = read(root, 'ko/index.html');
-  assert.ok(korean.includes('href="/ko/projects/"') && korean.includes('href="/ko/#hero"'));
+  assert.ok(korean.includes('href="/ko/projects/"') && korean.includes('href="/ko/"'));
 });
 test('null profile/PDF/social URLs omit controls without empty URLs', () => {
   const home = read(fixture);

@@ -2,19 +2,22 @@
 import type { Project } from '../lib/projects';
 import { getUi, type Locale } from '../i18n/ui';
 import ProjectActionIcon from './ProjectActionIcon.astro';
-interface Props { project: Project; locale?: Locale; detail?: boolean; }
-const { project, locale = 'en' } = Astro.props;
+import '../styles/project-actions.css';
+interface Props { project: Project; locale?: Locale; detail?: boolean; toolbar?: boolean; }
+const { project, locale = 'en', toolbar = false } = Astro.props;
 const { title, links } = project.data;
 const ui = getUi(locale);
-type Action = { url: string | null; key: string; label: string; icon: 'source' | 'video' | 'release' | 'liveDemo'; localPath?: string; external?: boolean };
+type Action = { id: string; url: string | null; key: string; label: string; icon: 'source' | 'video' | 'release' | 'liveDemo' | 'deepDive'; };
 const actions: Action[] = [
-  { url: links.source, key: 'project.source', label: ui.project.source, icon: 'source' },
-  { url: links.video, key: 'media.video', label: ui.media.video, icon: 'video' },
-  { url: links.release, key: 'media.release', label: ui.media.release, icon: 'release' },
-  { url: links.liveDemo || links.demo, key: 'project.liveDemo', label: ui.project.liveDemo, icon: 'liveDemo' },
+  { id: 'demo', url: links.liveDemo || links.demo, key: 'project.liveDemo', label: ui.project.liveDemo, icon: 'liveDemo' },
+  { id: 'github', url: links.source, key: 'project.source', label: ui.project.source, icon: 'source' },
+  { id: 'download', url: links.release, key: 'media.release', label: ui.media.release, icon: 'release' },
+  { id: 'video', url: links.video, key: 'media.video', label: ui.media.video, icon: 'video' },
+  ...(toolbar ? [{ id: 'case-study', url: links.caseStudy, key: 'project.caseStudy', label: ui.project.caseStudy, icon: 'deepDive' as const }] : []),
 ];
 const availableActions = actions.filter(action => action.url);
+const Container = toolbar ? 'nav' : 'div';
 ---
-{availableActions.length > 0 && <div class="project-actions" data-stable-layout>
-  {availableActions.map(action => <a href={action.url!} target={action.external === false ? undefined : '_blank'} rel={action.external === false ? undefined : 'noreferrer'} data-locale-path={action.localPath} aria-label={title + ': ' + action.label} title={action.label} data-i18n-title={action.key} class:list={{ 'icon-only': Boolean(action.icon) }} data-project-title={title} data-action-copy={action.key}><span class:list={{ 'visually-hidden': Boolean(action.icon) }} data-i18n={action.key}>{action.label}</span><ProjectActionIcon name={action.icon} /></a>)}
-</div>}
+{availableActions.length > 0 && <Container class:list={toolbar ? ['project-toolbar-actions'] : ['project-actions']} aria-label={toolbar ? title : undefined} data-stable-layout>
+  {availableActions.map(action => <a href={action.url!} target="_blank" rel="noreferrer" data-project-action={action.id} aria-label={title + ': ' + action.label} title={action.label} data-i18n-title={action.key} class:list={{ 'icon-only': !toolbar, 'game-control': toolbar, 'project-action': toolbar }} data-project-title={title} data-action-copy={action.key}><span class="visually-hidden" data-i18n={action.key}>{action.label}</span><ProjectActionIcon name={action.icon} /></a>)}
+</Container>}
