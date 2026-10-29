@@ -34,7 +34,7 @@ ESC와 화면의 이전 버튼은 브라우저 history와 독립적으로 detail
 DETAILS의 실제 href는 기존 상세 URL이다. 일반 클릭은 상세 window를 열고, 수정 키를 누른 클릭이나 새 탭은 독립 페이지로 이동한다.
 `ProjectDetailWindow.tsx`는 같은 출처의 Astro 상세 HTML에서 `.detail-page`를 표시한다. `detail-content.ts`가 캐시와 진행 중인 요청을 공유하며 요약 진입 700ms 후 선택한 프로젝트의 HTML만 낮은 우선순위로 미리 요청한다. 데이터 절약·2G·숨겨진 탭에서는 자동 사전 요청을 생략한다. 독립 상세 링크의 hover/focus는 native document prefetch를 사용한다.
 스크립트·번역용 template과 독립 페이지의 HUD/footer는 window에 복사하지 않는다. Details에서는 article의 소개 패널도 제거하고 영상과 상세 문서는 유지한다.
-YouTube는 `youtube-player`의 재생 버튼을 누를 때 iframe을 생성한다. 정적 독립 상세와 동적으로 삽입한 Details가 같은 컴포넌트를 사용하므로 상세를 읽기만 할 때는 YouTube 리소스를 요청하지 않는다. 로컬 MP4는 선택한 요약 화면에서만 로딩하고 떠날 때 source를 해제하며 첫 영상 프레임이 준비될 때까지 WebP 사진을 유지한다. `npm run test:project-loading`으로 실제 요청 순서·크기·중복 요청·데이터 절약 동작을 확인한다.
+YouTube는 `ProjectDemo.astro`의 iframe을 정적 독립 상세와 동적으로 삽입한 Details에 그대로 표시한다. 추가 재생 덮개는 없으며 화면에 들어오면 플레이어를 로딩하고 자동 재생은 강제하지 않는다. 요약 단계의 HTML 사전 요청은 YouTube 플레이어를 열지 않는다. 로컬 MP4는 선택한 요약 화면에서만 로딩하고 떠날 때 source를 해제하며 첫 영상 프레임이 준비될 때까지 WebP 사진을 유지한다. `npm run test:project-loading`으로 실제 요청 순서·크기·중복 요청·데이터 절약 동작을 확인한다.
 선택 화면과 상세 window의 title bar에 이전 버튼을 제공한다. 선택 화면에서는 전체 프로젝트 목록으로, 상세에서는 preview로 돌아간다. 프로젝트명은 window 제목 명판에 남긴다. 독립 상세의 홈 아이콘은 hash 없는 locale 홈으로 이동해 Projects를 열지 않는다.
 한·영 상세는 각 locale URL에서 로드하고 메모리에 캐시한다. 실패 시 독립 페이지 링크를 유지한다.
 언어를 바꿀 때 기존 본문은 번역을 불러오는 동안 유지한다. 교체 직전의 window body 위치와 본문 최소 높이를 보존하고 layout effect에서 위치를 복원해, 더 짧은 번역이나 로딩 상태 때문에 위로 이동하지 않게 한다.

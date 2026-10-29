@@ -46,13 +46,15 @@ try {
     assert.equal(await page.locator('.project-description').isVisible(), true, 'Selecting a project opens the summary');
     assert.equal(await page.locator('.explorer-left img').isVisible(), true, 'Poster remains during delayed video');
     await page.waitForRequest(site.base + '/work/zzz/');
+    assert.equal(requests.filter(path => path.startsWith('/embed/')).length, 0, 'Summary prefetch does not load the YouTube player');
     await page.locator('[data-project-action="details"]').click();
     assert.equal(requests.filter(path => path === '/work/zzz/').length, 1, 'Details joins its pending prefetch');
     assert.equal(await page.locator('.collection-panel video[src]').count(), 0, 'Hidden preview releases the video source');
     releaseVideo(); releaseDetail();
     await page.locator('.detail-window-content .detail-page').waitFor();
-    assert.equal(await page.locator('.detail-window-content iframe').count(), 0, 'Details never starts YouTube by itself');
-    assert.equal(requests.filter(path => path.startsWith('/embed/')).length, 0);
+    assert.equal(await page.locator('.detail-window-content iframe').count(), 1, 'Details shows the YouTube player immediately');
+    assert.equal(await page.locator('.detail-window-content .youtube-load,.detail-window-content youtube-player').count(), 0);
+    assert.match(await page.locator('.detail-window-content iframe').getAttribute('src'), /youtube-nocookie\.com\/embed\/.+\?playsinline=1$/);
     const videoPaths = new Set(requests.filter(path => path.endsWith('.mp4')));
     assert.deepEqual([...videoPaths], ['/videos/projects/zzz/demo.mp4']);
     await page.keyboard.press('Escape');
@@ -65,20 +67,15 @@ try {
     assert.equal(requests.filter(path => path === '/work/zzz/').length, 1, 'Repeated Details reuses parsed content');
     console.log('PASS selected preview only, delayed-video poster, shared in-flight request and cached Details');
 
-    await page.locator('.detail-window-content .youtube-load').focus();
-    await page.keyboard.press('Enter');
-    await page.locator('.detail-window-content youtube-player iframe').waitFor();
-    assert.match(await page.locator('.detail-window-content iframe').getAttribute('src'), /youtube-nocookie\.com\/embed\/.+autoplay=1/);
     const standalone = page.locator('[data-project-action="standalone"]');
     await standalone.focus();
     assert.equal(await page.locator('link[rel="prefetch"][href="/work/zzz/"]').count(), 1);
     await standalone.click();
     await page.waitForURL(site.base + '/work/zzz/');
-    assert.equal(await page.locator('.detail-page youtube-player').count(), 1);
-    assert.equal(await page.locator('.detail-page iframe').count(), 0);
-    await page.locator('.detail-page .youtube-load').click();
-    await page.locator('.detail-page youtube-player iframe').waitFor();
-    console.log('PASS keyboard YouTube activation, standalone intent prefetch and click-to-load standalone player');
+    assert.equal(await page.locator('.detail-page youtube-player,.detail-page .youtube-load').count(), 0);
+    assert.equal(await page.locator('.detail-page iframe').count(), 1);
+    assert.match(await page.locator('.detail-page iframe').getAttribute('src'), /youtube-nocookie\.com\/embed\/.+\?playsinline=1$/);
+    console.log('PASS visible YouTube players without overlays, standalone intent prefetch and no forced autoplay');
   } finally { releaseVideo(); releaseDetail(); await context.close(); }
 
   for (const saveData of [false, true]) {
@@ -95,7 +92,7 @@ try {
     await page.locator('[data-project-action="details"]').tap();
     await page.locator('.detail-window-content .detail-page').waitFor();
     assert.equal(requests.filter(path => path === '/ko/work/zzz/').length, 1);
-    assert.equal(await page.locator('.detail-window-content iframe').count(), 0);
+    assert.equal(await page.locator('.detail-window-content iframe').count(), 1);
     assert.equal(await page.locator('.window-body').evaluate(el => el.scrollWidth > el.clientWidth), false);
     console.log('PASS mobile/KO/reduced-motion: no video, saveData=' + saveData + ', manual Details still works');
     await context.close();

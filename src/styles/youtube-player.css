@@ -1,8 +1,0 @@
-youtube-player { display: block; width: 100%; height: 100%; background: var(--surface-dark, var(--surface)); }
-youtube-player iframe { display: block; width: 100%; height: 100%; border: 0; }
-.youtube-load { display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 18px; width: 100%; height: 100%; border: 0; background: transparent; color: var(--text-secondary, var(--text-soft)); font: inherit; cursor: pointer; }
-.youtube-load svg { width: 54px; height: 54px; color: var(--accent); transition: transform 180ms ease; }
-.youtube-load:is(:hover, :focus-visible) { color: var(--accent); }
-.youtube-load:is(:hover, :focus-visible) svg { transform: translateY(-3px); }
-.youtube-load:focus-visible { outline: 2px solid var(--accent); outline-offset: -6px; }
-@media (prefers-reduced-motion: reduce) { .youtube-load svg, .youtube-load:is(:hover, :focus-visible) svg { transform: none; transition: none; } }

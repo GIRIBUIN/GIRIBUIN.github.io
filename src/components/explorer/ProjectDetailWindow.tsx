@@ -2,8 +2,6 @@ import { useEffect, useLayoutEffect, useRef, useState, type ReactNode } from 're
 import { localePath, type Locale } from '../../i18n/ui';
 import { getExplorerUi } from './copy';
 import { cachedDetail, loadDetail } from './detail-content';
-import '../../lib/youtube-player';
-import '../../styles/youtube-player.css';
 
 export default function ProjectDetailWindow({ slug, locale, footer }: { slug: string; locale: Locale; footer: ReactNode }) {
   const url = localePath('/work/' + slug + '/', locale);

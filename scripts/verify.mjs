@@ -53,9 +53,9 @@ test('video cards use optional thumbnails or their own first frame with lazy sou
     assert.ok(thumbnail.includes('preload="none"') && thumbnail.includes('playsinline') && thumbnail.includes('loop'));
     const detail = read(root, 'work/' + slug + '/index.html');
     const videoId = readFileSync(join(root, 'src/content/projects', slug + '.md'), 'utf8').match(/"video":"https:\/\/youtu\.be\/([\w-]+)/)[1];
-    assert.ok(detail.includes('data-src="https://www.youtube-nocookie.com/embed/' + videoId + '?playsinline=1"'));
+    assert.ok(detail.includes('src="https://www.youtube-nocookie.com/embed/' + videoId + '?playsinline=1"'));
     const article = detail.slice(detail.indexOf('<article class="shell detail-page"'), detail.indexOf('</article>'));
-    assert.ok(article.includes('<youtube-player') && !article.includes('<iframe') && !article.includes('<video'));
+    assert.ok(article.includes('<iframe') && article.includes('allowfullscreen') && !article.includes('<video') && !article.includes('youtube-load'));
     assert.ok(!detail.includes('class="demo-toolbar"') && !detail.includes('class="demo-caption"'));
   }
   assert.equal((baseline.match(/<video /g) || []).length, 0, 'Menu folder contains photos only');
@@ -159,7 +159,7 @@ test('optional thumbnail and detail logo/media reuse the content schema', () => 
     assert.ok(read(fixture, 'work/' + slug + '/index.html').includes('class="project-logo"'));
   }
   assert.ok(read(fixture, 'work/ready-iframe/index.html').includes('<iframe'));
-  assert.ok(read(fixture, 'work/ready-video/index.html').includes('data-src="https://www.youtube-nocookie.com/embed/eqvWtHHWINI?playsinline=1"'));
+  assert.ok(read(fixture, 'work/ready-video/index.html').includes('src="https://www.youtube-nocookie.com/embed/eqvWtHHWINI?playsinline=1"'));
   const noYouTube = read(fixture, 'work/ready-terminal/index.html');
   const fallbackArticle = noYouTube.slice(noYouTube.indexOf('<article class="shell detail-page"'), noYouTube.indexOf('</article>'));
   assert.ok(!fallbackArticle.includes('<video') && fallbackArticle.includes('data-demo-state="fallback"'));
