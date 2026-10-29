@@ -53,12 +53,12 @@ test('video cards use optional thumbnails or their own first frame with lazy sou
     assert.ok(thumbnail.includes('preload="none"') && thumbnail.includes('playsinline') && thumbnail.includes('loop'));
     const detail = read(root, 'work/' + slug + '/index.html');
     const videoId = readFileSync(join(root, 'src/content/projects', slug + '.md'), 'utf8').match(/"video":"https:\/\/youtu\.be\/([\w-]+)/)[1];
-    assert.ok(detail.includes('src="https://www.youtube-nocookie.com/embed/' + videoId + '?playsinline=1"'));
+    assert.ok(detail.includes('data-src="https://www.youtube-nocookie.com/embed/' + videoId + '?playsinline=1"'));
     const article = detail.slice(detail.indexOf('<article class="shell detail-page"'), detail.indexOf('</article>'));
-    assert.ok(article.includes('allowfullscreen') && !article.includes('<video'));
+    assert.ok(article.includes('<youtube-player') && !article.includes('<iframe') && !article.includes('<video'));
     assert.ok(!detail.includes('class="demo-toolbar"') && !detail.includes('class="demo-caption"'));
   }
-  assert.equal((baseline.match(/<video /g) || []).length, 6);
+  assert.equal((baseline.match(/<video /g) || []).length, 0, 'Menu folder contains photos only');
   assert.equal((gallery.match(/<video /g) || []).length, 6);
   assert.ok(!baseline.includes('id="project-inspector"') && !baseline.includes('data-inspector-project'));
 });
@@ -159,7 +159,7 @@ test('optional thumbnail and detail logo/media reuse the content schema', () => 
     assert.ok(read(fixture, 'work/' + slug + '/index.html').includes('class="project-logo"'));
   }
   assert.ok(read(fixture, 'work/ready-iframe/index.html').includes('<iframe'));
-  assert.ok(read(fixture, 'work/ready-video/index.html').includes('src="https://www.youtube-nocookie.com/embed/eqvWtHHWINI?playsinline=1"'));
+  assert.ok(read(fixture, 'work/ready-video/index.html').includes('data-src="https://www.youtube-nocookie.com/embed/eqvWtHHWINI?playsinline=1"'));
   const noYouTube = read(fixture, 'work/ready-terminal/index.html');
   const fallbackArticle = noYouTube.slice(noYouTube.indexOf('<article class="shell detail-page"'), noYouTube.indexOf('</article>'));
   assert.ok(!fallbackArticle.includes('<video') && fallbackArticle.includes('data-demo-state="fallback"'));
@@ -215,7 +215,9 @@ test('canonical Projects navigation and legacy hash anchors exist', () => {
   }
 });
 test('static profile, real documents and favicon home links remain without a footer', () => {
-  const order = ['id="hero-title"', 'id="about"', 'id="education"', 'id="skills"', 'id="process"'];
+  const order = ['id="hero-title"', 'id="about"', 'id="skills"', 'id="background"', 'id="process"'];
+  assert.ok(baseline.includes('id="background-heading"') && baseline.includes('/images/background/konkuk.png'));
+  assert.equal(readFileSync(join(root, 'dist/images/background/konkuk.png')).subarray(0, 8).toString('hex'), '89504e470d0a1a0a');
   assert.ok(order.every((key, i) => i === 0 || baseline.indexOf(key) > baseline.indexOf(order[i - 1])));
   for (const file of ['resume-public.pdf', 'portfolio.pdf']) assert.equal(readFileSync(join(root, 'dist/files', file)).subarray(0, 4).toString(), '%PDF');
   assert.ok(!baseline.includes('<footer'));

@@ -6,7 +6,7 @@ import { projectToExplorer } from '../lib/explorer-data';
 import type { Locale } from '../i18n/ui';
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
-const projects = (await getProjects()).map(projectToExplorer);
+const projects = await Promise.all((await getProjects()).map(projectToExplorer));
 ---
 <PortfolioExplorer projects={projects} locale={locale} embedded client:load>
   <ProjectActionIcon slot="detailsIcon" name="deepDive" />

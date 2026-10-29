@@ -21,7 +21,7 @@
 public/
   images/
     profile/                  # Hero·About 사진
-    education/                # 학교 이미지
+    background/               # 학력·회사·인턴 이력 이미지 (현재 konkuk.png)
     skills/                   # 기술 아이콘
     projects/
       [slug]/
@@ -36,6 +36,8 @@ public/
 ```
 
 프로젝트 이미지는 해당 slug 폴더에 모읍니다. dark/light 썸네일을 따로 만들지 않으며, 현재 제공된 썸네일은 1280×720입니다. 이미지와 영상은 선택 사항입니다. 표시·호버 재생 규칙은 루트 [README](../README.md)의 미디어 표를 따릅니다.
+
+배포 빌드의 메뉴 폴더·요약 화면은 `explorer-data.ts`에서 Astro 이미지 파이프라인으로 생성한 800px WebP를 사용합니다. 개발 서버는 Windows 이미지 변환 경로 문제를 피하도록 public의 원본 PNG를 직접 사용합니다. 컬렉션의 원본 PNG 경로는 유지하며 `dist/_astro/`의 파생 파일을 직접 관리하지 않습니다. 폴더는 영상 요소 없이 썸네일만 로딩하고 요약에서 선택한 영상만 요청합니다. Details/독립 상세의 YouTube는 재생 버튼을 누른 뒤에만 연결됩니다.
 
 `dist/`, `.astro/`, `.verification/`에는 원본 이미지를 보관하지 않습니다. 프로젝트 저장소의 `assets/`에서 가져온 자산은 이 포트폴리오의 `public/`에 한 번만 복사해 연결합니다.
 

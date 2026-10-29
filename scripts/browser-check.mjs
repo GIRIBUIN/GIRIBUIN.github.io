@@ -18,22 +18,24 @@ try {
   const select=async slug=>{await page.locator('[data-collection-project="'+slug+'"]').click();await hash('#projects/'+slug);await page.locator('.project-description').waitFor();};
   const details=async slug=>{await page.locator('[data-project-action="details"]').click();await hash('#projects/'+slug+'/details');await page.locator('.detail-window-content .detail-page').waitFor();};
   const escape=async value=>{await page.keyboard.press('Escape');await hash(value);};
+  const settledWindowFocus=async()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   const language=async code=>{await page.locator('#settings-toggle').click();await page.locator('#settings-panel').waitFor({state:'visible'});await page.locator('#settings-panel [data-locale="'+code+'"]').click();await page.waitForFunction(code=>document.documentElement.lang===code,code);await page.keyboard.press('Escape');await page.locator('#settings-panel').waitFor({state:'hidden'});};
   await goto('/');
-  assert.equal(await page.locator('astro-island').count(),1,'Only the menu/browser is a React island');
+  assert.equal(await page.locator('astro-island').count(),2,'Menu UI and the independent character scene are separate islands');
   assert.equal(await page.locator('.title-menu a').count(),4);
   assert.equal(await page.locator('.menu-arrow').count(),0);
   assert.deepEqual(await page.locator('.title-menu a').allTextContents(),['PROJECTS','ABOUT','RESUME','CONTACT']);
   assert.ok(await page.locator('.menu-choice').evaluateAll(items=>items.every(el=>{const css=getComputedStyle(el);return css.borderTopWidth==='3px' && css.backgroundColor!=='rgba(0, 0, 0, 0)';})),'Home menu entries use the shared physical game button frame');
-  assert.equal(await page.locator('.visual-scene canvas').count(),1);
   assert.equal(await page.locator('.scene-landscape,.hero-scene,.title-screen-role,.title-screen-intro').count(),0);
   await page.waitForFunction(()=>document.querySelector('[data-pet-scene]')?.dataset.sceneState==='ready');
-  assert.equal(await page.locator('.visual-scene').getAttribute('aria-hidden'),'true');
-  assert.ok(await page.locator('#hero-title').evaluate(el=>{const r=el.getBoundingClientRect();return Math.abs((r.top+r.bottom)/2-innerHeight/2)<2;}),'Title is centered in the viewport');
+  assert.equal(await page.locator('.visual-scene canvas').count(),1);
+  assert.equal(await page.locator('[data-pet-scene]').getAttribute('data-look-mode'),'head');
+  assert.ok(await page.locator('.visual-scene').evaluate(el=>{const r=el.getBoundingClientRect(),body=document.body.getBoundingClientRect();return Math.abs((r.left+r.right-body.left-body.right)/2)<=1;}),'The character scene is centered');
+  assert.equal(await page.locator('.header .header-brand span,.scene-hint,.title-screen-copy').count(),0);
   assert.equal(await page.locator('.explorer-window').evaluate(el=>el.open),false);
   assert.equal(requests.filter(p=>p.endsWith('.mp4')).length,0,'No project videos requested by the title screen');
   await page.screenshot({path:join(out,'window-main.png')});
-  pass('independent pet GLB canvas, centered GIRIBUIN, four menu entries and no initial project video fetch');
+  pass('independent R3F pet scene with head pivot, split Hero, four menu entries and no initial project video fetch');
 
   const settings=page.locator('#settings-toggle'),settingsPanel=page.locator('#settings-panel');
   assert.equal(await page.locator('.header .language-switch').count(),0);
@@ -48,7 +50,7 @@ try {
   await page.keyboard.press('Shift+Tab');assert.equal(await page.locator(':focus').getAttribute('data-locale'),'ko');
   await page.keyboard.press('Escape');await settingsPanel.waitFor({state:'hidden'});
   assert.equal(await page.locator(':focus').getAttribute('id'),'settings-toggle');
-  await settings.click();await settingsPanel.waitFor({state:'visible'});await page.locator('#hero-title').click();await settingsPanel.waitFor({state:'hidden'});
+  await settings.click();await settingsPanel.waitFor({state:'visible'});await page.locator('#hero').click({position:{x:10,y:120}});await settingsPanel.waitFor({state:'hidden'});
   await language('ko');assert.equal(new URL(page.url()).hash,'');await language('en');
   await page.locator('[data-menu="projects"]').click();await hash('#projects');
   await settings.click();await settingsPanel.waitFor({state:'visible'});await page.keyboard.press('Escape');await settingsPanel.waitFor({state:'hidden'});
@@ -142,18 +144,20 @@ try {
   await escape('#projects');await escape('');
   await goto('/#projects/zzz/details');await page.locator('.detail-window-content .detail-page').waitFor();await close();
   await goto('/#projects/not-a-project');await page.locator('.collection-panel').waitFor({state:'visible'});assert.equal(await page.locator('.collection-panel [aria-current],.project-description').count(),0);await close();
-  for(const [legacy,title] of [['work','Projects'],['tools','Projects'],['education','About'],['skills','About'],['process','About']]){await goto('/#'+legacy);await page.locator('.explorer-window').waitFor({state:'visible'});assert.equal(await page.locator('#explorer-title').textContent(),title);await close();}
+  for(const [legacy,title] of [['work','Projects'],['tools','Projects'],['background','About'],['education','About'],['skills','About'],['process','About']]){await goto('/#'+legacy);await page.locator('.explorer-window').waitFor({state:'visible'});assert.equal(await page.locator('#explorer-title').textContent(),title);await close();}
   pass('document-only Back/Forward history, clean Home return, no Resume/menu/selection entries, direct preview/detail, refresh and legacy hashes');
 
   await open('about');
   assert.equal(await page.locator('.profile-panel .profile-photo').isVisible(),true);
-  assert.equal(await page.locator('.profile-panel .skill-tags img').count(),22);
+  assert.equal(await page.locator('#background-heading').textContent(),'Education');
+  await page.waitForFunction(()=>{const image=document.querySelector('#background img');return image?.complete && image.naturalWidth>0;});
+  assert.deepEqual(await page.locator('#profile-page-overview .core-skills li > span').allTextContents(),['Java','Python','Go','SQL','Linux','Docker','Git']);
   const aboutHistoryLength=await page.evaluate(()=>history.length);
-  assert.equal(await page.locator('.profile-tab').count(),3);
+  assert.equal(await page.locator('.profile-tab').count(),2);
   assert.equal(await page.locator('.profile-page:not([hidden])').getAttribute('data-profile-page'),'overview');
-  await page.locator('[data-profile-tab="skills"]').click();
-  assert.equal(await page.locator('.profile-page:not([hidden])').getAttribute('data-profile-page'),'skills');
-  assert.equal(await page.locator('#profile-page-skills .skill-tags img:visible').count(),22);
+  assert.equal(await page.locator('[data-profile-tab="skills"],#profile-page-skills').count(),0);
+  assert.equal(await page.locator('#profile-page-overview .core-skills li:visible').count(),7);
+  await page.locator('[data-profile-tab="overview"]').focus();
   await page.keyboard.press('ArrowRight');
   assert.equal(await page.locator('[role="tab"][aria-selected="true"]').getAttribute('data-profile-tab'),'approach');
   await page.keyboard.press('Home');
@@ -162,16 +166,36 @@ try {
   await page.locator('.profile-pages').evaluate(el=>el.scrollTop=el.scrollHeight);
   assert.equal(await page.locator('.profile-tabs').evaluate(el=>el.getBoundingClientRect().top),tabsY,'Profile tabs stay visible while their content scrolls');
   assert.equal(await page.locator('.window-body').evaluate(el=>el.scrollTop),0);
-  assert.equal(await page.locator('.profile-documents a').count(),2);
+  assert.equal(await page.locator('.profile-panel .profile-documents,.profile-panel .about-role,.profile-panel .profile-facts').count(),0);
+  assert.equal(await page.locator('#background time').textContent(),'2027.02');
   assert.equal(await page.evaluate(()=>history.length),aboutHistoryLength);
   await page.locator('[data-profile-tab="approach"]').click();
-  const trigger=page.locator('[data-principle="understand"]');await trigger.click();
+  assert.equal(await page.locator('#process > .section-intro').count(),0);
+  assert.equal(await page.locator('.principle-trigger').first().evaluate(el=>getComputedStyle(el,'::before').content),'""');
+  const trigger=page.locator('button[data-principle="understand"]');await trigger.click();
   assert.equal(await page.locator('#build-dialog').evaluate(el=>el.open),true);
+  assert.equal(await page.locator('#build-dialog .header-brand,#build-dialog img,#build-dialog [data-evidence],#build-dialog [data-i18n="process.evidence"]').count(),0);
+  assert.equal(await page.locator('#build-dialog article:not([hidden]) .principle-detail').count(),2);
+  assert.ok(await page.locator('#build-dialog article:not([hidden])').evaluate(el=>{
+    const why=el.querySelector('.principle-detail-why'),how=el.querySelector('.principle-detail-how');
+    return !el.querySelector('dt svg') && getComputedStyle(why).borderLeftWidth==='0px' && getComputedStyle(how).borderLeftWidth==='0px'
+      && getComputedStyle(why).backgroundColor===getComputedStyle(how).backgroundColor
+      && getComputedStyle(why.querySelector('dt')).color===getComputedStyle(how.querySelector('dt')).color;
+  }));
+  await page.locator('.build-dialog-close').click();
+  await page.waitForFunction(()=>!document.querySelector('#build-dialog').open);
+  assert.equal(await page.locator(':focus').getAttribute('data-principle'),'understand');
+  await trigger.click();
   await page.keyboard.press('Escape');await page.waitForFunction(()=>!document.querySelector('#build-dialog').open);
   assert.equal(await page.locator('.explorer-window').evaluate(el=>el.open),true);
   assert.equal(await page.locator(':focus').getAttribute('data-principle'),'understand');
   await page.locator('[data-profile-tab="overview"]').click();
-  await language('ko');assert.match(await page.locator('.profile-panel .about-bio').textContent(),/백엔드/);
+  const koreanBiography='낯선 문제를 만나면 먼저 직접 실행해 보고, 흐름을 확인한 뒤 필요한 만큼 깊게 파고드는 편입니다. 기능을 만드는 데서 끝내기보다 실제로 어떻게 동작하고 어디에서 실패할 수 있는지 확인하려고 합니다. AI는 탐색과 반복의 속도를 높이는 도구로 적극 활용하지만, 설계와 판단, 검증은 직접 책임지는 개발자가 되고자 합니다.';
+  await language('ko');assert.equal(await page.locator('.profile-panel .about-bio').innerText(),koreanBiography);
+  assert.equal(await page.locator('#profile-name').textContent(),'최정길');
+  assert.equal(await page.locator('#background .education-program').textContent(),'건국대학교 컴퓨터공학부');
+  await language('en');assert.match(await page.locator('.profile-panel .about-bio').innerText(),/^When I encounter an unfamiliar problem/);
+  await language('ko');assert.equal(await page.locator('.profile-panel .about-bio').innerText(),koreanBiography);
   assert.equal(await page.locator('#settings-panel .language-switch [aria-pressed="true"]').textContent(),'한국어');
   await page.locator('.window-body').evaluate(el=>el.scrollTop=0);
   await page.screenshot({path:join(out,'window-about.png')});await close();
@@ -215,11 +239,15 @@ try {
   await close();await open('contact');
   assert.equal(await page.locator('.contact-panel a[href^="mailto:"]').getAttribute('href'),'mailto:giribuin@gmail.com');
   assert.equal(await page.locator('.contact-panel a[target="_blank"]').count(),3);
-  const last=page.locator('.contact-panel a').last();await last.focus();await page.keyboard.press('Tab');
+  await page.waitForFunction(()=>document.activeElement?.id==='explorer-title');
+  await settledWindowFocus();
+  const last=page.locator('.contact-panel a').last();await page.keyboard.press('Tab');await last.focus();await page.keyboard.press('Tab');
   assert.equal(await page.locator(':focus').getAttribute('class'),'header-brand');
   await page.keyboard.press('Shift+Tab');assert.equal(await page.locator(':focus').getAttribute('href'),await last.getAttribute('href'));
   assert.equal(await page.locator(':focus').evaluate(el=>getComputedStyle(el).outlineStyle),'solid');
   await close();await page.locator('[data-menu="projects"]').focus();await page.keyboard.press('Enter');await hash('#projects');
+  await settledWindowFocus();
+  await page.waitForFunction(()=>document.activeElement?.id==='explorer-title'||document.activeElement?.hasAttribute('data-collection-project'));
   await page.locator('[data-collection-project="ct"]').focus();await page.keyboard.press('Enter');await hash('#projects/ct');await close();
   pass('real PDF documents/contact URLs, keyboard activation, focus-visible and window/header focus cycle');
 
@@ -285,7 +313,7 @@ try {
   assert.equal(await oldVideo.evaluate(el=>el.paused),true);
   assert.equal(await page.locator('.collection-panel video').count(),1);
   assert.equal(await page.locator('.collection-panel video').evaluateAll(a=>a.filter(x=>!x.paused).length),1);
-  assert.equal(await page.locator('.explorer-left img').getAttribute('src'),'/images/projects/smart-parking/thumbnail.png');
+  assert.match(await page.locator('.explorer-left img').getAttribute('src'),/^\/_astro\/thumbnail\..+\.webp$/);
   await page.emulateMedia({reducedMotion:'reduce'});await page.waitForFunction(()=>[...document.querySelectorAll('.collection-panel video')].every(x=>x.paused));
   await close();await page.emulateMedia({reducedMotion:'no-preference'});
   const mediaContext=await site.browser.newContext({viewport:{width:1440,height:900}});await mediaContext.route('**/*.mp4',r=>r.abort());const failed=await mediaContext.newPage();failed.on('pageerror',e=>errors.push(e.message));

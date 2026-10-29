@@ -16,6 +16,7 @@
     "test": "node scripts/verify.mjs",
     "test:browser": "node scripts/browser-check.mjs",
     "test:project-media": "node scripts/project-media-check.mjs",
+    "test:project-loading": "node scripts/project-loading-check.mjs",
     "test:hero": "node --experimental-strip-types scripts/hero-check.mjs"
   },
   "dependencies": {

@@ -8,6 +8,11 @@ export default function PreviewMedia({ image, video, active, enabled, label, emp
   const [ready, setReady] = useState(false);
   const [failed, setFailed] = useState(false);
   const [imageFailed, setImageFailed] = useState(false);
+  const [imageReady, setImageReady] = useState(false);
+  useEffect(() => {
+    const cover = region.current?.querySelector('img');
+    if (cover?.complete && cover.naturalWidth) setImageReady(true);
+  }, [image, enabled]);
   useEffect(() => {
     const media = ref.current;
     if (!media || !enabled || !video || failed) return;
@@ -30,7 +35,10 @@ export default function PreviewMedia({ image, video, active, enabled, label, emp
     document.addEventListener('visibilitychange', sync);
     motion.addEventListener('change', sync);
     pointer.addEventListener('change', sync);
-    return () => { observer.disconnect(); document.removeEventListener('visibilitychange', sync); motion.removeEventListener('change', sync); pointer.removeEventListener('change', sync); reset(); };
+    return () => {
+      observer.disconnect(); document.removeEventListener('visibilitychange', sync); motion.removeEventListener('change', sync); pointer.removeEventListener('change', sync);
+      reset(); media.removeAttribute('src'); media.load();
+    };
   }, [active, enabled, video, image, imageFailed, failed]);
   const capture = () => {
     const media = ref.current, target = canvas.current;
@@ -38,10 +46,14 @@ export default function PreviewMedia({ image, video, active, enabled, label, emp
     target.width = media.videoWidth; target.height = media.videoHeight;
     try { target.getContext('2d')?.drawImage(media, 0, 0); } catch {}
   };
-  return <div className="explorer-media" ref={region} data-playing={ready || undefined}>
-    {image && !imageFailed ? <img src={image} alt={label} width={1280} height={720} loading="lazy" onError={() => setImageFailed(true)} />
+  return <div className="explorer-media" ref={region} data-playing={ready || undefined} data-image-pending={Boolean(image && !imageFailed && !imageReady) || undefined}>
+    {image && !imageFailed ? <img src={image} alt={label} width={800} height={450} loading={enabled ? 'eager' : 'lazy'} fetchPriority={active ? 'high' : 'auto'} onLoad={() => setImageReady(true)} onError={() => setImageFailed(true)} />
       : <><span className="media-empty">{empty}</span>{video && !failed && <canvas ref={canvas} aria-hidden="true" />}</>}
     {video && !failed && <video ref={ref} preload="none" muted loop playsInline disablePictureInPicture tabIndex={-1} aria-hidden="true"
-      onLoadedData={capture} onSeeked={capture} onPlaying={() => setReady(true)} onPause={() => setReady(false)} onError={() => { setReady(false); setFailed(true); }} />}
+      onLoadedData={capture} onSeeked={capture} onPlaying={() => {
+        const media = ref.current;
+        if (media?.requestVideoFrameCallback) media.requestVideoFrameCallback(() => { if (!media.paused) setReady(true); });
+        else setReady(true);
+      }} onPause={() => setReady(false)} onError={() => { setReady(false); setFailed(true); }} />}
   </div>;
 }

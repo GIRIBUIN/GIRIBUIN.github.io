@@ -2,6 +2,7 @@
 import type { Project } from '../lib/projects';
 import { getUi, type Locale } from '../i18n/ui';
 import { getYouTubeEmbedUrl } from '../lib/media';
+import '../styles/youtube-player.css';
 interface Props { project: Project; compact?: boolean; preview?: boolean; detail?: boolean; locale?: Locale; }
 const { project, compact = false, preview = false, detail = false, locale = 'en' } = Astro.props;
 const { title, thumbnail, demo, visual, links } = project.data;
@@ -21,7 +22,10 @@ const showChrome = !(detail && (youtube || mediaIsVideo));
 <div class:list={['demo', 'demo-' + (youtube ? 'youtube' : demo.type), { compact, preview }]} data-demo-type={youtube ? 'youtube' : demo.type} data-demo-state={showThumbnail ? 'thumbnail' : canRender ? 'ready' : 'fallback'} data-media-error={ui.error}>
   {showChrome && <div class="demo-toolbar"><span data-i18n={showThumbnail ? 'media.thumbnail' : 'media.labels.' + demo.type}>{showThumbnail ? ui.thumbnail : ui.labels[demo.type]}</span><span data-i18n={showThumbnail || canRender ? 'media.preview' : 'media.pending'}>{showThumbnail || canRender ? ui.preview : ui.pending}</span></div>}
   <div class="demo-stage">
-    {youtube ? <iframe src={youtube} title={title + ' — YouTube'} loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
+    {youtube ? <youtube-player data-src={youtube} data-title={title + ' — YouTube'}><button class="youtube-load" type="button" aria-label={title + ' — YouTube'}>
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" aria-hidden="true"><rect x="2" y="5" width="20" height="14" rx="4" /><path d="m10 9 5 3-5 3Z" fill="currentColor" stroke="none" /></svg>
+      <span>YouTube · <span data-i18n="media.videoOpen">{ui.videoOpen}</span></span>
+    </button></youtube-player>
     : showThumbnail ? <img src={thumbnail!} alt={title + ' ' + ui.imageAlt} loading="lazy" width="1600" height="900" />
     : canRender && demo.type === 'iframe' ? <iframe src={mediaUrl!} title={title + ' ' + ui.frameTitle} loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms" referrerpolicy="no-referrer" allow="fullscreen"></iframe>
     : canRender && mediaIsImage ? <img src={mediaUrl!} alt={demo.alt!} loading="lazy" width="1200" height="750" />
@@ -36,6 +40,7 @@ const showChrome = !(detail && (youtube || mediaIsVideo));
   </div>}</div>}
 </div>
 <script>
+  import '../lib/youtube-player';
   document.querySelectorAll<HTMLMediaElement | HTMLImageElement>('.demo-stage video, .demo-stage img').forEach(media => {
     const fallback = () => {
       const message = document.createElement('p');

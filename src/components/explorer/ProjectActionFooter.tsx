@@ -2,6 +2,7 @@ import type { ReactNode } from 'react';
 import { localePath, type Locale } from '../../i18n/ui';
 import { getExplorerUi } from './copy';
 import type { ExplorerProject } from './types';
+import { prefetchDocument } from './detail-content';
 
 interface Icons { details?: ReactNode; demo?: ReactNode; github?: ReactNode; download?: ReactNode; video?: ReactNode; }
 interface Props { project: ExplorerProject; locale: Locale; icons: Icons; standalone?: boolean; }
@@ -20,6 +21,8 @@ export default function ProjectActionFooter({ project, locale, icons, standalone
   return <footer className="project-action-footer">
     {actions.map(action => <a key={action.id} className={'game-control project-action' + (action.id === 'standalone' ? ' standalone-link' : '')}
       data-project-action={action.id} href={action.url!} target={action.id === 'standalone' ? undefined : '_blank'} rel={action.id === 'standalone' ? undefined : 'noreferrer'}
+      onPointerEnter={action.id === 'standalone' ? () => prefetchDocument(action.url!) : undefined}
+      onFocus={action.id === 'standalone' ? () => prefetchDocument(action.url!) : undefined}
       onClick={action.id === 'standalone' ? event => {
         if (event.defaultPrevented || event.button || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
         // Leave a clean document entry for browser Back, including BFCache restores.

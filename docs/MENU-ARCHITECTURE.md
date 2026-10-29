@@ -3,10 +3,10 @@
 ## 구성과 원본
 
 - `/`, `/ko/`는 `MenuHome.astro`를 렌더링한다.
-- 홈은 global header, 중앙 GIRIBUIN, 하단 메뉴 네 개로 구성한다. 타이틀은 정적 Astro이며, 메뉴·window·프로젝트 선택만 `PortfolioExplorer.tsx` 한 개의 React island다.
+- 홈은 favicon·Settings, 중앙의 큰 컴패니언, 하단 메뉴 네 개로 구성한다. 이름·조작 안내는 화면에 표시하지 않고 접근성 제목·설명만 유지한다. 메뉴와 3D scene은 독립된 React island다.
 - `src/content/projects/`와 `src/content/project-notes/`가 프로젝트 원본이다. 원본 문서는 변경하지 않았다.
 - `src/lib/explorer-data.ts`는 빌드 시 기존 정렬·번역 함수를 사용해 UI에 필요한 데이터만 전달한다. 프로젝트별 내용을 수동으로 관리하는 별도 데이터 파일은 없다.
-- About·Education·Skills·HowIBuild는 기존 Astro 컴포넌트를 static slot으로 넣는다. 문서는 `site.ts`의 경로와 실제 public 파일 존재 여부를 함께 확인한다.
+- About·Background·HowIBuild는 Astro 컴포넌트를 static slot으로 넣고 Skills는 핵심 기술만 표시한다. Background는 학력·회사·인턴 이력을 담는 섹션이며 현재 건국대학교 정보를 기존 site.ts에서 재사용한다. 문서는 `site.ts`의 경로와 실제 public 파일 존재 여부를 함께 확인한다.
 - `/projects/`, `/ko/projects/`, `/work/[slug]/`, `/ko/work/[slug]/` 및 GitHub Pages 정적 배포를 유지한다.
 
 ## 상태와 주소
@@ -32,8 +32,9 @@ ESC와 화면의 이전 버튼은 브라우저 history와 독립적으로 detail
 ## 상세 원본 공유
 
 DETAILS의 실제 href는 기존 상세 URL이다. 일반 클릭은 상세 window를 열고, 수정 키를 누른 클릭이나 새 탭은 독립 페이지로 이동한다.
-`ProjectDetailWindow.tsx`는 같은 출처의 Astro 상세 HTML을 필요할 때 fetch하여 `.detail-page`를 표시한다.
+`ProjectDetailWindow.tsx`는 같은 출처의 Astro 상세 HTML에서 `.detail-page`를 표시한다. `detail-content.ts`가 캐시와 진행 중인 요청을 공유하며 요약 진입 700ms 후 선택한 프로젝트의 HTML만 낮은 우선순위로 미리 요청한다. 데이터 절약·2G·숨겨진 탭에서는 자동 사전 요청을 생략한다. 독립 상세 링크의 hover/focus는 native document prefetch를 사용한다.
 스크립트·번역용 template과 독립 페이지의 HUD/footer는 window에 복사하지 않는다. Details에서는 article의 소개 패널도 제거하고 영상과 상세 문서는 유지한다.
+YouTube는 `youtube-player`의 재생 버튼을 누를 때 iframe을 생성한다. 정적 독립 상세와 동적으로 삽입한 Details가 같은 컴포넌트를 사용하므로 상세를 읽기만 할 때는 YouTube 리소스를 요청하지 않는다. 로컬 MP4는 선택한 요약 화면에서만 로딩하고 떠날 때 source를 해제하며 첫 영상 프레임이 준비될 때까지 WebP 사진을 유지한다. `npm run test:project-loading`으로 실제 요청 순서·크기·중복 요청·데이터 절약 동작을 확인한다.
 선택 화면과 상세 window의 title bar에 이전 버튼을 제공한다. 선택 화면에서는 전체 프로젝트 목록으로, 상세에서는 preview로 돌아간다. 프로젝트명은 window 제목 명판에 남긴다. 독립 상세의 홈 아이콘은 hash 없는 locale 홈으로 이동해 Projects를 열지 않는다.
 한·영 상세는 각 locale URL에서 로드하고 메모리에 캐시한다. 실패 시 독립 페이지 링크를 유지한다.
 언어를 바꿀 때 기존 본문은 번역을 불러오는 동안 유지한다. 교체 직전의 window body 위치와 본문 최소 높이를 보존하고 layout effect에서 위치를 복원해, 더 짧은 번역이나 로딩 상태 때문에 위로 이동하지 않게 한다.
@@ -41,9 +42,10 @@ DETAILS의 실제 href는 기존 상세 URL이다. 일반 클릭은 상세 windo
 
 ## 비주얼 교체
 
-`VisualScene.astro`는 홈의 GIRIBUIN 위에 장식용 canvas를 배치한다. `public/models/pet.glb`를 `/models/pet.glb`에서 불러오며, 화면에 들어올 때만 독립된 `src/lib/pet-scene.ts`를 dynamic import한다. 메뉴 React island와 로딩·상태를 공유하지 않는다.
-Three.js와 GLTFLoader만 사용하며 R3F는 추가하지 않았다. 원본 모델·재질을 유지하고, 경계 크기에 맞춰 카메라를 조절한다. 현재 GLB에는 animation clip이 없어 load/resize 때만 렌더링한다. 향후 clip이 있는 GLB로 교체하면 첫 clip을 반복 재생하며 reduced-motion·숨김 탭·열린 메뉴에서는 재생하지 않는다.
-모델 로딩 실패나 WebGL 미지원 시 canvas를 숨기고 원래 타이틀과 메뉴를 유지한다. 투명 배경이며 임시 지형·별·장식·자동 회전은 없다. Blender room·영상·R3F로 교체할 때도 이 VisualScene 경계만 변경하면 된다.
+`VisualScene.astro`는 desktop/mobile 모두 중앙에 독립적인 `PetScene.tsx` client-only React island를 배치한다. `/models/pet.glb`는 fetch preload와 GLTFLoader promise cache를 공유한다. 실패는 R3F 바깥에서 처리하며 메뉴 로딩과 상태에 의존하지 않는다.
+`PetScene.tsx`에 R3F Canvas·모델·카메라·key/fill/rim 조명·shadow plane을 두고 `src/lib/pet-scene.ts`에 모델 준비와 motion 계산을 둔다. 별도 room 모델이나 Drei/OrbitControls는 추가하지 않았다. GLB/재질 원본은 유지하고 scene clone에서 `head`·`hood`·`eyes`만 attach로 공통 목 pivot에 묶는다. 해당 노드가 없으면 전체 그룹으로 mouse-look을 대체한다.
+머리 시선은 ±12°/±6°에 damping을 적용하고, idle은 작은 두 sine의 합이다. hover는 1.03배, 클릭은 0.65초의 작은 점프다. pointer capture로 그룹 전체를 드래그하며 각도를 유지하고 드래그/해제 직후에는 시선 제어를 쉬게 한다. 키보드 좌우·Enter/Space·Home도 제공한다. React setState는 프레임 안에서 사용하지 않는다.
+Canvas는 demand loop를 사용한다. 일반 사용자는 idle 동안 invalidate하고, reduced-motion에서는 idle·mouse-look·확대·점프를 끄며 직접 회전 입력만 감쇠 후 멈춘다. 창이 열리거나 탭이 숨겨지면 loop를 중단한다. DPR은 최대 1.5, shadow map은 1024다. 모델 로딩 실패·WebGL 미지원/손실은 기존 `pet.png`로 대체하며 메뉴·설정·URL은 정상 동작한다.
 
 ## 접근성과 미디어
 
@@ -63,7 +65,7 @@ Three.js와 GLTFLoader만 사용하며 R3F는 추가하지 않았다. 원본 모
 
 Contact window는 기존 SVG 아이콘 4개를 desktop 1행 / mobile 2×2로 표시한다. Resume window는 실제 PDF 액션 두 개만 중앙에 표시한다.
 
-About은 `ProfilePanel.astro`의 About Me / Skills / How I Build 탭으로 기존 Astro 콘텐츠를 나눠 보여준다. 소개·학력·PDF는 프로필 페이지에, 기술과 개발 기준은 각 페이지에 한 번씩 렌더링한다. `profile-menu.css`가 사진 프레임·정보 패널·기술 슬롯·선택 항목을 공통 game token으로 표현한다. 탭은 고정되고 `.profile-pages`만 스크롤하며, URL/history를 추가하지 않는다. native button과 tab/tabpanel ARIA, 방향키·Home·End로 탐색하고 기존 번역 및 설명 dialog를 재사용한다.
+About은 `ProfilePanel.astro`의 About Me / How I Build 두 탭으로 구성한다. About Me는 큰 사진 고정 폭 컬럼과 이름·소개·Skills·학력 컬럼을 나란히 배치하고, 모바일에서는 사진부터 세로로 배치한다. 소개는 About 전용 한/영 문구를 사용하며 Skills는 공용 아이콘으로 Java/Python/Go/SQL/Linux/Docker/Git 7개만 표시한다. 학력은 기존 site.ts의 학교명과 `2027.02`를 한 줄로 표현하고 직무·관심 분야·PDF·졸업 상태는 노출하지 않는다. `profile-menu.css`는 콘텐츠 최대 폭과 가벼운 underline 탭, 테두리 없는 기술 목록을 정의하며 How I Build의 01~06 과정 구조는 유지한다. 탭은 고정되고 `.profile-pages`만 스크롤하며 URL/history를 추가하지 않는다. native button과 tab/tabpanel ARIA, 방향키·Home·End로 탐색하고 기존 언어 전환 및 설명 dialog를 재사용한다.
 
 ## Game menu visual system
 

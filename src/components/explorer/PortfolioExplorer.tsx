@@ -8,6 +8,7 @@ import PreviewMedia from './PreviewMedia';
 import ProjectDetailWindow from './ProjectDetailWindow';
 import ProjectSplit from './ProjectSplit';
 import ProjectActionFooter from './ProjectActionFooter';
+import { allowPrefetch, loadDetail } from './detail-content';
 import './explorer.css';
 import '../../styles/project-actions.css';
 
@@ -27,6 +28,13 @@ export default function PortfolioExplorer({ projects, locale: initialLocale, abo
   const selected = state.screen === 'projects' && state.view !== 'list' ? projects.find(p => p.slug === state.slug) : undefined;
   const detail = state.screen === 'projects' && state.view === 'detail';
   const projectOpen = state.screen === 'projects' && !detail;
+  useEffect(() => {
+    if (!selected || !projectOpen || !allowPrefetch()) return;
+    const timer = setTimeout(() => {
+      if (allowPrefetch()) void loadDetail(localePath('/work/' + selected.slug + '/', locale), true).catch(() => {});
+    }, 700);
+    return () => clearTimeout(timer);
+  }, [selected, projectOpen, locale]);
   useEffect(() => {
     const sync = () => {
       const parsed = readState(location.hash, projects.map(p => p.slug));
@@ -82,7 +90,7 @@ export default function PortfolioExplorer({ projects, locale: initialLocale, abo
         {!selected ? <div className="collection-grid">
           {projects.map(project => <a key={project.slug} href={'#projects/' + project.slug} className="collection-entry game-item" data-collection-project={project.slug}
             onClick={event => activate(event, { screen: 'projects', view: 'preview', slug: project.slug })}>
-            <PreviewMedia image={project.image} video={project.video} active={false} enabled={projectOpen} label={project.copy[locale].title + ' — ' + ui.image} empty={ui.noMedia} />
+            <PreviewMedia image={project.image} video={null} active={false} enabled={projectOpen} label={project.copy[locale].title + ' — ' + ui.image} empty={ui.noMedia} />
             <h3>{project.copy[locale].title}</h3><p>{project.copy[locale].description}</p>
           </a>)}
         </div> : <ProjectSplit locale={locale} left={
