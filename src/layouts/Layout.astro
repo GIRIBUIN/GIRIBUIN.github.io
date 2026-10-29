@@ -3,6 +3,7 @@ import '../styles/global.css';
 import '../styles/game-theme.css';
 import Header from '../components/Header.astro';
 import LanguageController from '../components/LanguageController.astro';
+import DiagramViewer from '../components/DiagramViewer.astro';
 import { getUi, localePath, type Locale } from '../i18n/ui';
 interface Props { title?: string; description?: string; locale?: Locale; menuHome?: boolean; standaloneDetail?: boolean; }
 const { locale = 'en', menuHome = false, standaloneDetail = false } = Astro.props;
@@ -24,5 +25,6 @@ const { title, description = ui.pageDescription } = Astro.props;
   <body class:list={{ 'menu-home': menuHome, 'detail-standalone': standaloneDetail, 'game-theme': menuHome || standaloneDetail }}><a class="skip-link" href="#main" data-i18n="skip">{ui.skip}</a>{!standaloneDetail && <Header locale={locale} menuHome={menuHome} />}
     <main id="main" tabindex="-1"><slot /></main>
     <LanguageController />
+    <DiagramViewer />
   </body>
 </html>

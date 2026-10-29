@@ -3,6 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { resolve, join } from 'node:path';
 import { openSite } from './browser-harness.mjs';
+import { checkMobileResponsive } from './mobile-responsive-check.mjs';
 const out=resolve('.verification'); mkdirSync(out,{recursive:true});
 const site=await openSite(); const passed=[]; const errors=[];
 const pass=name=>{passed.push(name);console.log('PASS '+name);};
@@ -264,7 +265,7 @@ try {
   await page.locator('[data-collection-project="ct"]').focus();await page.keyboard.press('Enter');await hash('#projects/ct');await close();
   pass('real PDF documents/contact URLs, keyboard activation, focus-visible and window/header focus cycle');
 
-  for(const width of [1440,1280,768,390,360]){
+  for(const width of [1440,1280,768,430,412,390,360]){
     await page.setViewportSize({width,height:width>700?900:844});await goto('/ko/');
     assert.ok(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1),'Main fits viewport at '+width);
     assert.equal(await page.locator('footer,.window-back,.window-status,.window-index,.menu-number,.document-index,.project-index,.section-index,.principle-number').count(),0);
@@ -277,6 +278,7 @@ try {
       if(['about','resume','contact'].includes(screen)){await close();await open(screen);}
       assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'No page overflow at '+width+'/'+screen);
       assert.ok(await page.locator('.window-body').evaluate(el=>el.scrollWidth<=el.clientWidth+1),'No panel overflow at '+width+'/'+screen);
+      assert.ok(await page.locator('.demo-stage > iframe').evaluateAll(items=>items.every(el=>{const r=el.getBoundingClientRect(),p=el.parentElement.getBoundingClientRect();return r.width<=p.width+1 && r.left>=p.left-1 && r.right<=p.right+1 && r.right<=innerWidth && Math.abs(r.width/r.height-16/9)<.02;})),'Video embeds fit the pane at 16:9 at '+width+'/'+screen);
       assert.ok(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1 && scrollY===0),'No document-level scroll at '+width+'/'+screen);
       assert.equal(await page.locator('.window-bar button').count(),['preview','detail'].includes(screen)?2:1,'Previous returns one project stage; X always remains');
       assert.ok(await page.locator('.explorer-window').evaluate(el=>{const r=el.getBoundingClientRect(),header=document.querySelector('.header').getBoundingClientRect();return r.top>header.bottom && r.left>0 && r.right<innerWidth && r.bottom<innerHeight;}),'Window is inset above the same Home');
@@ -287,17 +289,24 @@ try {
       assert.ok(await settingsPanel.evaluate(el=>{const r=el.getBoundingClientRect();return r.left>0 && r.right<innerWidth && r.top>0 && r.bottom<innerHeight;}),'Compact Settings panel stays inside viewport');
       assert.equal(await settingsPanel.locator('[data-locale="en"]').isVisible(),true);
       assert.equal(await settingsPanel.locator('[data-locale="ko"]').isVisible(),true);
-      if(width<=700)assert.ok(await settingsPanel.evaluate(el=>el.getBoundingClientRect().top>innerHeight/2),'Mobile settings uses a compact bottom panel');
+      assert.ok(await settingsPanel.evaluate(el=>{const r=el.getBoundingClientRect(),gear=document.querySelector('#settings-toggle').getBoundingClientRect();return Math.abs(r.top-gear.bottom-12)<=1 && Math.abs(r.right-gear.right)<=1 && r.width<=300 && r.width<=innerWidth-32;}),'Settings stays anchored below the gear, including mobile');
       await page.keyboard.press('Escape');await settingsPanel.waitFor({state:'hidden'});
       if(screen==='preview'&&width<=700) assert.ok(await page.locator('.project-browser').evaluate(el=>{const media=el.querySelector('.explorer-media').getBoundingClientRect(),names=el.querySelector('.project-name-list').getBoundingClientRect(),description=el.querySelector('.project-description').getBoundingClientRect();return media.bottom<=names.top && names.bottom<=description.top;}));
       if(screen==='preview')assert.equal(await page.locator('.project-divider').isVisible(),width>700);
       if(screen==='contact')assert.equal(await page.locator('.contact-list').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width>700?4:2);
       if(screen==='resume')assert.equal(await page.locator('.document-list').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width>700?2:1);
+      if(screen==='about'&&width<=700){
+        assert.equal(await page.locator('.core-skills').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),3);
+        assert.ok(await page.locator('.core-skills').evaluate(el=>el.getBoundingClientRect().height<=120),'Seven mobile skills fit three compact rows');
+        assert.ok(await page.locator('.profile-tabs').evaluate(el=>el.getBoundingClientRect().height<=46));
+      }
+      if(screen==='contact'&&width<=700)assert.ok(await page.locator('.contact-list').evaluate(el=>el.getBoundingClientRect().height<=270));
+      if(screen==='resume'&&width<=700)assert.ok(await page.locator('.document-list').evaluate(el=>el.getBoundingClientRect().height<=260));
       if(width===390&&['list','about','contact','resume'].includes(screen))await page.screenshot({path:join(out,'window-mobile-'+screen+'.png')});
     }
     await close();if(width===390)await page.screenshot({path:join(out,'window-mobile-main.png')});
   }
-  pass('1440/1280/768/390/360px: game frames/plaque/overlapping close stay in viewport, responsive split/Contact/Resume, no overflow');
+  pass('360/390/412/430/768/1280/1440px: anchored Settings, compact About/Contact/Resume, 16:9 embeds and no page/panel overflow');
 
   await page.setViewportSize({width:1440,height:1000});await goto('/');await page.emulateMedia({reducedMotion:'no-preference'});await open('projects');
   await page.locator('.explorer-window').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
@@ -366,7 +375,7 @@ try {
   }
   pass('Details omits duplicate intro, shares the icon footer, keeps Previous and standalone navigation to EN/KO Home');
 
-  for(const width of [1440,1280,768,390,360]) {
+  for(const width of [1440,1280,768,430,412,390,360]) {
     await page.setViewportSize({width,height:844});await goto('/ko/work/zzz/');
     await page.locator('[data-explorer-ready]').waitFor({state:'attached'});
     assert.ok(await page.evaluate(()=>{const body=document.body.getBoundingClientRect();return Math.abs(body.top+scrollY)<=1 && Math.abs(body.bottom+scrollY-document.documentElement.scrollHeight)<=1;}),'Toolbar/footer margins stay inside the page without exposing strips of the root background');
@@ -375,9 +384,13 @@ try {
     assert.ok((await page.locator('.project-info-tech').textContent()).includes('Node.js · Express · MySQL · MQTT · AWS'));
     assert.equal(await page.locator('#project-info').isVisible(),false);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Standalone detail has no horizontal overflow at '+width);
-    assert.ok(await page.locator('.project-hud-title').evaluate(el=>{const r=el.getBoundingClientRect(),body=document.body.getBoundingClientRect();return Math.abs((r.left+r.right)/2-(body.left+body.right)/2)<=1 && r.left>0 && r.right<innerWidth;}),'Project plaque stays centered and inside viewport');
+    assert.ok(await page.locator('.project-hud-title').evaluate(el=>{const r=el.getBoundingClientRect(),body=document.body.getBoundingClientRect();return r.left>0 && r.right<innerWidth && (innerWidth<=700 || Math.abs((r.left+r.right)/2-(body.left+body.right)/2)<=1);}),'Project plaque stays inside viewport; desktop remains centered');
     assert.ok(await page.locator('.detail-hud-links').evaluate(el=>{const r=el.getBoundingClientRect(),settings=document.querySelector('#settings-toggle').getBoundingClientRect();return r.left>0 && r.right<settings.left;}),'Home/Projects controls and Settings do not overlap');
-    if(width<=700)assert.ok(await page.locator('.project-hud-title').evaluate(el=>el.getBoundingClientRect().top>document.querySelector('.detail-hud-links').getBoundingClientRect().bottom));
+    if(width<=700)assert.ok(await page.locator('.detail-toolbar').evaluate(el=>{
+      const r=el.getBoundingClientRect(),controls=[...el.querySelectorAll('.detail-hud-links a,.project-hud-title,#settings-toggle')].map(item=>item.getBoundingClientRect());
+      return r.height<=80 && controls.every((item,i)=>item.height>=44 && item.width>=44 && Math.abs(item.top-controls[0].top)<=1 && (i===0 || item.left>=controls[i-1].right));
+    }),'Mobile Home/folder/title/Settings share one row with 44px targets');
+    assert.ok(await page.locator('.demo-youtube iframe').evaluateAll(items=>items.every(el=>{const r=el.getBoundingClientRect(),parent=el.parentElement.getBoundingClientRect();return r.width<=parent.width+1 && r.right<=innerWidth && Math.abs(r.width/r.height-16/9)<.02;})),'Standalone YouTube fits the container at 16:9');
     assert.equal(await page.locator('.standalone-actions,main > footer').count(),0);
     assert.equal(await page.locator('#project-info .project-toolbar-actions a').count(),2);
     assert.equal(await page.locator('.detail-hud-links').evaluate(el=>getComputedStyle(el).position),'static');
@@ -482,7 +495,9 @@ try {
   } finally {await scrollFixture.close();}
   pass('desktop list/detail scroll independently by wheel; media fixed during both, no left-pane/outer scroll or width shift');
   pass('all 16 EN/KO standalone details and archive preserved; 28-project fixture, real demo URL and missing documents');
+  await checkMobileResponsive(site, out);
+  pass('touch 360/390/412/430px, tablet 768px and desktop 1280px: EN/KO compact HUD, anchored Settings after viewport resize, native-size diagram expansion/zoom/focus and nested ESC');
   assert.deepEqual(errors,[]);
-  writeFileSync(join(out,'browser-results.json'),JSON.stringify({passed,viewports:[1440,1280,768,390,360],errors},null,2));
+  writeFileSync(join(out,'browser-results.json'),JSON.stringify({passed,viewports:[1440,1280,768,430,412,390,360],errors},null,2));
   console.log(passed.length+' browser groups passed.');
 } finally {await site.close();}

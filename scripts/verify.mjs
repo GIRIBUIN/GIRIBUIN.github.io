@@ -76,6 +76,7 @@ test('optional Mermaid diagrams render to accessible static SVG in both locale b
     for (const prefix of ['', 'ko/']) {
       const detail = read(root, prefix + 'work/' + slug + '/index.html');
       assert.equal((detail.match(/class="project-diagram"/g) || []).length, count * 3);
+      assert.equal((detail.match(/class="diagram-expand"/g) || []).length, count * 3);
       if (count) {
         assert.match(detail, /aria-roledescription="flowchart(?:-v2)?"/);
         assert.ok(detail.includes('<title id="chart-title-mermaid-0">'));

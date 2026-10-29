@@ -146,10 +146,11 @@ main:focus { outline: none; }
 .demo.preview { border: 0; border-bottom: 1px solid var(--line); }
 .preview .demo-toolbar, .preview .demo-caption, .preview .reference-image figcaption { display: none; }
 .demo-toolbar { display: flex; justify-content: space-between; gap: 10px; padding: 10px 12px; border-bottom: 1px solid var(--line); color: var(--text-muted); font-size: 12px; }
-.demo-stage { position: relative; aspect-ratio: 16 / 9; overflow: hidden; display: grid; place-items: center; }
-.demo-stage>iframe, .demo-stage>video, .demo-stage>img { width: 100%; height: 100%; border: 0; object-fit: contain; background: var(--surface-strong); }
+.demo-stage { position: relative; width: 100%; max-width: 100%; min-width: 0; aspect-ratio: 16 / 9; overflow: hidden; display: grid; grid-template-columns: minmax(0, 1fr); place-items: center; }
+.demo-stage>iframe, .demo-stage>video, .demo-stage>img { width: 100%; max-width: 100%; min-width: 0; height: 100%; border: 0; object-fit: contain; background: var(--surface-strong); }
 .demo-stage>img { position: absolute; inset: 0; }
 .demo-stage>iframe { display: block; }
+.demo-stage>iframe, .demo-stage>video { position: absolute; inset: 0; min-height: 0; }
 .demo-placeholder { width: 100%; height: 100%; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 12px; padding: 24px; text-align: center; background: var(--surface); }
 .placeholder-title { color: var(--accent-ink); font-size: clamp(28px, 3.5vw, 48px); line-height: 1.2; letter-spacing: -.04em; }
 .demo-placeholder p { color: var(--text-muted); font-size: 13px; }
@@ -189,7 +190,7 @@ main:focus { outline: none; }
 .detail-summary { color: var(--text-soft); margin-bottom: 18px; }
 .detail-page>.project-actions { margin-top: 16px; }
 .detail-page>.demo { margin-top: 26px; }
-.demo-youtube .demo-stage { min-height: 200px; }
+.demo-youtube .demo-stage { min-height: 0; }
 .translation-note { color: var(--text-muted); margin-top: 24px; font-size: 14px; }
 .detail-prose { margin-top: 48px; }
 .prose { color: var(--text-soft); font-size: 16px; line-height: 1.85; }

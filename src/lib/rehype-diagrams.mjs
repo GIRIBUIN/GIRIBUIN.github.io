@@ -68,7 +68,14 @@ export default function rehypeDiagrams() {
                 tabIndex: 0,
                 ariaLabelledBy: child.properties.ariaLabelledBy,
               },
-              children: [child],
+              children: [child, {
+                type: 'element', tagName: 'button',
+                properties: { type: 'button', className: ['diagram-expand'], ariaHasPopup: 'dialog' },
+                children: [
+                  { type: 'element', tagName: 'span', properties: { lang: 'en' }, children: [{ type: 'text', value: 'Expand diagram ↗' }] },
+                  { type: 'element', tagName: 'span', properties: { lang: 'ko' }, children: [{ type: 'text', value: '다이어그램 확대 ↗' }] },
+                ],
+              }],
             };
           }
           wrap(child);

@@ -130,10 +130,10 @@ html[lang="en"] .empty-documents [lang="ko"], html[lang="ko"] .empty-documents [
   .window-close { right: -12px; }
   .window-previous { left: -12px; }
   .window-body { padding: 16px 14px 24px; }
-  .collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px 12px; padding: 6px 2px; }
-  .collection-entry { padding: 6px 6px 12px; }
-  .collection-entry h3 { font-size: 16px; margin-top: 12px; }
-  .collection-entry p { font-size: 12px; margin-top: 8px; }
+  .collection-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px 10px; padding: 4px 2px; }
+  .collection-entry { padding: 5px 5px 10px; }
+  .collection-entry h3 { font-size: 15px; margin-top: 10px; }
+  .collection-entry p { font-size: 12px; margin-top: 6px; }
   .explorer-window[data-screen="projects"][data-view="preview"] .window-body { overflow-y: auto; scrollbar-gutter: stable; }
   .collection-panel { height: auto; }
   .project-browser { display: block; height: auto; overflow: visible; }
@@ -151,14 +151,14 @@ html[lang="en"] .empty-documents [lang="ko"], html[lang="ko"] .empty-documents [
   .preview-description { font-size: 17px; margin-block: 20px 30px; }
   .preview-facts { gap: 24px; }
   .preview-facts dd { font-size: 14px; }
-  .document-list { grid-template-columns: 1fr; gap: 18px; max-width: 350px; }
-  .document-action { min-height: 170px; padding: 20px; }
-  .document-icon { margin-bottom: 14px; width: 30px; height: 36px; }
-  .document-label { font-size: 23px; }
-  .contact-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 16px; max-width: 350px; }
-  .contact-action { min-height: 150px; gap: 16px; font-size: 15px; padding: 20px 10px; }
-  .contact-icon { width: 54px; height: 54px; }
-  .contact-action svg { width: 30px; height: 30px; }
+  .document-list { grid-template-columns: 1fr; gap: 12px; max-width: 350px; }
+  .document-action { display: grid; grid-template-columns: 32px minmax(0, 1fr); align-content: center; column-gap: 14px; min-height: 110px; padding: 16px; }
+  .document-icon { grid-row: 1 / 3; align-self: center; margin: 0; width: 28px; height: 34px; }
+  .document-label { font-size: 21px; margin-top: 4px; }
+  .contact-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; max-width: 350px; }
+  .contact-action { min-height: 116px; gap: 10px; font-size: 14px; padding: 14px 8px; }
+  .contact-icon { width: 44px; height: 44px; }
+  .contact-action svg { width: 26px; height: 26px; }
 }
 @media (prefers-reduced-motion: reduce) {
   .explorer-window[open], .window-backdrop { animation: none; }

@@ -23,11 +23,27 @@ const ui = getUi(locale);
   const trigger = document.querySelector<HTMLButtonElement>('#settings-toggle');
   const panel = document.querySelector<HTMLElement>('#settings-panel');
   if (trigger && panel) {
+    const place = () => {
+      if (!panel.matches(':popover-open')) return;
+      const anchor = trigger.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const left = viewport?.offsetLeft || 0, top = viewport?.offsetTop || 0;
+      const width = viewport?.width || innerWidth, height = viewport?.height || innerHeight;
+      panel.style.width = Math.min(288, width - 32) + 'px';
+      panel.style.maxHeight = height - 32 + 'px';
+      panel.style.left = Math.max(left + 16, Math.min(anchor.right - panel.offsetWidth, left + width - panel.offsetWidth - 16)) + 'px';
+      const below = anchor.bottom + 12;
+      const preferred = below + panel.offsetHeight <= top + height - 16 ? below : anchor.top - panel.offsetHeight - 12;
+      panel.style.top = Math.max(top + 16, Math.min(preferred, top + height - panel.offsetHeight - 16)) + 'px';
+    };
     panel.addEventListener('beforetoggle', event => {
       trigger.setAttribute('aria-expanded', String((event as ToggleEvent).newState === 'open'));
     });
     panel.addEventListener('toggle', () => {
-      if (panel.matches(':popover-open')) panel.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus({ preventScroll: true });
+      if (panel.matches(':popover-open')) {
+        place();
+        panel.querySelector<HTMLButtonElement>('[aria-pressed="true"]')?.focus({ preventScroll: true });
+      }
     });
     panel.addEventListener('keydown', event => {
       if (event.key !== 'Escape') return;
@@ -39,13 +55,16 @@ const ui = getUi(locale);
     });
     const dismiss = () => { if (panel.matches(':popover-open')) panel.hidePopover(); };
     addEventListener('popstate', dismiss); addEventListener('hashchange', dismiss);
+    addEventListener('resize', place);
+    window.visualViewport?.addEventListener('resize', place);
+    window.visualViewport?.addEventListener('scroll', place);
   }
 </script>
 <style is:global>
   .settings-hud { --settings-control: #455a67; position: fixed; top: 24px; right: 28px; z-index: 45; width: 48px; height: 48px; }
   .settings-toggle { background: var(--settings-control); border-color: color-mix(in srgb, var(--settings-control) 55%, var(--text)); }
   .settings-toggle:is(:hover, :focus-visible) { transform: scale(1.08) rotate(14deg); background: color-mix(in srgb, var(--settings-control) 85%, var(--text)); }
-  .settings-panel { position: fixed; inset: 86px 28px auto auto; width: min(300px, calc(100% - 40px)); margin: 0; padding: 22px; border: 3px solid var(--border); border-radius: var(--radius-md); background: var(--panel); color: var(--text); box-shadow: var(--shadow-md); }
+  .settings-panel { position: fixed; inset: 86px auto auto max(16px, calc(100vw - 316px)); width: min(288px, calc(100vw - 32px)); max-height: calc(100dvh - 32px); overflow-y: auto; margin: 0; padding: 20px; border: 3px solid var(--border); border-radius: var(--radius-md); background: var(--panel); color: var(--text); box-shadow: var(--shadow-md); }
   .settings-panel:popover-open { animation: settings-enter 180ms ease both; }
   .settings-panel::backdrop { background: transparent; }
   .settings-panel h2 { margin-bottom: 24px; font: 600 13px/1.4 var(--mono); letter-spacing: .06em; }
@@ -60,7 +79,8 @@ const ui = getUi(locale);
   @media (max-width: 700px) {
     .settings-hud { top: 16px; right: 18px; width: 44px; height: 44px; }
     .settings-toggle { width: 44px; height: 44px; }
-    .settings-panel { inset: auto auto 24px 50%; width: min(360px, calc(100% - 40px)); translate: -50% 0; }
+    .settings-panel { top: 72px; padding: 18px; }
+    .settings-panel h2 { margin-bottom: 18px; }
   }
   @media (prefers-reduced-motion: reduce) {
     .settings-panel:popover-open { animation: none; }
