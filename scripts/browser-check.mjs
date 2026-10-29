@@ -21,6 +21,7 @@ try {
   const settledWindowFocus=async()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
   const language=async code=>{await page.locator('#settings-toggle').click();await page.locator('#settings-panel').waitFor({state:'visible'});await page.locator('#settings-panel [data-locale="'+code+'"]').click();await page.waitForFunction(code=>document.documentElement.lang===code,code);await page.keyboard.press('Escape');await page.locator('#settings-panel').waitFor({state:'hidden'});};
   await goto('/');
+  assert.equal(await page.title(),'GIRIBUIN');
   assert.equal(await page.locator('astro-island').count(),2,'Menu UI and the independent character scene are separate islands');
   assert.equal(await page.locator('.title-menu a').count(),4);
   assert.equal(await page.locator('.menu-arrow').count(),0);
@@ -51,7 +52,7 @@ try {
   await page.keyboard.press('Escape');await settingsPanel.waitFor({state:'hidden'});
   assert.equal(await page.locator(':focus').getAttribute('id'),'settings-toggle');
   await settings.click();await settingsPanel.waitFor({state:'visible'});await page.locator('#hero').click({position:{x:10,y:120}});await settingsPanel.waitFor({state:'hidden'});
-  await language('ko');assert.equal(new URL(page.url()).hash,'');await language('en');
+  await language('ko');assert.equal(new URL(page.url()).hash,'');assert.equal(await page.title(),'GIRIBUIN');await language('en');assert.equal(await page.title(),'GIRIBUIN');
   await page.locator('[data-menu="projects"]').click();await hash('#projects');
   await settings.click();await settingsPanel.waitFor({state:'visible'});await page.keyboard.press('Escape');await settingsPanel.waitFor({state:'hidden'});
   assert.equal(new URL(page.url()).hash,'#projects','Escape closes Settings before the underlying project window');

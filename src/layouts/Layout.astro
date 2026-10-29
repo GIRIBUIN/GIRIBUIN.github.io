@@ -3,12 +3,12 @@ import '../styles/global.css';
 import '../styles/game-theme.css';
 import Header from '../components/Header.astro';
 import LanguageController from '../components/LanguageController.astro';
-import { site } from '../data/site';
 import { getUi, localePath, type Locale } from '../i18n/ui';
 interface Props { title?: string; description?: string; locale?: Locale; menuHome?: boolean; standaloneDetail?: boolean; }
 const { locale = 'en', menuHome = false, standaloneDetail = false } = Astro.props;
 const ui = getUi(locale);
-const { title = ui.pageTitle, description = ui.pageDescription } = Astro.props;
+const portfolioName = 'GIRIBUIN';
+const { title, description = ui.pageDescription } = Astro.props;
 ---
 <!doctype html>
 <html lang={locale}>
@@ -19,7 +19,7 @@ const { title = ui.pageTitle, description = ui.pageDescription } = Astro.props;
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
     <link rel="alternate" hreflang="en" href={localePath(Astro.url.pathname, 'en')} />
     <link rel="alternate" hreflang="ko" href={localePath(Astro.url.pathname, 'ko')} />
-    <title>{site.handle} · {title}</title>
+    <title>{title ? `${portfolioName}/${title}` : portfolioName}</title>
   </head>
   <body class:list={{ 'menu-home': menuHome, 'detail-standalone': standaloneDetail, 'game-theme': menuHome || standaloneDetail }}><a class="skip-link" href="#main" data-i18n="skip">{ui.skip}</a>{!standaloneDetail && <Header locale={locale} menuHome={menuHome} />}
     <main id="main" tabindex="-1"><slot /></main>

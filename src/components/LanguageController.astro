@@ -86,7 +86,6 @@ const serializedProjectCopy = JSON.stringify(projectCopy).replace(/</g, '\\u003c
     document.querySelectorAll<HTMLButtonElement>('[data-locale]').forEach(button => { button.setAttribute('aria-pressed', String(button.dataset.locale === locale)); });
     renderProjectBody(locale);
     document.documentElement.lang = locale;
-    document.title = 'GIRIBUIN · ' + copy.pageTitle;
     document.querySelector('meta[name="description"]')?.setAttribute('content', copy.pageDescription);
     const announcement = document.querySelector('[data-language-announcement]');
     if (announcement) announcement.textContent = locale === 'en' ? 'English' : '한국어';

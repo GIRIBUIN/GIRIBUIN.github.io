@@ -28,6 +28,13 @@ const expected = ['zzz', 'smart-parking', 'review-analyzer', 'ct', 'kuroom', 'ku
 build(root);
 const baseline = read(root);
 const gallery = read(root, 'projects/index.html');
+test('page titles use the portfolio name and retain standalone project context', () => {
+  for (const prefix of ['', 'ko/']) {
+    assert.ok(read(root, prefix + 'index.html').includes('<title>GIRIBUIN</title>'));
+    assert.ok(read(root, prefix + 'projects/index.html').includes('<title>GIRIBUIN/Projects</title>'));
+    assert.ok(read(root, prefix + 'work/zzz/index.html').includes('<title>GIRIBUIN/ZZZ</title>'));
+  }
+});
 test('menu home projects are derived from the collection in requested order', () => {
   assert.deepEqual(collection(baseline), expected);
   assert.deepEqual(slugs(gallery), expected);
