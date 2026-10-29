@@ -3,7 +3,7 @@ import { createServer } from 'node:http';
 import { existsSync, readFileSync, statSync } from 'node:fs';
 import { resolve, join, extname, sep } from 'node:path';
 
-export async function openSite(dist = resolve('dist')) {
+export async function openSite(dist = resolve('dist'), launchOptions = {}) {
   const server = createServer((req, res) => {
     let path;
     try { path = resolve(dist, '.' + decodeURIComponent(new URL(req.url, 'http://localhost').pathname)); }
@@ -18,7 +18,7 @@ export async function openSite(dist = resolve('dist')) {
   let browser;
   try {
     for (const options of process.platform === 'win32' ? [{ channel: 'msedge' }, { channel: 'chrome' }, {}] : [{}]) {
-      try { browser = await chromium.launch({ headless: true, ...options }); break; } catch {}
+      try { browser = await chromium.launch({ headless: true, ...options, ...launchOptions }); break; } catch {}
     }
     if (!browser) throw new Error('No browser available');
   } catch (error) { server.close(); throw error; }

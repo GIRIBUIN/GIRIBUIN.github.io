@@ -51,8 +51,8 @@ export default function PortfolioExplorer({ projects, locale: initialLocale, abo
   }, [projects, embedded]);
   const navigate = (next: ExplorerState) => {
     const nextHash = stateHash(next);
-    if (nextHash === location.hash) return;
-    history.replaceState(history.state, '', location.pathname + location.search + nextHash);
+    if (nextHash !== location.hash) history.replaceState(history.state, '', location.pathname + location.search + nextHash);
+    // A restored document can have a clean URL while its previous window is still open.
     dispatch(next);
     dispatchEvent(new PopStateEvent('popstate'));
   };

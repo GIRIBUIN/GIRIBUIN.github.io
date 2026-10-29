@@ -131,8 +131,10 @@ try {
   const pageHistoryLength=await page.evaluate(()=>history.length);
   for(const menu of ['resume','about','contact']){await open(menu);await close();}
   await open('projects');await select('zzz');await select('kuroom');await details('kuroom');
+  await page.evaluate(() => addEventListener('pagehide', () => sessionStorage.setItem('departure-state', JSON.stringify({ hash: location.hash, open: document.querySelector('.explorer-window').open, locked: document.documentElement.classList.contains('explorer-open') })), { once: true }));
   assert.equal(await page.evaluate(()=>history.length),pageHistoryLength,'Menu/selection/Details/close replace the current URL without appending visits');
   await page.locator('.standalone-link').click();await page.waitForURL(site.base+'/work/kuroom/');
+  assert.deepEqual(await page.evaluate(()=>JSON.parse(sessionStorage.getItem('departure-state'))),{hash:'',open:false,locked:false},'Close React window, dialog and scroll lock before the browser snapshots the source document');
   assert.equal(await page.evaluate(()=>history.length),pageHistoryLength+1,'Only the standalone document adds a history entry');
   await page.goBack();await page.waitForURL(site.base+'/');await page.locator('[data-explorer-ready]').waitFor();
   assert.equal(await page.locator('.explorer-window').evaluate(el=>el.open),false,'Back returns to clean Home rather than the former Details window');
@@ -146,6 +148,16 @@ try {
   await goto('/#projects/not-a-project');await page.locator('.collection-panel').waitFor({state:'visible'});assert.equal(await page.locator('.collection-panel [aria-current],.project-description').count(),0);await close();
   for(const [legacy,title] of [['work','Projects'],['tools','Projects'],['background','About'],['education','About'],['skills','About'],['process','About']]){await goto('/#'+legacy);await page.locator('.explorer-window').waitFor({state:'visible'});assert.equal(await page.locator('#explorer-title').textContent(),title);await close();}
   pass('document-only Back/Forward history, clean Home return, no Resume/menu/selection entries, direct preview/detail, refresh and legacy hashes');
+
+  for (const state of ['projects/zzz/details','about']) {
+    await goto('/#'+state);await page.locator('.explorer-window[open]').waitFor();
+    await page.evaluate(()=>history.replaceState(history.state,'',location.pathname+location.search));
+    await close();
+    assert.equal(await page.locator('.explorer-window').evaluate(el=>el.open),false,'X closes a stale window even if the restored URL is already Home');
+    assert.equal(await page.locator('.title-menu').evaluate(el=>el.inert),false);
+    await open('contact');await close();
+  }
+  pass('X repairs URL/window mismatches and leaves menu navigation usable');
 
   await open('about');
   assert.equal(await page.locator('.profile-panel .profile-photo').isVisible(),true);

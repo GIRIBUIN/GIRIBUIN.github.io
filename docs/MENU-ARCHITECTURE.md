@@ -26,8 +26,9 @@
 `navigation.ts`가 hash를 읽고 부모 상태를 정의하며, React reducer가 현재 탐색 상태를 보관한다.
 창 내부 이동은 History API의 replaceState로 현재 URL만 갱신하며 방문 기록을 추가하지 않는다. 브라우저 Back/Forward는 실제 문서 사이를 이동하고 popstate/hashchange/pageshow에서 UI를 복원한다.
 ESC와 화면의 이전 버튼은 브라우저 history와 독립적으로 detail → preview → list → main으로 이동한다. 직접 링크·새로고침 진입에서도 부모 상태로 이동할 수 있다.
-독립 상세 링크를 일반 클릭할 때는 출발 문서의 hash를 제거한 뒤 기본 링크 이동을 유지한다. 따라서 홈에서 독립 상세로 이동한 뒤 Back하면 Home이 열린다. 독립 상세 안의 도감에서 다른 독립 상세로 이동한 경우에는 이전 상세 문서로 돌아온다. 수정 키 클릭·새 탭 열기는 원래 창의 상태를 바꾸지 않는다.
+독립 상세 링크를 일반 클릭할 때는 출발 문서의 hash와 React window 상태를 flushSync로 함께 정리한 뒤 location.assign으로 실제 문서 이동을 수행한다. BFCache가 DOM을 보존해도 출발 화면에는 닫힌 dialog와 해제된 scroll lock만 남는다. 따라서 홈에서 독립 상세로 이동한 뒤 Back하면 Home이 열린다. 독립 상세 안의 도감에서 다른 독립 상세로 이동한 경우에는 이전 상세 문서로 돌아온다. 수정 키 클릭·새 탭 열기는 원래 창의 상태를 바꾸지 않는다. X는 URL이 이미 Home이어도 UI 상태를 닫는다.
 기존 `#work`·`#tools`는 Projects, `#education`·`#skills`·`#process`는 About으로 연결한다.
+`npm run test:history`는 Playwright의 BFCache 비활성 옵션을 해제해 실제 pageshow.persisted 복원, 한·영 홈/독립 상세 출발, Back/Forward 후 닫기 동작을 확인한다. 일반 브라우저 검사에서는 URL과 창 상태가 어긋난 경우의 X도 별도로 검사한다.
 
 ## 상세 원본 공유
 

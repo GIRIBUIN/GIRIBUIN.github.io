@@ -1,4 +1,5 @@
 import type { ReactNode } from 'react';
+import { flushSync } from 'react-dom';
 import { localePath, type Locale } from '../../i18n/ui';
 import { getExplorerUi } from './copy';
 import type { ExplorerProject } from './types';
@@ -25,8 +26,14 @@ export default function ProjectActionFooter({ project, locale, icons, standalone
       onFocus={action.id === 'standalone' ? () => prefetchDocument(action.url!) : undefined}
       onClick={action.id === 'standalone' ? event => {
         if (event.defaultPrevented || event.button || event.metaKey || event.ctrlKey || event.altKey || event.shiftKey) return;
-        // Leave a clean document entry for browser Back, including BFCache restores.
-        history.replaceState(history.state, '', location.pathname + location.search);
+        event.preventDefault();
+        const destination = event.currentTarget.href;
+        // BFCache preserves React and dialog DOM too, so commit the closed state before leaving.
+        flushSync(() => {
+          history.replaceState(history.state, '', location.pathname + location.search);
+          dispatchEvent(new PopStateEvent('popstate'));
+        });
+        location.assign(destination);
       } : undefined}
       aria-label={project.copy[locale].title + ': ' + action.label} title={action.label}>{action.icon}</a>)}
   </footer>;
