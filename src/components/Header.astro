@@ -11,7 +11,7 @@ const homePath = localePath('/', locale);
 ---
 <header class="header" id="top" data-hidden="false">
   <div class="shell header-inner">
-    <a class="header-brand" href={homePath} data-locale-path="/" aria-label={ui.home} data-i18n-aria-label="home"><img src="/favicon.svg" alt="" width="28" height="28" /><span>GIRIBUIN</span></a>
+    <a class="header-brand" href={homePath} data-locale-path="/" aria-label={ui.home} data-i18n-aria-label="home"><img src="/favicon.svg" alt="" width="28" height="28" />{!menuHome && <span>GIRIBUIN</span>}</a>
     {!menuHome && <div class="header-actions"><div class="social-links" aria-label={ui.socialLinks} data-i18n-aria-label="socialLinks">{site.socials.filter(link => link.url).map(link => <a href={link.url!} target="_blank" rel="noreferrer" aria-label={link.label} title={link.label}><SocialIcon name={link.id} /></a>)}</div></div>}
   </div>
 </header>

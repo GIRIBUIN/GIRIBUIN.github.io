@@ -16,10 +16,8 @@ const projects = (await getProjects()).map(projectToExplorer);
 ---
 <Layout locale={locale} menuHome>
   <section id="hero" class="title-screen" aria-labelledby="hero-title">
-    <div class="title-screen-copy">
-      <h1 id="hero-title">{site.handle}</h1>
-    </div>
-    <VisualScene />
+    <h1 id="hero-title" class="visually-hidden">{site.handle}</h1>
+    <VisualScene locale={locale} />
     <PortfolioExplorer projects={projects} locale={locale} client:load>
       <ProfilePanel slot="about" locale={locale} />
       <DocumentsPanel slot="resume" />

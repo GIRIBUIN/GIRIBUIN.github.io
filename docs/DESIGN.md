@@ -15,9 +15,15 @@
 - 프로젝트 순서와 이미지, 기술 목록, 번역은 기존 콘텐츠 데이터를 사용한다.
 - 코드 블록은 `astro.config.mjs`, Mermaid는 `src/lib/rehype-diagrams.mjs`에서 다크 색상을 지정한다.
 
-## Hero 영상 연결
+## Hero 캐릭터 쇼케이스
 
-`src/components/VisualScene.astro`가 독립된 비주얼 교체 경계다. 현재 DOM을 렌더링하지 않으며 홈에는 중앙 GIRIBUIN과 하단 메뉴만 표시한다.
+현재 홈은 정적 HTML 타이틀·하단 게임 메뉴와 별도 R3F island를 조합한다. `VisualScene.astro` → `PetScene.tsx`가 캐릭터·조명·그림자를 담당하고, `src/lib/pet-scene.ts`가 GLB 복제·머리 pivot·ref motion을 담당한다. Blender 파일은 변경하지 않는다.
+캐릭터는 화면 중앙에 배치하고 desktop의 실제 높이는 viewport의 40~55%를 목표로 한다. 화면의 GIRIBUIN 이름과 조작 안내는 제거하고 접근성 설명만 유지한다. 다크 올리브 radial 배경, key/fill/rim light와 얕은 plane shadow만 사용한다. 머리는 ±12°/±6°, hover는 1.03배, 클릭은 작은 점프, 드래그는 그룹 전체 회전이다.
+idle을 제외한 상태 변경은 이벤트에서 처리하고 useFrame은 ref만 갱신한다. reduced-motion·숨김 탭·열린 메뉴의 렌더링 정책과 교체 경계는 [MENU-ARCHITECTURE.md](./MENU-ARCHITECTURE.md)에 기록한다.
+
+## 향후 Hero 영상 연결
+
+`src/components/VisualScene.astro`가 독립된 비주얼 교체 경계다. 현재는 위의 캐릭터 scene을 표시한다.
 영상을 준비하면 이 파일에 video를 추가하거나 기존 `HeroScene.astro`를 연결한다. 아래는 기존 HeroScene을 재사용할 때의 자산 설정이다.
 
 1. 영상을 `public/videos/hero/lunar-loop.webm` 및/또는 `public/videos/hero/lunar-loop.mp4`에 둔다.
@@ -49,4 +55,5 @@ Blender 배경을 `#0D0E10`에 맞추고 지면을 하단에 배치하면 Hero �
 - `npm test`: 실제 사이트 및 콘텐츠 fixture 빌드, 콘텐츠·라우팅 검증.
 - `npm run test:browser`: 360~1440px 레이아웃, 메뉴·URL·history·언어 전환·키보드·영상 회귀 검증.
 - `npm run test:project-media`: 데스크톱 호버 및 모바일·태블릿 터치 미리보기 검증.
+- `npm run test:hero`: 실제 GLB pivot, desktop 크기, idle·시선·드래그·점프·키보드·터치·reduced-motion 검증.
 - 생성된 스크린샷과 검증 결과는 `.verification/`에만 둔다.

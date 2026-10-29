@@ -15,10 +15,12 @@
     "check": "astro check",
     "test": "node scripts/verify.mjs",
     "test:browser": "node scripts/browser-check.mjs",
-    "test:project-media": "node scripts/project-media-check.mjs"
+    "test:project-media": "node scripts/project-media-check.mjs",
+    "test:hero": "node --experimental-strip-types scripts/hero-check.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.1",
+    "@react-three/fiber": "^9.8.2",
     "astro": "7.3.2",
     "react": "^19.3.1",
     "react-dom": "^19.3.1",

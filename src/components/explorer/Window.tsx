@@ -18,7 +18,7 @@ export default function Window({ open, title, route, locale, focusTarget, onBack
     const dialog = ref.current!;
     const background = document.querySelectorAll<HTMLElement>(preserveDocumentScroll
       ? '.detail-toolbar .detail-hud-links, .detail-toolbar .project-hud-title, .detail-standalone main > .detail-page'
-      : '.title-screen-copy, .title-menu');
+      : '.visual-scene, .title-menu');
     if (open && !dialog.open) {
       opener.current = document.activeElement instanceof HTMLElement ? document.activeElement : null;
       documentPosition.current = { x: scrollX, y: scrollY };
