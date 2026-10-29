@@ -1,17 +1,24 @@
 ---
-import About from '../About.astro';
-import Education from '../Education.astro';
-import Skills from '../Skills.astro';
+import Background from '../Background.astro';
+import { skillIcons } from '../../data/skills';
 import HowIBuild from '../HowIBuild.astro';
-import { getDocuments } from '../../lib/documents.mjs';
+import { site } from '../../data/site';
 import { getUi, type Locale } from '../../i18n/ui';
 import './profile-menu.css';
 interface Props { locale: Locale; }
 const { locale } = Astro.props;
 const ui = getUi(locale);
+const coreSkills = ['Java', 'Python', 'Go', 'SQL', 'Linux', 'Docker', 'Git'];
+const biography = {
+  ko: '낯선 문제를 만나면 먼저 직접 실행해 보고, 흐름을 확인한 뒤 필요한 만큼 깊게 파고드는 편입니다. 기능을 만드는 데서 끝내기보다 실제로 어떻게 동작하고 어디에서 실패할 수 있는지 확인하려고 합니다. AI는 탐색과 반복의 속도를 높이는 도구로 적극 활용하지만, 설계와 판단, 검증은 직접 책임지는 개발자가 되고자 합니다.',
+  en: 'When I encounter an unfamiliar problem, I tend to try running it myself, trace the flow, and then dig as deeply as needed. I try to go beyond building features to understand how they actually behave and where they can fail. I aim to be a developer who actively uses AI to speed up exploration and iteration, while taking personal responsibility for design, decisions, and verification.',
+};
+const skillMarks: Record<string, string> = {
+  Java: 'M5 9h12v7a4 4 0 0 1-4 4H9a4 4 0 0 1-4-4ZM17 10h2a2 2 0 0 1 0 4h-2M9 6V3m4 3V2',
+  Git: 'M6 7v10m12-10v3a5 5 0 0 1-5 5H6M8 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM8 19a2 2 0 1 1-4 0 2 2 0 0 1 4 0ZM20 5a2 2 0 1 1-4 0 2 2 0 0 1 4 0Z',
+};
 const tabs = [
   { id: 'overview', label: ui.about.title, key: 'about.title', icon: 'M20 21v-2a6 6 0 0 0-6-6h-4a6 6 0 0 0-6 6v2M16 6a4 4 0 1 1-8 0 4 4 0 0 1 8 0Z' },
-  { id: 'skills', label: ui.skills.title, key: 'skills.title', icon: 'M3 3h7v7H3zM14 3h7v7h-7zM3 14h7v7H3zM14 14h7v7h-7z' },
   { id: 'approach', label: ui.process.title, key: 'process.title', icon: 'm8 5-6 7 6 7m8-14 6 7-6 7m-3-16-2 20' },
 ];
 ---
@@ -24,10 +31,22 @@ const tabs = [
   </div>
   <div class="profile-pages">
     <div class="profile-page" id="profile-page-overview" role="tabpanel" aria-labelledby="profile-tab-overview" tabindex="0" data-profile-page="overview">
-      <About locale={locale} /><Education locale={locale} />
-      <div class="profile-documents">{getDocuments().map(doc => <a class="game-control profile-document" href={doc.url} target="_blank" rel="noreferrer"><svg viewBox="0 0 24 24" width="20" height="20" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linejoin="round" aria-hidden="true"><path d="M5 3h9l5 5v13H5zM14 3v6h5M9 13h6M9 17h6" /></svg><span data-i18n={doc.key}>{doc.label}</span></a>)}</div>
+      <section id="about" class="profile-overview" aria-labelledby="profile-name" data-without-portrait={!site.profileImage || undefined}>
+        {site.profileImage && <figure class="about-portrait"><img class="profile-photo" src={site.profileImage} alt={site.profileAlt[locale]} data-i18n-alt="profile.profileAlt" width="1080" height="1440" loading="lazy" /></figure>}
+        <div class="about-copy">
+          <h3 id="profile-name" data-i18n="profile.name">{site.name[locale]}</h3>
+          <p class="about-bio">{(['ko', 'en'] as const).map(language => <span lang={language}>{biography[language]}</span>)}</p>
+          <section id="skills" class="profile-skills" aria-labelledby="skills-heading">
+            <h4 id="skills-heading" class="profile-subheading" data-i18n="skills.title">{ui.skills.title}</h4>
+            <ul class="skill-tags core-skills" aria-label={ui.skills.title} data-i18n-aria-label="skills.title">{coreSkills.map(tech => <li>
+              {skillIcons[tech] ? <img src={`/images/skills/${skillIcons[tech]}.svg`} alt="" width="22" height="22" /> : <svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d={skillMarks[tech]} /></svg>}
+              <span>{tech}</span>
+            </li>)}</ul>
+          </section>
+          <Background locale={locale} />
+        </div>
+      </section>
     </div>
-    <div class="profile-page" id="profile-page-skills" role="tabpanel" aria-labelledby="profile-tab-skills" tabindex="0" data-profile-page="skills" hidden><Skills locale={locale} /></div>
     <div class="profile-page" id="profile-page-approach" role="tabpanel" aria-labelledby="profile-tab-approach" tabindex="0" data-profile-page="approach" hidden><HowIBuild locale={locale} /></div>
   </div>
 </div>

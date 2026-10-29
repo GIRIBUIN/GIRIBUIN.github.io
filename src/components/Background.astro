@@ -1,0 +1,17 @@
+---
+import { site } from '../data/site';
+import { getUi, type Locale } from '../i18n/ui';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const ui = getUi(locale);
+---
+<section id="background" class="shell section background-section education-section" aria-labelledby="background-heading">
+  <h4 id="background-heading" class="profile-subheading" data-i18n="about.education">{ui.about.education}</h4>
+  <div class="background-entry education-card">
+    <img src="/images/background/konkuk.png" alt="" width="1000" height="1000" />
+    <div class="education-copy">
+      <p class="education-program" data-i18n="profile.educationProgram">{site.educationProgram[locale]}</p>
+      <time datetime="2027-02">2027.02</time>
+    </div>
+  </div>
+</section>

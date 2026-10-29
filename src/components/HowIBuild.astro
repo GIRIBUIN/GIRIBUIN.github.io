@@ -1,7 +1,7 @@
 ---
 import SectionHeading from './SectionHeading.astro';
 import { buildPrinciples } from '../data/buildPrinciples';
-import { getUi, localePath, type Locale } from '../i18n/ui';
+import { getUi, type Locale } from '../i18n/ui';
 interface Props { locale?: Locale; }
 const { locale = 'en' } = Astro.props;
 const ui = getUi(locale);
@@ -10,7 +10,6 @@ const firstId = principles[0]?.id;
 ---
 <section id="process" class="shell section process" aria-labelledby="process-heading">
   <SectionHeading title={ui.process.title} note={ui.process.note} titleKey="process.title" noteKey="process.note" id="process-heading" />
-  <p class="section-intro" data-i18n="process.intro" data-stable-copy>{ui.process.intro}</p>
   <ol class="principles-list">{principles.map(principle => <li class="principle-item">
     <button type="button" class="principle-trigger" data-principle={principle.id} aria-haspopup="dialog" aria-controls="build-dialog">
       <span class="principle-copy">
@@ -20,21 +19,23 @@ const firstId = principles[0]?.id;
     </button>
   </li>)}</ol>
   <dialog id="build-dialog" class="build-dialog" aria-labelledby={firstId && 'principle-' + firstId + '-title'} aria-describedby={firstId && 'principle-' + firstId + '-description'}>
-    <a class="header-brand principle-home" href={localePath('/', locale)} data-locale-path="/" aria-label={ui.home} data-i18n-aria-label="home"><img src="/favicon.svg" alt="" width="28" height="28" /><span>GIRIBUIN</span></a>
+    <button class="game-control build-dialog-close" type="button" aria-label={ui.process.close} title={ui.process.close} data-i18n-aria-label="process.close" data-i18n-title="process.close">
+      <svg viewBox="0 0 24 24" width="24" height="24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" aria-hidden="true"><path d="m6 6 12 12M18 6 6 18" /></svg>
+    </button>
+    <div class="build-dialog-body">
     {principles.map(principle => <article data-principle-panel={principle.id} hidden>
       <h3 id={'principle-' + principle.id + '-title'} data-i18n={'principles.' + principle.id + '.title'}>{principle.title}</h3>
       <p class="principle-dialog-intro" id={'principle-' + principle.id + '-description'} data-i18n={'principles.' + principle.id + '.shortDescription'} data-stable-copy>{principle.shortDescription[locale]}</p>
       <dl>
-        {(['why', 'how'] as const).map(key => <div><dt data-i18n={'process.' + key}>{ui.process[key]}</dt><dd data-i18n={'principles.' + principle.id + '.' + key} data-stable-copy>{principle[key][locale]}</dd></div>)}
-        <div><dt data-i18n="process.evidence">{ui.process.evidence}</dt><dd><ul class="principle-evidence">{principle.evidence.map(evidence => <li data-evidence={evidence.id}>
-            <p data-i18n={'principles.' + principle.id + '.evidence.' + evidence.id + '.description'} data-stable-copy>{evidence.description[locale]}</p>
-          </li>)}</ul></dd></div>
+        {(['why', 'how'] as const).map(key => <div class={'principle-detail principle-detail-' + key}><dt>
+          <span data-i18n={'process.' + key}>{ui.process[key]}</span>
+        </dt><dd data-i18n={'principles.' + principle.id + '.' + key} data-stable-copy>{principle[key][locale]}</dd></div>)}
       </dl>
     </article>)}
+    </div>
   </dialog>
 </section>
 <style>
-  .process > .section-intro { max-width: none; }
   .principles-list { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 48px; margin: 0; border-bottom: 1px solid var(--line); }
   .principle-item { min-width: 0; border-top: 1px solid var(--line); }
   .principle-trigger { display: flex; align-items: flex-start; gap: 22px; min-width: 0; width: 100%; height: 100%; padding: 28px 8px 28px 0; border: 0; background: none; color: var(--ink); text-align: left; cursor: pointer; }
@@ -47,12 +48,30 @@ const firstId = principles[0]?.id;
     .principle-trigger { gap: 16px; padding-block: 22px; }
     .principle-title { font-size: 24px; }
   }
-  .build-dialog dl > div:nth-child(1) { --detail-tone: var(--accent); }
-  .build-dialog dl > div:nth-child(2) { --detail-tone: var(--text-soft); }
-  .build-dialog dl > div:nth-child(3) { --detail-tone: var(--text-muted); }
-  .build-dialog dt { display: inline-block; padding: 5px 10px; border-radius: var(--radius-sm); background: color-mix(in srgb, var(--detail-tone) 8%, var(--surface)); color: var(--text); }
+  .build-dialog { width: min(780px, calc(100% - 64px)); max-height: calc(100dvh - 80px); padding: 0; overflow: visible; border: 3px solid var(--border); background: var(--panel); animation: build-enter var(--game-open-duration) var(--game-ease) both; }
+  .build-dialog-body { max-height: calc(100dvh - 86px); padding: 38px; overflow-y: auto; overscroll-behavior: contain; scrollbar-width: thin; border-radius: inherit; }
+  .build-dialog h3 { margin-top: 0; padding-right: 14px; font-size: 34px; line-height: 1.2; }
+  .build-dialog .build-dialog-close { position: absolute; top: -22px; right: -20px; z-index: 1; width: 48px; height: 48px; background: var(--close-control); border-color: color-mix(in srgb, var(--close-control) 55%, var(--text)); }
+  .build-dialog-close:is(:hover, :focus-visible) { transform: scale(1.1) rotate(6deg); }
+  .build-dialog-close:active { transform: scale(.94); }
+  .build-dialog dl { gap: 18px; margin: 28px 0 0; }
+  .principle-detail { padding: 22px 24px; border-radius: var(--radius-sm); background: var(--surface-dark); }
+  .build-dialog dt { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; color: var(--accent); font: 600 14px/1.5 var(--mono); letter-spacing: .08em; }
+  .build-dialog dd { font-size: 16px; line-height: 1.9; }
   .principle-dialog-intro { margin-top: 16px; color: var(--text-soft); font-size: 16px; }
-  .principle-evidence { display: grid; gap: 28px; margin: 0; }
+  @keyframes build-enter { from { opacity: 0; transform: translateY(12px) scale(.98); } to { opacity: 1; transform: none; } }
+  @media (max-width: 700px) {
+    .build-dialog { width: calc(100% - 48px); }
+    .build-dialog-body { padding: 28px 18px 22px; }
+    .build-dialog h3 { font-size: 27px; }
+    .build-dialog .build-dialog-close { width: 44px; height: 44px; right: -14px; }
+    .principle-detail { padding: 18px 16px; }
+    .build-dialog dd, .principle-dialog-intro { font-size: 15px; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .build-dialog { animation: none; }
+    .build-dialog-close:is(:hover, :focus-visible, :active) { transform: none; transition: none; }
+  }
 </style>
 <script>
   const dialog = document.querySelector<HTMLDialogElement>('#build-dialog');
@@ -68,10 +87,12 @@ const firstId = principles[0]?.id;
         dialog.setAttribute('aria-describedby', 'principle-' + id + '-description');
         dialog.showModal();
         dialog.scrollTop = 0;
+        dialog.querySelector('.build-dialog-body')?.scrollTo({ top: 0 });
         document.documentElement.classList.add('dialog-open');
         document.dispatchEvent(new Event('portfolio:dialog-open'));
       });
     });
+    dialog.querySelector('.build-dialog-close')?.addEventListener('click', () => dialog.close());
     dialog.addEventListener('keydown', event => {
       if (event.key !== 'Tab') return;
       const controls = [...dialog.querySelectorAll<HTMLElement>('button:not([disabled]), a[href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])')]

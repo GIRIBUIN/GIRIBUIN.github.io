@@ -7,7 +7,7 @@ export function readState(hash: string, slugs: readonly string[]): ExplorerState
     if (parts[1] && slugs.includes(parts[1])) return { screen: 'projects', view: parts[2] === 'details' ? 'detail' : 'preview', slug: parts[1] };
     return { screen: 'projects', view: 'list' };
   }
-  if (['about', 'education', 'skills', 'process'].includes(parts[0])) return { screen: 'about' };
+  if (['about', 'background', 'education', 'skills', 'process'].includes(parts[0])) return { screen: 'about' };
   if (parts[0] === 'resume' || parts[0] === 'contact') return { screen: parts[0] };
   return { screen: 'main' };
 }

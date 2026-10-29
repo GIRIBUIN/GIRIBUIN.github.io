@@ -1,75 +1,88 @@
-/* About keeps the existing content components inside a compact game menu. */
+/* A single profile view and the existing six-step process share a compact About window. */
 .explorer-window[data-screen="about"] .window-body { display: flex; overflow: hidden; }
 .profile-panel:not([hidden]) { display: flex; width: 100%; min-width: 0; min-height: 0; }
-.profile-menu { display: flex; flex-direction: column; gap: 22px; width: 100%; height: 100%; min-height: 0; }
-.profile-tabs { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; padding: 3px 5px 5px 0; flex: 0 0 auto; }
-.profile-tabs .profile-tab { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: auto; min-height: 50px; padding: 12px; font-size: 14px; font-weight: 650; }
+.profile-menu { display: flex; flex-direction: column; gap: 30px; width: 100%; max-width: 1080px; height: 100%; min-height: 0; margin-inline: auto; }
+.profile-tabs { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 12px; padding: 0; border-bottom: 1px solid var(--line); flex: 0 0 auto; }
+.profile-tabs .profile-tab { display: flex; align-items: center; justify-content: center; gap: 10px; width: 100%; height: auto; min-height: 54px; padding: 15px 12px; border: 0; border-bottom: 2px solid transparent; border-radius: 0; background: transparent; color: var(--text-secondary); box-shadow: none; font-size: 16px; font-weight: 600; }
 .profile-tab svg { flex: none; }
-.profile-tabs .profile-tab[aria-selected="true"] { border-color: var(--accent); background: var(--title-plaque); color: var(--text); box-shadow: 2px 2px 0 #11120e, inset 0 1px 0 rgb(243 241 232 / 10%); }
-.profile-tabs .profile-tab:is(:hover, :focus-visible) { transform: translateY(-2px); }
-.profile-pages { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: var(--border) var(--panel); padding: 2px 10px 6px 0; }
+.profile-tabs .profile-tab[aria-selected="true"] { border-bottom-color: var(--accent); color: var(--text); }
+.profile-tabs .profile-tab[aria-selected="true"] svg { color: var(--accent); }
+.profile-tabs .profile-tab:is(:hover, :focus-visible) { background: rgb(243 241 232 / 3%); color: var(--accent); transform: translateY(-1px); }
+.profile-tabs .profile-tab:active { box-shadow: none; transform: translateY(1px); }
+.profile-pages { flex: 1; min-height: 0; overflow-y: auto; overscroll-behavior: contain; scrollbar-gutter: stable; scrollbar-width: thin; scrollbar-color: var(--border) var(--panel); padding: 2px 12px 6px 0; }
 .profile-page[hidden] { display: none; }
 .profile-page:focus-visible { outline: 2px solid var(--accent); outline-offset: -2px; }
+.profile-overview { display: grid; grid-template-columns: 34% minmax(0, 1fr); gap: 44px; align-items: start; padding-top: 4px; }
+.profile-overview[data-without-portrait] { grid-template-columns: 1fr; }
+.profile-panel .about-portrait { position: sticky; top: 0; align-self: start; width: 100%; max-width: none; margin: 0; padding: 0; border: 0; border-radius: var(--radius-sm); background: var(--surface-dark); box-shadow: none; }
+.profile-panel .about-copy { min-width: 0; max-width: 640px; }
+.profile-panel .about-copy h3 { font-size: 42px; font-weight: 750; line-height: 1.2; margin: 0; }
+.profile-panel .about-bio { max-width: 58ch; font-size: 17px; margin-top: 26px; line-height: 1.95; }
+html[lang="en"] .profile-panel .about-bio [lang="ko"], html[lang="ko"] .profile-panel .about-bio [lang="en"] { display: none; }
+.profile-subheading { margin: 0 0 16px; color: var(--accent); font: 600 13px/1.5 var(--mono); letter-spacing: .07em; text-transform: uppercase; }
+.profile-skills { margin-top: 34px; }
+.profile-panel .core-skills { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); column-gap: 16px; row-gap: 14px; margin: 0; padding: 0; }
+.profile-panel .core-skills li { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 46px; padding: 4px 0; border: 0; background: none; font-size: 16px; font-weight: 500; color: var(--text); }
+.profile-panel .core-skills :is(img, svg) { flex: none; width: 28px; height: 28px; object-fit: contain; }
 .profile-panel .shell { width: 100%; max-width: none; margin: 0; }
-.profile-panel .section { margin-top: 24px; }
-.profile-panel .about, .profile-panel .skills, .profile-panel .process { margin-top: 0; }
-.profile-panel :is(.about, .skills, .process) > .section-heading { display: none; }
-.profile-panel .about-body { grid-template-columns: minmax(150px, .65fr) minmax(0, 1.8fr); gap: 28px; padding: 24px; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--surface-dark); box-shadow: var(--shadow-sm); }
-.profile-panel .about-portrait { align-self: start; width: 100%; max-width: 230px; margin: 0; padding: 7px; border: 3px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); box-shadow: var(--shadow-sm); }
-.profile-panel .about-copy h3 { font-size: 32px; font-weight: 750; }
-.profile-panel .about-role { color: var(--success); }
-.profile-panel .about-bio { font-size: 14px; margin-top: 20px; }
-.profile-panel .profile-facts { grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 12px; margin-top: 24px; }
-.profile-panel .profile-facts > div { display: flex; flex-direction: column; align-items: stretch; gap: 10px; padding: 14px; border: 1px solid var(--border); border-radius: var(--radius-sm); background: var(--surface); }
-.profile-panel .profile-facts dt { font: 11px/1.6 var(--mono); color: var(--border-highlight); }
-.profile-panel .profile-facts dd { font-size: 13px; line-height: 1.8; }
-.profile-panel .education-section .section-heading { margin-bottom: 12px; padding: 0; border: 0; }
-.profile-panel .education-section .section-heading h2 { font: 600 12px/1.5 var(--mono); text-transform: uppercase; letter-spacing: .06em; }
-.profile-panel .education-card { gap: 18px; padding: 18px; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--surface-dark); box-shadow: var(--shadow-sm); }
-.profile-panel .education-card img { width: 48px; height: 48px; }
-.profile-panel .education-program { font-size: 17px; }
-.profile-panel .education-status { color: var(--success); }
-.profile-panel .section-intro { margin: 0 0 22px; font-size: 14px; line-height: 1.8; }
-.profile-panel .skills-grid { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; }
-.profile-panel .skill-group { padding: 20px; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--surface-dark); box-shadow: var(--shadow-sm); }
-.profile-panel .skill-group h3 { min-height: 0; padding-bottom: 14px; color: var(--border-highlight); }
-.profile-panel .skill-tags { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px; margin-top: 16px; }
-.profile-panel .skill-tags li { min-width: 0; gap: 10px; padding: 10px; border: 1px solid var(--line); border-radius: var(--radius-sm); background: var(--surface); font-size: 13px; }
-.profile-panel .process .principles-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; border: 0; }
+.profile-panel .section { margin-top: 32px; }
+.profile-panel .background-section { margin-top: 38px; }
+.profile-panel .education-card { max-width: 530px; gap: 12px; padding: 0; border: 0; background: none; box-shadow: none; }
+.profile-panel .education-card img { width: 30px; height: 30px; }
+.profile-panel .education-copy { display: flex; flex-direction: row; justify-content: flex-start; align-items: baseline; gap: 28px; }
+.profile-panel .education-program { font-size: 16px; line-height: 1.7; }
+.profile-panel .education-copy time { flex: none; color: var(--text-secondary); font: 14px/1.7 var(--mono); white-space: nowrap; }
+.profile-panel .process { margin-top: 0; }
+.profile-panel .process > .section-heading { display: none; }
+.profile-panel .section-intro { margin: 0 0 20px; font-size: 16px; line-height: 1.85; color: var(--text-secondary); }
+.profile-panel .process .principles-list { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 36px; row-gap: 0; border: 0; }
 .profile-panel .process .principle-item { border: 0; }
-.profile-panel .process .principle-trigger { padding: 22px; border: 2px solid var(--border); border-radius: var(--radius-md); background: var(--surface-dark); box-shadow: var(--shadow-sm); transition: transform var(--game-duration), border-color var(--game-duration), background var(--game-duration); }
-.profile-panel .principle-trigger:is(:hover, :focus-visible) { border-color: var(--border-highlight); background: var(--surface); transform: translateY(-2px); }
-.profile-panel .principle-trigger:active { transform: translateY(2px); box-shadow: 1px 1px 0 #11120e; }
-.profile-panel .process .principle-title { font-size: 23px; }
+.profile-panel .process .principle-item:nth-child(n+3) { border-top: 1px solid var(--line); }
+.profile-panel .process .principle-trigger { position: relative; align-items: center; min-height: clamp(164px, 18dvh, 184px); gap: 16px; padding: 32px 14px; border: 0; background: none; box-shadow: none; transition: color var(--game-duration), background var(--game-duration), transform var(--game-duration) var(--game-ease); }
+.profile-panel .process .principle-trigger::before { content: ''; flex: 0 0 12px; height: 14px; clip-path: polygon(0 0, 100% 50%, 0 100%); background: var(--accent); opacity: 0; transform: translateX(-5px); transition: opacity var(--game-duration), transform var(--game-duration) var(--game-ease); }
+.profile-panel .principle-trigger:is(:hover, :focus-visible) { color: var(--accent); background: rgb(243 241 232 / 4%); transform: translateY(-3px); }
+.profile-panel .principle-trigger:is(:hover, :focus-visible)::before { opacity: 1; transform: translateX(0); }
+.profile-panel .principle-trigger:active { transform: translateY(1px) scale(.99); box-shadow: none; }
+.profile-panel .process .principle-title { font-size: 26px; line-height: 1.3; }
+.profile-panel .process .principle-hook { margin-top: 14px; font-size: 15px; line-height: 1.85; }
 .profile-panel .build-dialog { border: 3px solid var(--border); box-shadow: var(--shadow-dialog); background: var(--panel); }
-.profile-documents { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 24px; padding-bottom: 5px; }
-.profile-documents .profile-document { display: flex; align-items: center; gap: 10px; width: auto; height: auto; min-height: 46px; padding: 10px 16px; font-size: 13px; }
 @media (min-width: 701px) and (max-width: 1050px) {
-  .profile-panel .profile-facts { grid-template-columns: 1fr; }
-  .profile-panel .skill-tags { grid-template-columns: 1fr; }
-  .profile-panel .education-copy { flex-direction: column; gap: 6px; }
+  .profile-overview { gap: 28px; }
+  .profile-panel .about-copy h3 { font-size: 36px; }
+  .profile-panel .about-bio { font-size: 16px; }
+  .profile-panel .core-skills { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+  .profile-panel .education-copy { gap: 16px; }
+  .profile-panel .process .principle-trigger { gap: 14px; padding-inline: 4px; }
+  .profile-panel .process .principle-title { font-size: 23px; }
 }
 @media (max-width: 700px) {
-  .profile-menu { gap: 18px; }
+  .profile-menu { gap: 24px; }
   .profile-tabs { gap: 8px; }
-  .profile-tabs .profile-tab { flex-direction: column; gap: 6px; min-height: 64px; padding: 10px 5px; font-size: 11px; line-height: 1.4; }
+  .profile-tabs .profile-tab { min-height: 48px; padding: 12px 6px; gap: 8px; font-size: 12px; line-height: 1.4; }
   .profile-pages { padding-right: 8px; }
-  .profile-panel .about-body { grid-template-columns: 1fr; gap: 24px; padding: 18px; }
-  .profile-panel .about-portrait { justify-self: center; max-width: 160px; }
-  .profile-panel .about-copy h3 { font-size: 28px; }
-  .profile-panel .profile-facts { grid-template-columns: 1fr; }
-  .profile-panel .education-card { align-items: flex-start; gap: 12px; padding: 14px; }
-  .profile-panel .education-card img { width: 36px; height: 36px; }
-  .profile-panel .education-copy { flex-direction: column; align-items: flex-start; gap: 8px; }
-  .profile-panel .education-program { font-size: 14px; }
-  .profile-panel .education-status { font-size: 12px; }
-  .profile-panel .skills-grid, .profile-panel .process .principles-list { grid-template-columns: 1fr; }
-  .profile-panel .skill-group { padding: 16px; }
-  .profile-panel .skill-tags { grid-template-columns: 1fr; }
-  .profile-panel .process .principle-trigger { padding: 18px; }
+  .profile-overview { grid-template-columns: 1fr; gap: 24px; padding: 0; }
+  .profile-panel .about-portrait { position: static; justify-self: start; width: 200px; max-width: 100%; }
+  .profile-panel .about-copy h3 { font-size: 30px; }
+  .profile-panel .about-bio { font-size: 15px; margin-top: 20px; line-height: 1.9; }
+  .profile-subheading { font-size: 12px; margin-bottom: 12px; }
+  .profile-skills { margin-top: 26px; }
+  .profile-panel .core-skills { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 10px 14px; }
+  .profile-panel .core-skills li { min-height: 40px; gap: 8px; font-size: 14px; }
+  .profile-panel .core-skills :is(img, svg) { width: 24px; height: 24px; }
+  .profile-panel .background-section { margin-top: 28px; }
+  .profile-panel .education-card { gap: 8px; }
+  .profile-panel .education-card img { width: 24px; height: 24px; }
+  .profile-panel .education-copy { gap: 10px; }
+  .profile-panel .education-program { font-size: 12px; }
+  .profile-panel .education-copy time { font-size: 11px; }
+  .profile-panel .process .principles-list { grid-template-columns: 1fr; }
+  .profile-panel .process .principle-item:nth-child(n+2) { border-top: 1px solid var(--line); }
+  .profile-panel .section-intro { font-size: 14px; margin-bottom: 16px; }
+  .profile-panel .process .principle-trigger { min-height: 0; gap: 12px; padding: 24px 0; }
+  .profile-panel .process .principle-trigger::before { flex-basis: 12px; }
   .profile-panel .process .principle-title { font-size: 21px; }
-  .profile-documents .profile-document { flex: 1; justify-content: center; padding-inline: 12px; }
+  .profile-panel .process .principle-hook { margin-top: 10px; font-size: 14px; line-height: 1.8; }
 }
 @media (prefers-reduced-motion: reduce) {
-  .profile-tabs .profile-tab:is(:hover, :focus-visible, :active), .profile-panel .principle-trigger:is(:hover, :focus-visible, :active) { transform: none; transition: none; }
+  .profile-tabs .profile-tab:is(:hover, :focus-visible, :active), .profile-panel .principle-trigger:is(:hover, :focus-visible, :active), .profile-panel .process .principle-trigger::before { transform: none; transition: none; }
 }
