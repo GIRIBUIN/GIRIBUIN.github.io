@@ -55,6 +55,11 @@ const ui = getUi(locale);
     });
     const dismiss = () => { if (panel.matches(':popover-open')) panel.hidePopover(); };
     addEventListener('popstate', dismiss); addEventListener('hashchange', dismiss);
+    document.addEventListener('portfolio:dialog-open', () => { if (matchMedia('(max-width: 700px)').matches) dismiss(); });
+    const mobileMode = matchMedia('(max-width: 700px)');
+    mobileMode.addEventListener('change', () => {
+      if (mobileMode.matches && (document.documentElement.classList.contains('explorer-open') || document.body.classList.contains('detail-standalone'))) dismiss();
+    });
     addEventListener('resize', place);
     window.visualViewport?.addEventListener('resize', place);
     window.visualViewport?.addEventListener('scroll', place);
@@ -77,6 +82,7 @@ const ui = getUi(locale);
   .settings-panel .language-switch button:active { transform: scale(.96); }
   @keyframes settings-enter { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
   @media (max-width: 700px) {
+    .explorer-open .settings-hud, .detail-standalone .settings-hud { display: none; }
     .settings-hud { top: 16px; right: 18px; width: 44px; height: 44px; }
     .settings-toggle { width: 44px; height: 44px; }
     .settings-panel { top: 72px; padding: 18px; }

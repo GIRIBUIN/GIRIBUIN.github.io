@@ -111,7 +111,7 @@ export default function PortfolioExplorer({ projects, locale: initialLocale, abo
             <p className="preview-description">{copy.description}</p>
             <dl className="preview-facts">
               <div><dt>{ui.scope}</dt><dd>{copy.scope}</dd></div>
-              {selected.tech.length > 0 && <div><dt>{ui.stack}</dt><dd>{selected.tech.join(' / ')}</dd></div>}
+              {selected.tech.length > 0 && <div className="preview-stack"><dt>{ui.stack}</dt><dd>{selected.tech.join(' / ')}</dd></div>}
               {copy.result && <div><dt>{ui.result}</dt><dd>{copy.result}</dd></div>}
             </dl>
             </div>

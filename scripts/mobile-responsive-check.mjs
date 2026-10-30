@@ -16,8 +16,10 @@ export async function checkMobileResponsive(site, out) {
     });
     try {
       for (const prefix of ['', 'ko/']) {
-        await page.goto(site.base + '/' + prefix + 'work/zzz/');
+        await page.goto(site.base + '/' + prefix);
         await page.locator('[data-explorer-ready]').waitFor({ state: 'attached' });
+        assert.equal(await page.locator('.header-brand').isVisible(), true, 'Home keeps the logo');
+        assert.equal(await page.locator('#settings-toggle').isVisible(), true, 'Home keeps Settings');
         assert.ok(await inside(), `No horizontal overflow at ${prefix}/${width}`);
         await page.locator('#settings-toggle').click();
         await page.waitForFunction(() => document.querySelector('#settings-toggle').getAttribute('aria-expanded') === 'true');
@@ -32,8 +34,11 @@ export async function checkMobileResponsive(site, out) {
           await page.locator('#settings-toggle').click();
           await page.touchscreen.tap(4, 400);
           await page.locator('#settings-panel').waitFor({ state: 'hidden' });
-          assert.ok(await page.locator('.detail-toolbar').evaluate(el => el.getBoundingClientRect().height <= 80));
         }
+        await page.goto(site.base + '/' + prefix + 'work/zzz/');
+        await page.locator('[data-explorer-ready]').waitFor({ state: 'attached' });
+        assert.equal(await page.locator('#settings-toggle').isVisible(), width > 700, 'Standalone mobile detail hides the global HUD');
+        if(width<=700)assert.ok(await page.locator('.detail-toolbar').evaluate(el => el.getBoundingClientRect().height <= 76));
         const embed = page.locator('.demo-youtube iframe');
         assert.equal(await embed.count(), 1);
         assert.ok(await embed.evaluate(el => {
@@ -72,17 +77,44 @@ export async function checkMobileResponsive(site, out) {
         await page.keyboard.press('Escape');
         await page.locator('.diagram-viewer').waitFor({ state: 'hidden' });
         assert.equal(new URL(page.url()).hash, '#projects/zzz/details', 'ESC closes the expanded diagram before its parent window');
+        assert.equal(await page.locator('#settings-toggle').isVisible(), false);
+        assert.equal(await page.locator('.header-brand').isVisible(), false);
+        assert.ok(await page.locator('.detail-document .demo-youtube iframe').evaluate(el => {
+          const r=el.getBoundingClientRect(),p=el.parentElement.getBoundingClientRect();
+          return !!el.closest('.window-body .detail-page') && r.left>=0 && r.right<=innerWidth && r.width<=p.width+1 && Math.abs(r.width/r.height-16/9)<.02;
+        }), 'Modal video belongs to the content scroll flow and fits its container');
         await page.locator('.window-close').click();
         for (const screen of ['about', 'contact', 'resume']) {
           await page.locator(`[data-menu="${screen}"]`).click();
           await page.locator('.explorer-window[open]').waitFor();
           assert.ok(await inside());
+          assert.equal(await page.locator('#settings-toggle').isVisible(), false);
+          assert.equal(await page.locator('.header-brand').isVisible(), false);
           if (width === 390) await page.screenshot({ path: join(out, `mobile-compact-${screen}-390.png`) });
           if (width === 390 && screen === 'about') {
             await page.locator('.profile-pages').evaluate(el => el.scrollTop = el.scrollHeight);
             await page.screenshot({ path: join(out, 'mobile-compact-skills-390.png') });
           }
           await page.locator('.window-close').click();
+          await page.locator('.explorer-window').waitFor({state:'hidden'});
+          assert.equal(await page.locator('#settings-toggle').isVisible(), true, 'Closing restores Home HUD');
+        }
+        for (const prefix of ['', 'ko/']) {
+          await page.goto(site.base + '/' + prefix + '#projects');
+          await page.locator('.collection-grid').waitFor();
+          for(const slug of ['zzz','smart-parking','review-analyzer','ct','kuroom','kutodo','baljucall','convoary']) {
+            await page.locator(`[data-collection-project="${slug}"]`).click();
+            await page.locator('.project-description').waitFor();
+            assert.equal(await page.locator('.project-name-list').isVisible(), false, 'Mobile has no project sidebar/list');
+            assert.ok(await page.locator('.project-description').evaluate(el=>{
+              const body=el.closest('.window-body'),box=body.getBoundingClientRect();
+              const required=[...el.querySelectorAll('[data-preview-heading],.preview-description,.preview-stack,.preview-facts > div:first-child,.project-action-footer a')];
+              return body.scrollTop===0 && required.every(item=>{const r=item.getBoundingClientRect();return r.top>=box.top-1 && r.bottom<=box.bottom+1;}) && getComputedStyle(el).overflowY==='visible';
+            }), `Title/summary/tech/scope/actions fit the first viewport at ${width}/${prefix}${slug}`);
+            assert.ok(await inside());
+            await page.locator('.window-previous').click();
+            await page.locator('.collection-grid').waitFor();
+          }
         }
         // Other graph shapes and long project names also share the mobile layer.
         for (const slug of ['review-analyzer', 'smart-parking', 'kutodo']) {

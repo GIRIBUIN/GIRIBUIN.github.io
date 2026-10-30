@@ -1,0 +1,17 @@
+---
+import ProjectActions from './ProjectActions.astro';
+import { getExplorerUi } from './explorer/copy';
+import type { Project } from '../lib/projects';
+import type { Locale } from '../i18n/ui';
+interface Props { project: Project; locale: Locale; }
+const { project, locale } = Astro.props;
+const { title, slug, oneLine, summary, tech } = project.data;
+---
+<!-- Responsive presentation of the existing collection; shared by fetched Details. -->
+<section class="project-mobile-intro" aria-label={title}>
+  <h2>{title}</h2>
+  <p class="project-mobile-description" data-i18n={'projects.' + slug + '.oneLine'}>{oneLine || summary}</p>
+  {tech.length > 0 && <p class="project-mobile-tech">{tech.join(' · ')}</p>}
+  {oneLine && oneLine !== summary && <p class="project-mobile-scope"><span><span lang="en">{getExplorerUi('en').scope}</span><span lang="ko">{getExplorerUi('ko').scope}</span></span><span data-i18n={'projects.' + slug + '.summary'}>{summary}</span></p>}
+  <ProjectActions project={project} locale={locale} detail toolbar />
+</section>

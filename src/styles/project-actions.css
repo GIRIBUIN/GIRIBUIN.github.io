@@ -5,5 +5,17 @@
 :is(.preview-details, .standalone-link) { background: var(--accent); border-color: var(--accent); color: var(--bg); }
 :is(.preview-details, .standalone-link):is(:hover, :focus-visible) { background: var(--cta-hover); border-color: var(--cta-hover); }
 .project-action-footer .standalone-link { margin-inline-start: auto; }
-@media (max-width: 700px) { .project-action-footer { padding: 16px 20px; } }
+.project-mobile-intro { display: none; }
+@media (max-width: 700px) {
+  .project-action-footer { position: static; margin-top: 0; padding: 8px 20px 16px; border: 0; background: none; backdrop-filter: none; box-shadow: none; }
+  .detail-window-content > .project-action-footer > a:not(.standalone-link) { display: none; }
+  .project-mobile-intro { display: block; min-width: 0; margin-bottom: 24px; }
+  .project-mobile-intro h2 { margin: 0; font-size: 34px; line-height: 1.15; letter-spacing: -.04em; overflow-wrap: anywhere; }
+  .project-mobile-description { margin: 10px 0; font-size: 15px; line-height: 1.65; }
+  .project-mobile-tech { color: var(--accent); font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+  .project-mobile-scope { margin-top: 12px; font-size: 13px; line-height: 1.7; color: var(--text-secondary); }
+  .project-mobile-scope > span:first-child { display: block; margin-bottom: 4px; color: var(--accent); font-size: 12px; }
+  html[lang="ko"] .project-mobile-scope [lang="en"], html[lang="en"] .project-mobile-scope [lang="ko"] { display: none; }
+  .project-mobile-intro .project-toolbar-actions { display: flex; flex-wrap: wrap; gap: 10px; margin-top: 16px; }
+}
 @media (prefers-reduced-motion: reduce) { .project-action:is(:hover, :focus-visible) { transform: none; } }

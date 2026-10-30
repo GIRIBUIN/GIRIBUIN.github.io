@@ -20,7 +20,15 @@ try {
   const details=async slug=>{await page.locator('[data-project-action="details"]').click();await hash('#projects/'+slug+'/details');await page.locator('.detail-window-content .detail-page').waitFor();};
   const escape=async value=>{await page.keyboard.press('Escape');await hash(value);};
   const settledWindowFocus=async()=>page.evaluate(()=>new Promise(resolve=>requestAnimationFrame(()=>requestAnimationFrame(resolve))));
-  const language=async code=>{await page.locator('#settings-toggle').click();await page.locator('#settings-panel').waitFor({state:'visible'});await page.locator('#settings-panel [data-locale="'+code+'"]').click();await page.waitForFunction(code=>document.documentElement.lang===code,code);await page.keyboard.press('Escape');await page.locator('#settings-panel').waitFor({state:'hidden'});};
+  const language=async code=>{
+    // Mobile has no Settings inside a window. Exercise the existing locale
+    // handler directly for the reading-position regression, without exposing UI.
+    if(!await page.locator('#settings-toggle').isVisible()) {
+      await page.evaluate(code=>document.querySelector('#settings-panel [data-locale="'+code+'"]').click(),code);
+      await page.waitForFunction(code=>document.documentElement.lang===code,code);return;
+    }
+    await page.locator('#settings-toggle').click();await page.locator('#settings-panel').waitFor({state:'visible'});await page.locator('#settings-panel [data-locale="'+code+'"]').click();await page.waitForFunction(code=>document.documentElement.lang===code,code);await page.keyboard.press('Escape');await page.locator('#settings-panel').waitFor({state:'hidden'});
+  };
   await goto('/');
   assert.equal(await page.title(),'GIRIBUIN');
   assert.equal(await page.locator('astro-island').count(),2,'Menu UI and the independent character scene are separate islands');
@@ -229,7 +237,9 @@ try {
       await reader.goto(site.base+'/ko/#projects/zzz/details');await reader.waitForSelector('.detail-window-content .detail-page');
       const pane=reader.locator('.window-body');
       const before=await pane.evaluate(el=>{el.scrollTop=1200;return el.scrollTop;});assert.ok(before>1000);
-      await reader.locator('#settings-toggle').click();await reader.locator('#settings-panel [data-locale="en"]').click();await started;
+      if(width>700){await reader.locator('#settings-toggle').click();await reader.locator('#settings-panel [data-locale="en"]').click();}
+      else await reader.evaluate(()=>document.querySelector('#settings-panel [data-locale="en"]').click());
+      await started;
       assert.equal(await reader.locator('.detail-window-content .detail-page').count(),1,'Keep the previous document visible during translation fetch');
       assert.equal(await pane.evaluate(el=>el.scrollTop),before,'Pending translation must not collapse the scroll area');
       const latest=await pane.evaluate(el=>{el.scrollTop+=200;return el.scrollTop;});
@@ -237,7 +247,8 @@ try {
       assert.ok(Math.abs(await pane.evaluate(el=>el.scrollTop)-latest)<=1,'Respect scrolling that happened while fetching');
       const nearEnd=await pane.evaluate(el=>{el.scrollTop=el.scrollHeight-el.clientHeight-12;return el.scrollTop;});
       for(const code of ['ko','en']) {
-        await reader.locator('#settings-panel [data-locale="'+code+'"]').click();
+        if(width>700)await reader.locator('#settings-panel [data-locale="'+code+'"]').click();
+        else await reader.evaluate(code=>document.querySelector('#settings-panel [data-locale="'+code+'"]').click(),code);
         await reader.waitForFunction(code=>document.querySelector('.detail-window-content [data-project-body]')?.lang===code,code);
         assert.ok(Math.abs(await pane.evaluate(el=>el.scrollTop)-nearEnd)<=1,'Cached locale swap preserves deep scroll at '+width+'/'+code);
       }
@@ -281,7 +292,8 @@ try {
       assert.ok(await page.locator('.demo-stage > iframe').evaluateAll(items=>items.every(el=>{const r=el.getBoundingClientRect(),p=el.parentElement.getBoundingClientRect();return r.width<=p.width+1 && r.left>=p.left-1 && r.right<=p.right+1 && r.right<=innerWidth && Math.abs(r.width/r.height-16/9)<.02;})),'Video embeds fit the pane at 16:9 at '+width+'/'+screen);
       assert.ok(await page.evaluate(()=>document.documentElement.scrollHeight<=innerHeight+1 && scrollY===0),'No document-level scroll at '+width+'/'+screen);
       assert.equal(await page.locator('.window-bar button').count(),['preview','detail'].includes(screen)?2:1,'Previous returns one project stage; X always remains');
-      assert.ok(await page.locator('.explorer-window').evaluate(el=>{const r=el.getBoundingClientRect(),header=document.querySelector('.header').getBoundingClientRect();return r.top>header.bottom && r.left>0 && r.right<innerWidth && r.bottom<innerHeight;}),'Window is inset above the same Home');
+      assert.ok(await page.locator('.explorer-window').evaluate(el=>{const r=el.getBoundingClientRect(),header=document.querySelector('.header').getBoundingClientRect();return (innerWidth<=700 || r.top>header.bottom) && r.left>0 && r.right<innerWidth && r.bottom<innerHeight;}),'Window is inset; mobile does not reserve global HUD space');
+      if(width>700){
       assert.ok(await page.locator('.window-close').evaluate(el=>{const r=el.getBoundingClientRect(),panel=el.closest('dialog').getBoundingClientRect();return r.top<panel.top && r.bottom>panel.top && r.left>0 && r.right<innerWidth && r.top>document.querySelector('.header').getBoundingClientRect().bottom;}),'Overlapping close stays visible, below the global header and inside the viewport');
       assert.ok(await page.locator('#explorer-title').evaluate(el=>{const r=el.getBoundingClientRect(),panel=el.closest('dialog').getBoundingClientRect();return r.top<panel.top && r.bottom>panel.top;}),'Title plaque overlaps the frame');
       assert.equal(await settings.isVisible(),true);
@@ -291,7 +303,14 @@ try {
       assert.equal(await settingsPanel.locator('[data-locale="ko"]').isVisible(),true);
       assert.ok(await settingsPanel.evaluate(el=>{const r=el.getBoundingClientRect(),gear=document.querySelector('#settings-toggle').getBoundingClientRect();return Math.abs(r.top-gear.bottom-12)<=1 && Math.abs(r.right-gear.right)<=1 && r.width<=300 && r.width<=innerWidth-32;}),'Settings stays anchored below the gear, including mobile');
       await page.keyboard.press('Escape');await settingsPanel.waitFor({state:'hidden'});
-      if(screen==='preview'&&width<=700) assert.ok(await page.locator('.project-browser').evaluate(el=>{const media=el.querySelector('.explorer-media').getBoundingClientRect(),names=el.querySelector('.project-name-list').getBoundingClientRect(),description=el.querySelector('.project-description').getBoundingClientRect();return media.bottom<=names.top && names.bottom<=description.top;}));
+      } else {
+        assert.equal(await settings.isVisible(),false);assert.equal(await page.locator('.header-brand').isVisible(),false);
+        assert.ok(await page.locator('.window-bar').evaluate(el=>{const r=el.getBoundingClientRect(),items=[...el.querySelectorAll('button,h2')].map(item=>item.getBoundingClientRect());return r.height<=68 && items.every(item=>item.top>=r.top && item.bottom<=r.bottom && Math.abs(item.top-items[0].top)<=2);}),'Mobile header has one row with its own controls');
+      }
+      if(screen==='preview'&&width<=700) {
+        assert.equal(await page.locator('.project-name-list').isVisible(),false);
+        assert.ok(await page.locator('.project-browser').evaluate(el=>{const media=el.querySelector('.explorer-media').getBoundingClientRect(),description=el.querySelector('.project-description').getBoundingClientRect();return description.bottom<=media.top;}),'Mobile summary precedes media');
+      }
       if(screen==='preview')assert.equal(await page.locator('.project-divider').isVisible(),width>700);
       if(screen==='contact')assert.equal(await page.locator('.contact-list').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width>700?4:2);
       if(screen==='resume')assert.equal(await page.locator('.document-list').evaluate(el=>getComputedStyle(el).gridTemplateColumns.split(' ').length),width>700?2:1);
@@ -349,8 +368,8 @@ try {
   await mobile.goto(site.base+'/#projects/convoary');await mobile.waitForSelector('.project-description');await mobile.keyboard.press('Escape');await mobile.waitForFunction(()=>location.hash==='#projects');await mobile.waitForFunction(()=>document.activeElement?.dataset.collectionProject==='convoary');assert.ok(await mobile.locator('[data-collection-project="convoary"]').evaluate(el=>{const r=el.getBoundingClientRect(),b=el.closest('.window-body').getBoundingClientRect();return r.top>=b.top && r.top<b.bottom;}));
   await mobile.locator('.window-backdrop').tap({position:{x:4,y:400}});await mobile.waitForFunction(()=>location.hash==='');await mobile.locator('.explorer-window').waitFor({state:'hidden'});
   await mobile.goto(site.base+'/ko/work/zzz/');await mobile.locator('[data-explorer-ready]').waitFor({state:'attached'});
-  await mobile.locator('.project-info-toggle').tap();await mobile.locator('#project-info').waitFor({state:'visible'});
-  await mobile.touchscreen.tap(4,400);await mobile.locator('#project-info').waitFor({state:'hidden'});
+  assert.equal(await mobile.locator('.project-info-toggle').isVisible(),false);
+  assert.equal(await mobile.locator('.project-mobile-intro').isVisible(),true);
   await mobile.locator('.detail-projects').tap();await mobile.locator('.explorer-window[open]').waitFor();assert.equal(new URL(mobile.url()).pathname,'/ko/work/zzz/');
   await mobile.locator('.window-close').tap();await mobile.locator('.explorer-window').waitFor({state:'hidden'});assert.equal(new URL(mobile.url()).hash,'');await touch.close();
   await goto('/');assert.equal(await page.locator('.visual-scene').count(),1);await open('contact');assert.equal(await page.locator('.contact-panel').isVisible(),true);await close();
@@ -385,11 +404,11 @@ try {
     assert.equal(await page.locator('#project-info').isVisible(),false);
     assert.ok(await page.evaluate(()=>document.documentElement.scrollWidth<=innerWidth+1),'Standalone detail has no horizontal overflow at '+width);
     assert.ok(await page.locator('.project-hud-title').evaluate(el=>{const r=el.getBoundingClientRect(),body=document.body.getBoundingClientRect();return r.left>0 && r.right<innerWidth && (innerWidth<=700 || Math.abs((r.left+r.right)/2-(body.left+body.right)/2)<=1);}),'Project plaque stays inside viewport; desktop remains centered');
-    assert.ok(await page.locator('.detail-hud-links').evaluate(el=>{const r=el.getBoundingClientRect(),settings=document.querySelector('#settings-toggle').getBoundingClientRect();return r.left>0 && r.right<settings.left;}),'Home/Projects controls and Settings do not overlap');
+    if(width>700)assert.ok(await page.locator('.detail-hud-links').evaluate(el=>{const r=el.getBoundingClientRect(),settings=document.querySelector('#settings-toggle').getBoundingClientRect();return r.left>0 && r.right<settings.left;}),'Home/Projects controls and Settings do not overlap');
     if(width<=700)assert.ok(await page.locator('.detail-toolbar').evaluate(el=>{
-      const r=el.getBoundingClientRect(),controls=[...el.querySelectorAll('.detail-hud-links a,.project-hud-title,#settings-toggle')].map(item=>item.getBoundingClientRect());
-      return r.height<=80 && controls.every((item,i)=>item.height>=44 && item.width>=44 && Math.abs(item.top-controls[0].top)<=1 && (i===0 || item.left>=controls[i-1].right));
-    }),'Mobile Home/folder/title/Settings share one row with 44px targets');
+      const r=el.getBoundingClientRect(),controls=[...el.querySelectorAll('.detail-hud-links a,.project-hud-title')].map(item=>item.getBoundingClientRect());
+      return r.height<=76 && controls.every(item=>item.height>=44 && item.width>=44 && Math.abs(item.top-controls[0].top)<=1);
+    }),'Mobile collection/title/close share one compact row');
     assert.ok(await page.locator('.demo-youtube iframe').evaluateAll(items=>items.every(el=>{const r=el.getBoundingClientRect(),parent=el.parentElement.getBoundingClientRect();return r.width<=parent.width+1 && r.right<=innerWidth && Math.abs(r.width/r.height-16/9)<.02;})),'Standalone YouTube fits the container at 16:9');
     assert.equal(await page.locator('.standalone-actions,main > footer').count(),0);
     assert.equal(await page.locator('#project-info .project-toolbar-actions a').count(),2);
@@ -403,13 +422,13 @@ try {
       assert.equal(await page.locator('#project-info').isVisible(),true,'Explicit click pins the popover after pointer leave');
       await page.locator('.project-info-toggle').click();await page.locator('#project-info').waitFor({state:'hidden'});
     }
-    await page.locator('.project-info-toggle').focus();await page.keyboard.press('Enter');await page.locator('#project-info').waitFor({state:'visible'});
+    if(width>700){await page.locator('.project-info-toggle').focus();await page.keyboard.press('Enter');await page.locator('#project-info').waitFor({state:'visible'});
     await page.keyboard.press('Escape');await page.locator('#project-info').waitFor({state:'hidden'});
-    assert.equal(await page.locator('.project-info-toggle').evaluate(el=>el===document.activeElement),true);
+    assert.equal(await page.locator('.project-info-toggle').evaluate(el=>el===document.activeElement),true);}
     await page.evaluate(()=>scrollTo({top:1200,behavior:'instant'}));
     const top=await page.evaluate(()=>scrollY);await language('en');assert.ok(Math.abs(await page.evaluate(()=>scrollY)-top)<=1,'Standalone locale switch preserves document position');
     assert.equal(await page.locator('.detail-projects').getAttribute('href'),'/projects/');
-    assert.ok(await page.locator('.detail-toolbar').evaluate(el=>{const r=el.getBoundingClientRect(),css=getComputedStyle(el),settings=document.querySelector('.settings-hud').getBoundingClientRect();return css.position==='fixed' && r.top===0 && css.backgroundColor==='rgb(22, 23, 19)' && settings.top>=r.top && settings.bottom<=r.bottom;}),'Home/folder/title/Settings share an opaque pinned header');
+    assert.ok(await page.locator('.detail-toolbar').evaluate(el=>{const r=el.getBoundingClientRect(),css=getComputedStyle(el),settings=document.querySelector('.settings-hud').getBoundingClientRect();return css.position==='fixed' && r.top===0 && css.backgroundColor==='rgb(22, 23, 19)' && (innerWidth<=700 || settings.top>=r.top && settings.bottom<=r.bottom);}),'Detail owns its pinned header; desktop retains Settings');
     await page.evaluate(()=>document.querySelector('[data-project-explorer-trigger]').click());await page.locator('.explorer-window[open]').waitFor();
     assert.equal(new URL(page.url()).pathname,'/ko/work/zzz/');assert.equal(new URL(page.url()).hash,'#projects');
     assert.ok(Math.abs(await page.evaluate(()=>scrollY)-top)<=1,'Opening the local collection preserves document scroll');
@@ -490,7 +509,7 @@ try {
     await page.setViewportSize({width:360,height:844});await page.goto(scrollFixture.base+'/#projects/inserted');await page.waitForSelector('.project-description');
     await page.locator('.explorer-window').evaluate(el=>Promise.all(el.getAnimations().map(animation=>animation.finished)));
     await page.locator('.window-body').evaluate(el=>{el.scrollTop+=el.querySelector('.project-description').getBoundingClientRect().top-el.getBoundingClientRect().top+250;});
-    assert.ok(await page.locator('.project-description').evaluate(el=>{const body=el.closest('.window-body').getBoundingClientRect(),heading=el.querySelector('.preview-heading-bar').getBoundingClientRect(),footer=el.querySelector('.project-action-footer').getBoundingClientRect();return Math.abs(heading.top-body.top)<=1 && Math.abs(footer.bottom-body.bottom)<=1;}),'Long mobile descriptions keep heading and icon footer in the window scroll viewport');
+    assert.ok(await page.locator('.project-description').evaluate(el=>getComputedStyle(el).overflowY==='visible' && getComputedStyle(el.querySelector('.preview-heading-bar')).position==='static' && getComputedStyle(el.querySelector('.project-action-footer')).position==='static'),'Long mobile descriptions use the window body as their only vertical scroll');
     await page.screenshot({path:join(out,'sticky-project-mobile.png')});
   } finally {await scrollFixture.close();}
   pass('desktop list/detail scroll independently by wheel; media fixed during both, no left-pane/outer scroll or width shift');

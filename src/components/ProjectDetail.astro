@@ -5,6 +5,7 @@ import ProjectInfo from './ProjectInfo.astro';
 import StandaloneExplorer from './StandaloneExplorer.astro';
 import ProjectDemo from './ProjectDemo.astro';
 import SettingsHud from './SettingsHud.astro';
+import ProjectMobileIntro from './ProjectMobileIntro.astro';
 import '../styles/standalone-detail.css';
 import { localizeProject, type Project } from '../lib/projects';
 import { getUi, localePath, type Locale } from '../i18n/ui';
@@ -32,6 +33,7 @@ const ui = getUi(locale);
   <SettingsHud locale={locale} />
   </header>
   <article class="shell detail-page" data-project={slug} aria-labelledby="standalone-project-title">
+    <ProjectMobileIntro project={project} locale={locale} />
     <ProjectDemo project={project} locale={locale} detail />
     {!englishNotes && <p class="translation-note" data-i18n="project.untranslated" data-project-translation-note hidden={contentLocale === locale}>{ui.project.untranslated}</p>}
     <div class="prose detail-prose" lang={contentLocale} data-project-body data-rendered-locale={locale}>{locale === 'en' ? <EnglishContent /> : <KoreanContent />}</div>

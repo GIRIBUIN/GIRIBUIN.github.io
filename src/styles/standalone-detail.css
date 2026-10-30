@@ -20,14 +20,19 @@
 .detail-standalone .detail-page { width: min(980px, calc(100% - 96px)); max-width: none; margin-inline: auto; padding: 48px 0; }
 .detail-standalone .detail-page > .demo { margin-top: 0; }
 @media (max-width: 700px) {
-  .detail-standalone { --header-height: 76px; }
-  .detail-toolbar { grid-template-columns: auto minmax(0, 1fr) 44px; grid-template-rows: 44px; gap: 8px; padding: 16px; }
-  .detail-hud-links { grid-row: 1; gap: 6px; }
+  .detail-standalone { --header-height: 72px; }
+  .detail-toolbar { grid-template-columns: 44px minmax(0, 1fr) 44px; grid-template-rows: 44px; gap: 8px; padding: 12px 16px; }
+  .detail-hud-links { display: contents; }
+  .detail-hud-links .detail-projects { grid-column: 1; grid-row: 1; }
+  .detail-hud-links .detail-home { grid-column: 3; grid-row: 1; }
+  .detail-hud-links .game-control svg { display: none; }
+  .detail-projects::before { content: '←'; font: 26px/1 var(--font-body, sans-serif); }
+  .detail-home::before { content: '×'; font: 30px/1 var(--font-body, sans-serif); }
   .detail-hud-links .game-control { width: 44px; height: 44px; }
-  .project-hud-title { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; height: 44px; padding: 9px 28px 9px 8px; box-shadow: var(--shadow-sm); }
-  .project-hud-title .project-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 14px; line-height: 20px; }
+  .project-hud-title { grid-column: 2; grid-row: 1; width: 100%; min-width: 0; height: 44px; padding: 10px 4px; border: 0; background: none; box-shadow: none; }
+  .project-hud-title .project-name { display: block; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; font-size: 16px; line-height: 24px; }
   .project-hud-title .project-logo { display: none; }
-  .project-info-toggle > svg { right: 6px; width: 16px; height: 16px; }
+  .project-info-toggle, .project-info-panel { display: none; }
   .detail-standalone .detail-page { width: calc(100% - 32px); padding: 20px 0 28px; }
 }
 @media (prefers-reduced-motion: reduce) { .detail-hud-links .game-control:is(:hover, :focus-visible) { transform: none; } }
