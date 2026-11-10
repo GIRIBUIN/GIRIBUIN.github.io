@@ -1,0 +1,27 @@
+<svg width="120" height="120" viewBox="0 0 120 120" fill="none" xmlns="http://www.w3.org/2000/svg">
+<rect width="120" height="120" fill="#E94545"/>
+<path d="M0 0H120V120L0 0Z" fill="#E4CFCF"/>
+<path d="M28 28L45 45V95H28V28Z" fill="#E4CFCF"/>
+<mask id="stroke0_9_166" fill="white">
+<path d="M28 28L45 45V95H28V28Z"/>
+</mask>
+<path d="M28 28L45 45V95H28V28Z" stroke-width="2" stroke="black" mask="url(#stroke0_9_166)"/>
+<path d="M30 28H45V43L30 28Z" fill="#E94545"/>
+<mask id="stroke1_9_166" fill="white">
+<path d="M30 28H45V43L30 28Z"/>
+</mask>
+<path d="M30 28H45V43L30 28Z" stroke-width="2" stroke="black" mask="url(#stroke1_9_166)"/>
+<path d="M47 28H90V61H63.5L47 45V28Z" fill="#E94545"/>
+<mask id="stroke2_9_166" fill="white">
+<path d="M47 28H90V61H63.5L47 45V28Z"/>
+</mask>
+<path d="M47 28H90V61H63.5L47 45V28Z" stroke-width="2" stroke="black" mask="url(#stroke2_9_166)"/>
+<path d="M47 47L61 61H47V47Z" fill="#E4CFCF"/>
+<mask id="stroke3_9_166" fill="white">
+<path d="M47 47L61 61H47V47Z"/>
+</mask>
+<path d="M47 47V61H61L47 47Z" stroke-width="2" stroke="black" mask="url(#stroke3_9_166)"/>
+<rect x="56.5" y="32.5" width="27" height="10" rx="2.5" fill="#D9D9D9" stroke="black"/>
+<rect x="58.5" y="44.5" width="9" height="9" rx="4.5" fill="#D9D9D9" stroke="black"/>
+<rect x="72.5" y="44.5" width="9" height="9" rx="4.5" fill="#D9D9D9" stroke="black"/>
+</svg>

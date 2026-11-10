@@ -28,16 +28,13 @@ public/
         icon.png              # 선택: 프로젝트 아이콘
         thumbnail.png         # 선택: 공통 16:9 썸네일
         reference.png         # 선택: 이전 구현 참고 화면
-  videos/projects/[slug]/
-    demo.mp4                  # 선택: 무음 카드 미리보기
   files/                      # 이력서·포트폴리오 PDF
-  models/pet.glb               # 홈 companion 원본 모델
   fonts/                      # 폰트와 라이선스
 ```
 
-프로젝트 이미지는 해당 slug 폴더에 모읍니다. dark/light 썸네일을 따로 만들지 않으며, 현재 제공된 썸네일은 1280×720입니다. 이미지와 영상은 선택 사항입니다. 표시·호버 재생 규칙은 루트 [README](../README.md)의 미디어 표를 따릅니다.
+프로젝트 이미지는 해당 slug 폴더에 모읍니다. dark/light 썸네일을 따로 만들지 않으며, 현재 제공된 썸네일은 1280×720입니다. V3 목록은 텍스트만 표시하며 썸네일은 상세에서만 사용합니다. 호버 영상과 3D 모델은 사용하지 않습니다.
 
-배포 빌드의 메뉴 폴더·요약 화면은 `explorer-data.ts`에서 Astro 이미지 파이프라인으로 생성한 800px WebP를 사용합니다. 개발 서버는 Windows 이미지 변환 경로 문제를 피하도록 public의 원본 PNG를 직접 사용합니다. 컬렉션의 원본 PNG 경로는 유지하며 `dist/_astro/`의 파생 파일을 직접 관리하지 않습니다. 폴더는 영상 요소 없이 썸네일만 로딩하고 요약에서 선택한 영상만 요청합니다. Details/독립 상세에는 별도 덮개 없이 YouTube iframe을 바로 표시하며 자동 재생을 강제하지 않습니다.
+상세 이미지는 `project-images.ts`에서 Astro 이미지 파이프라인으로 생성한 800px WebP를 사용합니다. 개발 서버는 Windows 이미지 변환 경로 문제를 피하도록 public 원본 PNG를 사용합니다. 컬렉션의 원본 PNG 경로는 유지하며 `dist/_astro/` 파생 파일은 직접 관리하지 않습니다. 영상은 YouTube iframe으로 표시하며 자동 재생하지 않습니다. 중복 MP4 연결은 제거했습니다. `public/videos/projects/`의 기존 MP4 6개는 OS 삭제 권한 문제로 남아 있으나 페이지에서 요청하지 않습니다.
 
 `dist/`, `.astro/`, `.verification/`에는 원본 이미지를 보관하지 않습니다. 프로젝트 저장소의 `assets/`에서 가져온 자산은 이 포트폴리오의 `public/`에 한 번만 복사해 연결합니다.
 
@@ -50,7 +47,7 @@ public/
 
 두 파일은 원본 바이트를 유지한 이전 구현 참고 자료입니다. ZZZ는 초기 On-Premise 단계이며 최종 AWS·Google Health 화면을 의미하지 않습니다. Review Analyzer는 기존 웹 프로토타입의 입력 화면이며 최종 분석 결과를 증명하지 않습니다.
 
-`public/models/pet.glb`는 2026-10-29 사용자 Downloads의 `pet.glb`를 원본 그대로 복사했다. 크기 1,366,392 bytes, SHA-256 `D61360CD559E0183D391D6D53D7DF17172F9D9BF1F4A6B34E91415392FEB59BE`. Blender glTF 2.0 모델이며 현재 animation clip은 없다. 수정본은 이 public 경로에 교체한다.
+과거 `public/models/pet.glb`는 2026-10-29 사용자 Downloads에서 복사했습니다. 크기 1,366,392 bytes, SHA-256 `D61360CD559E0183D391D6D53D7DF17172F9D9BF1F4A6B34E91415392FEB59BE`. V3에서는 모델과 렌더러를 제거했으며 현재 배포 자산이 아닙니다.
 
 프로필·PDF·프로젝트 아이콘과 썸네일의 상세 출처는 [CONTENT_SOURCES](CONTENT_SOURCES.md), 기술 아이콘 출처는 [TECH_ICON_SOURCES](TECH_ICON_SOURCES.md)에 기록합니다.
 
