@@ -110,6 +110,23 @@ Career DB·원본 사이트·PDF·프로젝트 코드에는 쓰기 작업을 하
 - 아이콘은 기존 logo 필드에, 썸네일은 thumbnail 필드에 연결했습니다. 기존 MP4 호버 재생과 상세 YouTube 링크를 유지하며 dark/light 구분은 없습니다.
 - Review Analyzer·KUTODO·발주콜에는 새 자산을 추가하지 않았습니다.
 
+## systems-track 설계 반영 (2026-11-10)
+
+읽은 문서:
+
+- `D:/_workspace/systems-track/backend-systems/spool/_planning/01_project.md`
+- `D:/_workspace/systems-track/backend-systems/spool/_planning/02_project_capabilities.md`
+- `D:/_workspace/systems-track/backend-systems/spool/_planning/todo.md`
+- `D:/_workspace/systems-track/backend-systems/spool/README.md`, `go.mod`, `cmd/spool/main.go`
+- `D:/_workspace/systems-track/ai-systems/KVcompact/01_project.md`
+- `D:/_workspace/systems-track/ai-systems/KVcompact/02_project_capabilities.md`
+
+Spool은 Q/D/C·manifest·내구성 ack·입장 제한·재전송·회수 순서, 독립 receipt/ledger와 fault injection, 동일 내구성의 group commit 비교를 설계 내용으로 정리했습니다. 실제 코드는 fmt.Println 진입점이며 내부 구현 파일은 확인되지 않았습니다. In Progress를 유지하되 core 구현·crash 검증·benchmark·운영 완료를 주장하지 않습니다.
+
+KVCompact는 4-bit packed blocks/BF16 residual·타일 복원·Qwen2 adapter·독립 oracle·비교 실험·GPU feasibility gate를 계획으로 정리했습니다. 문서의 이론 계산·완료 목표·예상 역량을 실측 성과로 옮기지 않았습니다. 계획한 Python/PyTorch/Triton 등은 본문에서 명시하고 사용 경험 metadata로 올리지 않았습니다. 코드·baseline 실행·GPU 실측·품질 결과가 없다는 원문의 경계를 유지합니다.
+
+공통 전략·취업·진학 평가·Strong/Moderate 등급과 일정 추정은 공개 프로젝트 설명에서 제외했습니다. 원본 작업 폴더는 읽기만 했으며 수정하지 않았습니다. 공개 URL이 확인된 기존 Spool GitHub 링크만 유지하고 내부 설계 파일 경로를 사이트 링크로 만들지 않았습니다.
+
 ## 폴더·자산 정리 (2026-10-21)
 
 - 두 참고 이미지를 프로젝트별 reference.png로 이동했고 파일 내용은 유지했습니다.
