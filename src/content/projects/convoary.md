@@ -4,17 +4,21 @@ title: "Convoary"
 ownership: {"type":"personal","teamSize":null}
 category: "Browser Extension"
 cardTech: ["TypeScript","React","WebExtensions","Dropbox API"]
-featured: false
+featured: true
+status: completed
+origin: "independent"
+validation: tested
+role: {"ko":"TypeScript·React로 탐색기 UI를 구성하고, WebExtensions API로 별도 창·탭·로컬 저장소를 연결했습니다.","en":"Built the TypeScript/React explorer UI and connected windows, tabs, and local storage through WebExtensions APIs."}
+tags: ["Browser Extension","Local-first","Encrypted sync"]
 section: "tools"
 order: 80
-tech: ["TypeScript","React","Vite","WebExtensions","Dropbox API","Web Crypto","Vitest","Playwright"]
+technologies: ["TypeScript","React","Vite","WebExtensions","Dropbox API","Web Crypto","Vitest","Playwright"]
 summary: "ChatGPT 대화를 탐색기처럼 정리하는 브라우저 확장입니다. 중첩 폴더·검색·다중 선택과 로컬 저장, 선택적 Dropbox 암호화 동기화를 제공합니다."
 oneLine: "AI 대화를 폴더로 정리하고 검색하는 탐색기형 브라우저 확장"
 problem: "길어진 대화 목록에서 필요한 대화를 다시 찾고 주제별로 정리하기 어려움"
 decision: "원본 대화와 정리 데이터를 분리하고 로컬 저장을 기본으로 선택적 암호화 동기화 제공"
 result: "Chrome·Edge·Firefox·Zen용 v0.1 alpha와 시연 영상 공개"
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/convoary","release":"https://github.com/GIRIBUIN/convoary/releases","video":"https://youtu.be/8-YvxsedAxQ","caseStudy":null}
-demo: {"type":"video","url":"/videos/projects/convoary/demo.mp4"}
 logo: null
 thumbnail: "/images/projects/convoary/thumbnail.png"
 hidden: false

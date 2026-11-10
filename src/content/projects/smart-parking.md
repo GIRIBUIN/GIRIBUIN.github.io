@@ -5,17 +5,20 @@ ownership: {"type":"team","teamSize":3}
 category: "Embedded / IoT"
 cardTech: ["Raspberry Pi","C","MQTT"]
 featured: false
+status: completed
+origin: null
+validation: prototype
+tags: ["Embedded","MQTT","Device diagnostics"]
 section: "tools"
 order: 20
 trace: {"input":"센서·게이트 노드 상태","decision":"MQTT 수집 + heartbeat 진단","output":"중앙 주차 모형 대시보드"}
-tech: ["Raspberry Pi","C","Python","MQTT","Flask","SQLite"]
+technologies: ["Raspberry Pi","C","Python","MQTT","Flask","SQLite"]
 oneLine: "Raspberry Pi 3대와 MQTT로 감지·게이트·모니터링을 연결한 주차장 모형"
 summary: "RPi3 중앙 노드를 맡아 MQTT·SQLite·Flask 대시보드, 커널 상태 진단과 로컬 네트워크를 통합했습니다."
 problem: "감지·제어 장치의 상태와 이벤트 수집"
 decision: "MQTT 구독, heartbeat와 커널 상태 인터페이스"
 result: "실제 센서·모터를 포함한 3-node 수업 시연 완료"
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/RPI-Parking-service-driver","release":null,"video":"https://youtu.be/YD9IXrkSWf0","caseStudy":null}
-demo: {"type":"video","url":"/videos/projects/smart-parking/demo.mp4"}
 logo: "/images/projects/smart-parking/icon.png"
 thumbnail: "/images/projects/smart-parking/thumbnail.png"
 hidden: false

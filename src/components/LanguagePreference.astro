@@ -1,0 +1,22 @@
+<script is:inline>
+  (() => {
+  if (window.__portfolioLocaleNegotiated) return;
+  window.__portfolioLocaleNegotiated = true;
+  // Static hosting has no request locale. Only the neutral Home entry negotiates.
+  // Explicit localized/deep URLs keep their language; manual choices take priority.
+  if (location.pathname === '/' && !location.hash) {
+    let preferred = new URLSearchParams(location.search).get('lang');
+    if (preferred !== 'en' && preferred !== 'ko') {
+      try { preferred = localStorage.getItem('portfolio.locale'); } catch {}
+    }
+    if (preferred !== 'en' && preferred !== 'ko') {
+      const language = (navigator.languages || [navigator.language]).find(value => /^(ko|en)(-|$)/i.test(value));
+      preferred = /^ko(-|$)/i.test(language || '') ? 'ko' : 'en';
+    }
+    if (preferred === 'ko') {
+      const target = new URL(location.href); target.pathname = '/ko/';
+      location.replace(target.href);
+    }
+  }
+  })();
+</script>

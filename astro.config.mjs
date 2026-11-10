@@ -8,9 +8,20 @@ export default defineConfig({
   output: 'static',
   trailingSlash: 'always',
   devToolbar: { enabled: false },
-  integrations: [react()],
+  prefetch: { prefetchAll: false, defaultStrategy: 'hover' },
+  integrations: [react(), {
+    name: 'portfolio-localized-pages',
+    hooks: {
+      'astro:config:setup': ({ injectRoute }) => {
+        injectRoute({ pattern: '/ko/about', entrypoint: './src/routes/KoreanAbout.astro', prerender: true });
+        injectRoute({ pattern: '/ko/projects/[slug]', entrypoint: './src/routes/KoreanProject.astro', prerender: true });
+        injectRoute({ pattern: '/contact', entrypoint: './src/routes/LegacyContact.astro', prerender: true });
+        injectRoute({ pattern: '/ko/contact', entrypoint: './src/routes/LegacyContact.astro', prerender: true });
+      },
+    },
+  }],
   markdown: {
-    shikiConfig: { theme: 'github-dark' },
+    shikiConfig: { theme: 'github-light' },
     syntaxHighlight: { type: 'shiki', excludeLangs: ['mermaid', 'math'] },
     processor: satteri({ hastPlugins: [rehypeDiagrams()] }),
   },

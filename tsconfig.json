@@ -1,12 +1,26 @@
 {
   "extends": "astro/tsconfigs/strict",
-  "compilerOptions": { "jsx": "react-jsx", "jsxImportSource": "react" },
+  "compilerOptions": {
+    "jsx": "react-jsx",
+    "jsxImportSource": "react"
+  },
   "include": [
     ".astro/types.d.ts",
     "**/*"
   ],
   "exclude": [
     "dist",
-    ".verification"
+    ".verification",
+    "src/components/Education.astro",
+    "src/components/HomePage.astro",
+    "src/components/ProjectActionIcon.astro",
+    "src/components/ProjectRail.astro",
+    "src/components/ProjectTitle.astro",
+    "src/components/Skills.astro",
+    "src/components/SocialIcon.astro",
+    "src/i18n/runtime.ts",
+    "src/i18n/ui.ts",
+    "src/data/skills.ts",
+    "src/data/buildPrinciples.ts"
   ]
 }

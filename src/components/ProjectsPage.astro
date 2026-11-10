@@ -1,8 +1,17 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import Projects from './Projects.astro';
-import { getUi, type Locale } from '../i18n/ui';
+import ProjectRow from './ProjectRow.astro';
+import ProjectFilters from './ProjectFilters.astro';
+import { getProjects } from '../lib/projects';
+import { getUi, type Locale } from '../lib/i18n';
 interface Props { locale?: Locale; }
 const { locale = 'en' } = Astro.props;
+const ui = getUi(locale);
+const projects = await getProjects();
+const filters = projects.map(({data}) => ({ slug: data.slug, status: data.status, featured: data.featured }));
 ---
-<Layout locale={locale} title={getUi(locale).projectSection.title}><Projects locale={locale} all /></Layout>
+<Layout title={ui.allProjects} locale={locale}>
+  <header class="page-intro"><h1>Projects</h1><p>{ui.archiveIntro}</p></header>
+  <ProjectFilters projects={filters} locale={locale} />
+  <div class="project-list" id="project-list">{projects.map(project => <ProjectRow project={project} locale={locale} />)}</div>
+</Layout>

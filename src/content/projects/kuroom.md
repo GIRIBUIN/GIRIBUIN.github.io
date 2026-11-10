@@ -4,18 +4,22 @@ title: "KUROOM"
 ownership: {"type":"personal","teamSize":null}
 category: "Web"
 cardTech: ["TypeScript","Python","Vite"]
-featured: true
+featured: false
+status: completed
+origin: "independent"
+validation: tested
+notes: {"en":"en/kuroom-current"}
+tags: ["Web","Static data","Time intervals"]
 section: "work"
 order: 50
 trace: {"input":"학교 건물·강의실 시간표","decision":"정적 JSON 조회 + 시간 경계 검증","output":"건물·강의실별 주간 일정"}
-tech: ["TypeScript","Python","Vite","Vitest"]
+technologies: ["TypeScript","Python","Vite","Vitest"]
 oneLine: "학교 시간표를 정제해 건물·강의실별 주간 일정을 조회하는 웹 서비스"
 summary: "시간표 정제, 일정 조회와 반응형 UI, Python·TypeScript 결과 비교를 담당합니다."
 problem: "복잡한 시간표에서 강의실 일정 찾기"
 decision: "정적 JSON 조회와 시간대 계산을 분리·검증"
 result: "강의실 404개·시간표 3,087개 구조 확인. 공개 배포 준비 중"
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/kuroom","release":null,"video":"https://youtu.be/iZvaG1DglfI?si=hF7h1nOkf_jBIxXl","caseStudy":null}
-demo: {"type":"video","url":"/videos/projects/kuroom/demo.mp4"}
 logo: "/images/projects/kuroom/icon.png"
 thumbnail: "/images/projects/kuroom/thumbnail.png"
 hidden: false
@@ -24,7 +28,7 @@ translations: {"en":{"oneLine":"A web app for building and room timetable lookup
 
 ## 개발 배경
 
-복잡한 학교 시간표에서 건물과 강의실의 일정을 매번 찾아야 하는 불편에서 시작했습니다. 혼자 수집·정제·조회 로직과 웹 UI를 개발하고 있으며, 현재는 강의실별 주간 시간표를 쉽게 확인하는 데 초점을 두고 있습니다.
+복잡한 학교 시간표에서 건물과 강의실의 일정을 매번 찾아야 하는 불편에서 시작했습니다. 수집·정제·조회 로직과 웹 UI를 직접 개발해 강의실별 주간 시간표를 쉽게 확인할 수 있도록 했습니다.
 
 ## 시스템 아키텍처
 
@@ -52,4 +56,4 @@ flowchart TB
 
 ## 현재 상태
 
-건물·강의실 검색과 주간 시간표 UI를 개발하고 검증하는 단계입니다. 표시하는 것은 등록된 수업 일정이며, 실제 점유·대관·개방 상태나 공간 사용 권한을 보장하지 않습니다. 공개 배포 주소와 외부 사용자 평가는 아직 없습니다.
+건물·강의실 검색과 주간 시간표 UI의 구현을 마쳤습니다. 표시하는 것은 등록된 수업 일정이며, 실제 점유·대관·개방 상태나 공간 사용 권한을 보장하지 않습니다. 공개 배포 주소와 외부 사용자 평가는 아직 없습니다.

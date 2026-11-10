@@ -1,0 +1,33 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { site } from '../data/site';
+import { getUi, type Locale } from '../lib/i18n';
+import { getDocuments } from '../lib/documents.mjs';
+import ContactLinks from './ContactLinks.astro';
+import { profileAsset } from '../lib/profile-images';
+import { getImage } from 'astro:assets';
+import schoolLogo from '../../public/images/background/konkuk.png';
+interface Props { locale?: Locale; }
+const { locale = 'en' } = Astro.props;
+const ui = getUi(locale);
+const documents = getDocuments();
+const portrait = site.profileImage ? await profileAsset(site.profileImage, 560) : null;
+const school = await getImage({ src: schoolLogo, width: 64, height: 64, format: 'webp', quality: 85 });
+const biography = {
+  ko: '낯선 문제는 직접 실행해 흐름을 살펴보고, 필요한 만큼 깊게 파고듭니다. 기능 구현뿐 아니라 실패할 수 있는 지점을 확인하려고 합니다. AI는 탐색과 반복에 활용하되 설계와 검증은 직접 책임집니다.',
+  en: 'I explore unfamiliar problems by running them and tracing how they work. Beyond implementing features, I look for where they can fail. I use AI for exploration and iteration, while taking responsibility for design and verification.',
+};
+---
+<Layout title={ui.aboutTitle} locale={locale}>
+  <header class="page-intro"><h1>{ui.aboutTitle}</h1><p>{site.name[locale]} · {site.role}</p></header>
+  <div class="about-layout">
+    <div class="about-content">
+      <p class="about-bio">{biography[locale]}</p>
+      <section id="education"><h2>{ui.education}</h2><div class="education-row"><span class="school-name"><img src={school.src} alt="" width="32" height="32" loading="lazy" decoding="async" />{site.educationProgram[locale]}</span><time datetime="2027-02">2027.02</time></div></section>
+      <section id="skills"><h2>{ui.skills}</h2><p class="skill-inventory">Java · Python · Go · SQL · Linux · Docker · Git</p></section>
+      {documents.length > 0 && <section id="documents"><h2>Documents</h2><nav class="text-links" aria-label={locale === 'ko' ? 'PDF 문서' : 'PDF documents'}>{documents.map(document => <a href={document.url} data-astro-reload>{document.label} ↓</a>)}</nav></section>}
+      <section id="contact"><h2>{ui.contact}</h2><ContactLinks className="contact-icons" /></section>
+    </div>
+    {portrait && <img class="about-photo" src={portrait} alt={site.profileAlt[locale]} width="280" height="373" loading="lazy" />}
+  </div>
+</Layout>

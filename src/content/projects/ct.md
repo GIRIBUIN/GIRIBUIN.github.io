@@ -5,13 +5,17 @@ ownership: {"type":"personal","teamSize":null}
 category: "CLI"
 cardTech: ["Go","VS Code"]
 featured: false
+status: completed
+origin: "independent"
+validation: in-use
+role: {"ko":"CLI·템플릿·레지스트리·VS Code 연동부터 테스트·설치 스크립트·릴리스까지 직접 담당했습니다.","en":"Handled the CLI, templates, registry, VS Code integration, tests, installation scripts, and releases."}
+tags: ["CLI","Developer tools"]
 section: "tools"
 order: 40
 trace: {"input":"언어별 풀이 파일·환경 준비","decision":"파일 보존 + 진단·설치 분리","output":"템플릿과 환경 진단 CLI"}
-tech: ["Go","JSON","GitHub Actions","VS Code"]
+technologies: ["Go","JSON","GitHub Actions","VS Code"]
 summary: "풀이 파일 생성, VS Code 연동과 환경 진단을 제공하는 개인 실사용 도구입니다. Windows·Linux 바이너리를 배포했습니다."
 links: {"demo":null,"source":"https://github.com/GIRIBUIN/ct","release":"https://github.com/GIRIBUIN/ct/releases/tag/v0.3.1","video":"https://youtu.be/NN1xVfZOhDg?si=binFhCB4yua3H-Tc","caseStudy":null}
-demo: {"type":"terminal","url":"/videos/projects/ct/demo.mp4","format":"video"}
 logo: "/images/projects/ct/icon.png"
 thumbnail: "/images/projects/ct/thumbnail.png"
 hidden: false

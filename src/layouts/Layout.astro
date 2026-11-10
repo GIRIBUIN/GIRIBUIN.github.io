@@ -1,30 +1,41 @@
 ---
 import '../styles/global.css';
-import '../styles/game-theme.css';
+import { ClientRouter } from 'astro:transitions';
 import Header from '../components/Header.astro';
-import LanguageController from '../components/LanguageController.astro';
-import DiagramViewer from '../components/DiagramViewer.astro';
-import { getUi, localePath, type Locale } from '../i18n/ui';
-interface Props { title?: string; description?: string; locale?: Locale; menuHome?: boolean; standaloneDetail?: boolean; }
-const { locale = 'en', menuHome = false, standaloneDetail = false } = Astro.props;
+import LanguagePreference from '../components/LanguagePreference.astro';
+import ContactLinks from '../components/ContactLinks.astro';
+import { site } from '../data/site';
+import fontManifest from '../../public/fonts/portfolio/manifest.json';
+import { getUi, localePath, type Locale } from '../lib/i18n';
+interface Props { title?: string; description?: string; locale?: Locale; canonicalPath?: string; }
+const { title, locale = 'en', description = getUi(locale).description, canonicalPath = Astro.url.pathname } = Astro.props;
 const ui = getUi(locale);
-const portfolioName = 'GIRIBUIN';
-const { title, description = ui.pageDescription } = Astro.props;
+const pageTitle = site.handle;
+const shareTitle = title ? title + ' · ' + pageTitle : pageTitle;
+const canonical = new URL(canonicalPath, Astro.site);
+const latinFont = fontManifest.files.find(font => font.file.startsWith('latin-'))!;
 ---
 <!doctype html>
 <html lang={locale}>
-  <head>
-    <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
-    <meta name="description" content={description} /><meta name="theme-color" content={menuHome || standaloneDetail ? '#161713' : '#0d0e10'} />
-    {!import.meta.env.PROD && <meta name="robots" content="noindex, nofollow" />}
-    <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-    <link rel="alternate" hreflang="en" href={localePath(Astro.url.pathname, 'en')} />
-    <link rel="alternate" hreflang="ko" href={localePath(Astro.url.pathname, 'ko')} />
-    <title>{title ? `${portfolioName}/${title}` : portfolioName}</title>
-  </head>
-  <body class:list={{ 'menu-home': menuHome, 'detail-standalone': standaloneDetail, 'game-theme': menuHome || standaloneDetail }}><a class="skip-link" href="#main" data-i18n="skip">{ui.skip}</a>{!standaloneDetail && <Header locale={locale} menuHome={menuHome} />}
-    <main id="main" tabindex="-1"><slot /></main>
-    <LanguageController />
-    <DiagramViewer />
-  </body>
+<head>
+  <meta charset="utf-8" /><meta name="viewport" content="width=device-width, initial-scale=1" />
+  <LanguagePreference />
+  <ClientRouter fallback="swap" />
+  <title>{pageTitle}</title><meta name="description" content={description} /><meta name="theme-color" content="#ffffff" />
+  <link rel="canonical" href={canonical} />
+  <link rel="alternate" hreflang="en" href={new URL(localePath(canonicalPath, 'en'), Astro.site)} />
+  <link rel="alternate" hreflang="ko" href={new URL(localePath(canonicalPath, 'ko'), Astro.site)} />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preload" href={'/fonts/portfolio/' + latinFont.file} as="font" type="font/woff2" crossorigin="anonymous" />
+  <meta property="og:type" content="website" /><meta property="og:title" content={shareTitle} /><meta property="og:description" content={description} /><meta property="og:url" content={canonical} />
+  <slot name="head" />
+  <script>
+    import '../scripts/navigation';
+  </script>
+</head>
+<body>
+  <a class="skip-link" href="#main">{ui.skip}</a><Header locale={locale} />
+  <main id="main" class="shell" tabindex="-1"><slot /></main>
+  <footer class="site-footer shell"><ContactLinks /></footer>
+</body>
 </html>

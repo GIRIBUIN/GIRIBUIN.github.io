@@ -1,0 +1,32 @@
+---
+import { availableFilters } from '../lib/project-filters';
+import { getUi, type Locale } from '../lib/i18n';
+import InterfaceIcon from './InterfaceIcon.astro';
+interface Props { projects: { status: string | null; featured: boolean }[]; locale: Locale; }
+const { projects, locale } = Astro.props;
+const ui = getUi(locale);
+const filters = availableFilters(projects);
+---
+<!-- Prevent an unfiltered first frame on static query-string entry. -->
+<script is:inline define:vars={{ filters }} data-astro-rerun>
+  const requested = new URLSearchParams(location.search).get('filter');
+  document.documentElement.dataset.projectFilter = filters.includes(requested) ? requested : 'all';
+</script>
+<div class="project-filters" data-count-label={ui.projectCount}>
+  <fieldset><legend class="visually-hidden">{ui.filters}</legend>
+    {filters.map(filter => <button type="button" data-filter={filter} disabled aria-pressed={filter === 'all' ? 'true' : 'false'} aria-controls="project-list">{ui.filter[filter]}</button>)}
+  </fieldset>
+  <div class="filter-tools">
+    <p role="status" aria-live="polite">{projects.length} {ui.projectCount}</p>
+    <button class="icon-link filter-help-toggle" type="button" popovertarget="project-filter-help" aria-label={ui.filterHelpTitle} title={ui.filterHelpTitle} aria-expanded="false" aria-controls="project-filter-help" aria-haspopup="dialog"><InterfaceIcon name="help" /></button>
+  </div>
+  <aside id="project-filter-help" class="filter-help" popover="auto" role="dialog" aria-labelledby="project-filter-help-title" tabindex="-1">
+    <h2 id="project-filter-help-title" class="visually-hidden">{ui.filterHelpTitle}</h2>
+    <dl>{filters.map(filter => <div><dt>{ui.filter[filter]}</dt><dd>{ui.filterDescriptions[filter]}</dd></div>)}</dl>
+  </aside>
+</div>
+<script>
+  import { onPageLoad } from '../lib/page-lifecycle';
+  import { initializeProjectFilters } from '../lib/project-filters';
+  onPageLoad(initializeProjectFilters);
+</script>

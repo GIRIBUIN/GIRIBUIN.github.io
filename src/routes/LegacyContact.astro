@@ -1,0 +1,10 @@
+---
+import Layout from '../layouts/Layout.astro';
+import { localePath, type Locale } from '../lib/i18n';
+const locale: Locale = Astro.url.pathname.startsWith('/ko/') ? 'ko' : 'en';
+const target = localePath('/about/', locale) + '#contact';
+---
+<Layout title="Contact" locale={locale} canonicalPath={localePath('/about/', locale)}>
+  <meta slot="head" http-equiv="refresh" content={'0;url=' + target} />
+  <p><a href={target}>About / Contact →</a></p>
+</Layout>

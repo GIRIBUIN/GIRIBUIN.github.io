@@ -1,4 +1,4 @@
-import type { Locale } from '../i18n/ui';
+import type { Locale } from '../lib/i18n';
 type Localized = Record<Locale, string>;
 interface Social { id: string; label: string; url: string | null; contact: boolean; }
 export const site: {
@@ -7,8 +7,8 @@ export const site: {
   heroImage: string | null; heroAlt: Localized; profileImage: string | null; profileAlt: Localized;
   resumeUrl: string | null; portfolioPdfUrl: string | null; email: string | null; socials: Social[];
 } = {
-  handle: 'GIRIBUIN', name: { en: 'Jeong-gil Choi', ko: '최정길' }, role: 'Backend / Systems Developer',
-  intro: { en: 'I build APIs, data flows, and integrations across web applications and connected devices.', ko: 'API와 데이터베이스를 바탕으로 웹 서비스와 장치를 연결하는 기능을 개발합니다.' },
+  handle: 'GIRIBUIN', name: { en: 'Jeong-gil Choi', ko: '최정길' }, role: 'Backend / Systems / Platform',
+  intro: { en: 'I’m interested in backend services, systems software, and the platforms they run on. My projects explore data handling, system integration, and behavior under failure.', ko: '백엔드 서비스와 시스템 소프트웨어, 이를 실행하는 플랫폼에 관심이 있습니다. 프로젝트에서 데이터 처리와 시스템 통합을 구현하고, 실패할 때의 동작을 확인합니다.' },
   bio: { en: 'I’m interested in backend and systems software. My projects connect databases and APIs with Linux, Raspberry Pi, MQTT, and cloud services. I care about understanding why a system is designed a certain way and how it behaves.', ko: '백엔드와 시스템 소프트웨어에 관심 있는 개발자입니다. 데이터베이스와 API부터 Linux, Raspberry Pi, MQTT, 클라우드까지 여러 요소를 연결하는 프로젝트를 해왔습니다. 구현한 기능이 왜 그렇게 동작하는지 설명할 수 있는 개발을 지향합니다.' },
   focus: { en: 'Backend · Systems software · Server infrastructure', ko: '백엔드 · 시스템 소프트웨어 · 서버 인프라' },
   educationStatus: { en: 'Expected graduation: February 2027', ko: '2027년 2월 졸업 예정' },

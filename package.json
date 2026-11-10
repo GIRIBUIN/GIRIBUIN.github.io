@@ -15,25 +15,19 @@
     "check": "astro check",
     "test": "node scripts/verify.mjs",
     "test:browser": "node scripts/browser-check.mjs",
-    "test:project-media": "node scripts/project-media-check.mjs",
-    "test:project-loading": "node scripts/project-loading-check.mjs",
-    "test:history": "node scripts/history-cache-check.mjs",
-    "test:hero": "node --experimental-strip-types scripts/hero-check.mjs"
+    "test:rendering": "node scripts/rendering-check.mjs"
   },
   "dependencies": {
     "@astrojs/react": "^7.1.1",
-    "@react-three/fiber": "^9.8.2",
     "astro": "7.4.4",
     "react": "^19.3.1",
-    "react-dom": "^19.3.1",
-    "three": "^0.186.1"
+    "react-dom": "^19.3.1"
   },
   "devDependencies": {
     "@astrojs/check": "^0.9.9",
     "@astrojs/markdown-satteri": "0.4.1",
     "@types/react": "^19.3.0",
     "@types/react-dom": "^19.3.0",
-    "@types/three": "^0.186.0",
     "playwright": "^1.56.1",
     "rehype-mermaid": "3.0.0",
     "typescript": "^5.9.3"

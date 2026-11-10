@@ -1,44 +1,43 @@
 ---
 import { getCollection, render } from 'astro:content';
 import Layout from '../layouts/Layout.astro';
-import ProjectInfo from './ProjectInfo.astro';
-import StandaloneExplorer from './StandaloneExplorer.astro';
 import ProjectDemo from './ProjectDemo.astro';
-import SettingsHud from './SettingsHud.astro';
-import ProjectMobileIntro from './ProjectMobileIntro.astro';
-import '../styles/standalone-detail.css';
-import { localizeProject, type Project } from '../lib/projects';
-import { getUi, localePath, type Locale } from '../i18n/ui';
+import DiagramViewer from './DiagramViewer.astro';
+import InterfaceIcon from './InterfaceIcon.astro';
+import { localizeProject, projectLinks, projectPath, type Project } from '../lib/projects';
+import { getUi, localePath, type Locale } from '../lib/i18n';
 interface Props { project: Project; locale?: Locale; }
 const { project: entry, locale = 'en' } = Astro.props;
 const project = localizeProject(entry, locale);
-const { title, summary, slug } = project.data;
+const { title, summary, oneLine, slug, technologies, ownership, category, origin, status, validation, problem, decision, result, role, tags } = project.data;
 const notes = await getCollection('projectNotes');
-const englishNotes = notes.find(note => note.id === 'en/' + slug);
-const koreanNotes = notes.find(note => note.id === 'ko/' + slug);
-const [{ Content: EnglishContent }, { Content: KoreanContent }] = await Promise.all([
-  render(englishNotes || entry),
-  render(koreanNotes || entry),
-]);
-const contentLocale = locale === 'en' && englishNotes ? 'en' : 'ko';
+const noteId = project.data.notes?.[locale] || locale + '/' + slug;
+const note = notes.find(note => note.id === noteId);
+const { Content } = await render(note || entry);
 const ui = getUi(locale);
+const links = projectLinks(project, locale);
+const contribution = role?.[locale] || (ownership ? summary : null);
 ---
-<Layout title={title} description={summary} locale={locale} standaloneDetail>
-  <header class="detail-toolbar">
-  <nav class="detail-hud-links" aria-label={ui.navigation} data-i18n-aria-label="navigation">
-    <a class="game-control detail-home" data-locale-path="/" href={localePath('/', locale)} aria-label={ui.home} title={ui.home} data-i18n-aria-label="home" data-i18n-title="home"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m3 10 9-7 9 7M5 9v12h5v-7h4v7h5V9" /></svg></a>
-    <a class="game-control detail-projects" data-project-explorer-trigger data-locale-path="/projects/" href={localePath('/projects/', locale)} aria-label={ui.nav.projects} title={ui.nav.projects} data-i18n-aria-label="nav.projects" data-i18n-title="nav.projects" aria-haspopup="dialog" aria-controls="project-explorer-window" aria-expanded="false"><svg viewBox="0 0 24 24" width="22" height="22" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 7V5a2 2 0 0 1 2-2h5l2 3h7a2 2 0 0 1 2 2v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V7Z" /><path d="M3 8h18" /></svg></a>
-  </nav>
-  <ProjectInfo project={project} locale={locale} />
-  <SettingsHud locale={locale} />
-  </header>
-  <article class="shell detail-page" data-project={slug} aria-labelledby="standalone-project-title">
-    <ProjectMobileIntro project={project} locale={locale} />
-    <ProjectDemo project={project} locale={locale} detail />
-    {!englishNotes && <p class="translation-note" data-i18n="project.untranslated" data-project-translation-note hidden={contentLocale === locale}>{ui.project.untranslated}</p>}
-    <div class="prose detail-prose" lang={contentLocale} data-project-body data-rendered-locale={locale}>{locale === 'en' ? <EnglishContent /> : <KoreanContent />}</div>
-    <template data-project-body-copy="en" data-body-language={englishNotes ? 'en' : 'ko'}><EnglishContent /></template>
-    <template data-project-body-copy="ko" data-body-language="ko"><KoreanContent /></template>
+<Layout title={title} description={oneLine || summary} locale={locale} canonicalPath={projectPath(slug, locale)}>
+  <article class="detail-page" data-project={slug}>
+    <header class="detail-header">
+      <a class="back-link" href={localePath('/projects/', locale)}>← {ui.back}</a>
+      {(category || status) && <p class="eyebrow">{category}{category && status && <span aria-hidden="true">/</span>}{status && ui.projectStatus[status]}</p>}
+      <h1>{title}</h1><p class="detail-lead">{oneLine || summary}</p>
+      {technologies.length > 0 && <p class="tech-line">{technologies.join(' · ')}</p>}
+      <p class="project-meta">{ownership?.type === 'team' ? ui.team + (ownership.teamSize ? ' · ' + ownership.teamSize + ' ' + ui.people : '') : ownership?.type === 'personal' ? ui.personal : ''}{origin && <> / {ui.projectOrigin[origin]}</>}{validation && <> / {ui.validationLabel}: {ui.validation[validation]}</>}{tags.length > 0 && <> / {tags.join(' · ')}</>}</p>
+      {links.length > 0 && <nav class="icon-links project-links" aria-label={ui.links}>{links.map(link => <a class="icon-link" href={link.url} aria-label={link.label} title={link.label}><InterfaceIcon name={link.icon} /></a>)}</nav>}
+    </header>
+    {(problem || contribution || decision) && <section class="project-brief" aria-label={ui.overview}><dl>
+      {problem && <div><dt>{ui.problem}</dt><dd>{problem}</dd></div>}
+      {contribution && <div><dt>{ui.role}</dt><dd>{contribution}</dd></div>}
+      {decision && <div><dt>{ui.decision}</dt><dd>{decision}</dd></div>}
+    </dl></section>}
+    <ProjectDemo project={project} locale={locale} />
+    {!note && locale === 'en' && <p class="translation-note">{ui.translationNote}</p>}
+    <div class="prose" lang={locale === 'en' && !note ? 'ko' : locale} data-project-body><Content /></div>
+    {result && <section class="result-section" aria-labelledby="result-heading"><h2 id="result-heading">{ui.result}</h2><p>{result}</p></section>}
+    <a class="back-link bottom-back" href={localePath('/projects/', locale)}>← {ui.back}</a>
   </article>
-  <StandaloneExplorer locale={locale} />
+  <DiagramViewer />
 </Layout>

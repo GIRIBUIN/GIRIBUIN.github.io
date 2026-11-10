@@ -23,5 +23,10 @@ export async function openSite(dist = resolve('dist'), launchOptions = {}) {
     if (!browser) throw new Error('No browser available');
   } catch (error) { server.close(); throw error; }
   return { browser, base: 'http://127.0.0.1:' + server.address().port,
-    async close() { await browser.close(); await new Promise(done => server.close(done)); } };
+    async close() {
+      await browser.close();
+      // Prefetch can leave connections from a page using another fixture browser.
+      server.closeAllConnections();
+      await new Promise(done => server.close(done));
+    } };
 }

@@ -1,50 +1,35 @@
 ---
 import type { Project } from '../lib/projects';
-import { getUi, type Locale } from '../i18n/ui';
+import { getUi, type Locale } from '../lib/i18n';
 import { getYouTubeEmbedUrl } from '../lib/media';
-interface Props { project: Project; compact?: boolean; preview?: boolean; detail?: boolean; locale?: Locale; }
-const { project, compact = false, preview = false, detail = false, locale = 'en' } = Astro.props;
+import { projectImage } from '../lib/project-images';
+interface Props { project: Project; locale: Locale; }
+const { project, locale } = Astro.props;
 const { title, thumbnail, demo, visual, links } = project.data;
-const ui = getUi(locale).media;
-const fullDemo = demo.type === 'iframe' ? links.demo || demo.url : null;
-const youtube = detail ? getYouTubeEmbedUrl(links.video) : null;
-const mediaIsImage = demo.type === 'image' || (demo.type === 'terminal' && demo.format === 'image');
-const mediaIsVideo = demo.type === 'video' || (demo.type === 'terminal' && demo.format === 'video');
-// Local videos remain the gallery previews; detail pages use links.video only.
-const mediaUrl = detail && mediaIsVideo ? null : demo.url;
-const canRender = Boolean(youtube || (mediaUrl && ['iframe', 'video', 'terminal', 'image'].includes(demo.type)));
-const showThumbnail = Boolean(!youtube && thumbnail && (!canRender || (preview && !mediaIsVideo)));
-const hasCaption = showThumbnail || canRender || (!preview && ((demo.type === 'apk' && demo.url) || fullDemo));
-const poster = preview && mediaIsVideo ? undefined : demo.poster || thumbnail || visual?.url;
-const showChrome = !(detail && (youtube || mediaIsVideo));
+const ui = getUi(locale);
+const youtube = getYouTubeEmbedUrl(links.video);
+const image = demo.type === 'image' || demo.type === 'terminal' && demo.format === 'image' ? demo.url : null;
+const poster = await projectImage(demo.poster || thumbnail);
+const hasMedia = youtube || image || poster || visual;
 ---
-<div class:list={['demo', 'demo-' + (youtube ? 'youtube' : demo.type), { compact, preview }]} data-demo-type={youtube ? 'youtube' : demo.type} data-demo-state={showThumbnail ? 'thumbnail' : canRender ? 'ready' : 'fallback'} data-media-error={ui.error}>
-  {showChrome && <div class="demo-toolbar"><span data-i18n={showThumbnail ? 'media.thumbnail' : 'media.labels.' + demo.type}>{showThumbnail ? ui.thumbnail : ui.labels[demo.type]}</span><span data-i18n={showThumbnail || canRender ? 'media.preview' : 'media.pending'}>{showThumbnail || canRender ? ui.preview : ui.pending}</span></div>}
-  <div class="demo-stage">
-    {youtube ? <iframe src={youtube} title={title + ' — YouTube'} loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe>
-    : showThumbnail ? <img src={thumbnail!} alt={title + ' ' + ui.imageAlt} loading="lazy" width="1600" height="900" />
-    : canRender && demo.type === 'iframe' ? <iframe src={mediaUrl!} title={title + ' ' + ui.frameTitle} loading="lazy" sandbox="allow-scripts allow-same-origin allow-forms" referrerpolicy="no-referrer" allow="fullscreen"></iframe>
-    : canRender && mediaIsImage ? <img src={mediaUrl!} alt={demo.alt!} loading="lazy" width="1200" height="750" />
-    : canRender ? <video src={preview ? undefined : mediaUrl!} data-preview-src={preview ? mediaUrl : undefined} poster={poster || undefined} controls={!preview} disablepictureinpicture={preview} muted={preview} loop={preview} preload="none" playsinline data-preview-video={preview ? '' : undefined} aria-label={title + ' ' + ui.videoTitle}><a href={mediaUrl!}>{ui.videoOpen}</a></video>
-    : visual ? <figure class="reference-image"><img src={visual.url} alt={visual.alt} loading="lazy" width="1200" height="750" /><figcaption>{visual.caption || ui.reference} · {ui.referencePending}</figcaption></figure>
-    : <div class="demo-placeholder"><span class="placeholder-title" aria-hidden="true">{title}</span><p data-i18n={demo.type === 'apk' && demo.url ? 'media.apkReady' : 'media.pending'}>{demo.type === 'apk' && demo.url ? ui.apkReady : ui.pending}</p></div>}
-  </div>
-  {showChrome && hasCaption && <div class="demo-caption">{(showThumbnail || canRender) && <span>{showThumbnail ? ui.thumbnail : demo.caption || ui.preview}</span>}{!preview && <div>
-    {fullDemo && <a href={fullDemo} target="_blank" rel="noreferrer"><span data-i18n="media.fullDemo">{ui.fullDemo}</span> ↗</a>}
-    {demo.type === 'apk' && demo.url && <a href={demo.url} target="_blank" rel="noreferrer"><span data-i18n="media.apk">{ui.apk}</span> ↗</a>}
-
-  </div>}</div>}
-</div>
+{hasMedia && <section class="project-demo" aria-labelledby="demo-heading">
+  <h2 id="demo-heading">{ui.demo}</h2>
+  {youtube ? <div class="video-wrapper"><iframe src={youtube} title={title + ' — YouTube'} loading="lazy" referrerpolicy="strict-origin-when-cross-origin" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" allowfullscreen></iframe></div>
+    : image || poster ? <figure class="project-image"><img src={image || poster!} alt={demo.alt || title + ' — ' + ui.openImage} width="800" height="450" loading="lazy" decoding="async" /></figure> : null}
+  {visual && <details class="reference-image"><summary>{locale === 'ko' ? '기존 참고 화면' : 'Earlier reference screen'}</summary><figure><img src={visual.url} alt={visual.alt} width="1200" height="750" loading="lazy" /><figcaption>{visual.caption}</figcaption></figure></details>}
+</section>}
 <script>
-  document.querySelectorAll<HTMLMediaElement | HTMLImageElement>('.demo-stage video, .demo-stage img').forEach(media => {
-    const fallback = () => {
-      const message = document.createElement('p');
-      message.className = 'media-error';
-      message.dataset.i18n = 'media.error';
-      message.textContent = media.closest<HTMLElement>('.demo')?.dataset.mediaError || '';
-      media.replaceWith(message);
-    };
-    media.addEventListener('error', fallback, { once: true });
-    if (media instanceof HTMLImageElement && media.complete && media.naturalWidth === 0) fallback();
+  import { onPageLoad } from '../lib/page-lifecycle';
+  onPageLoad(signal => {
+    document.querySelectorAll<HTMLImageElement>('.project-demo img').forEach(media => {
+      const fallback = () => {
+        if (!media.isConnected) return;
+        const text = document.createElement('p'); text.className = 'media-error';
+        text.textContent = document.documentElement.lang === 'ko' ? '미디어를 불러오지 못했습니다. 원본 링크에서 확인해 주세요.' : 'Media could not be loaded. Use the original link.';
+        media.replaceWith(text);
+      };
+      media.addEventListener('error', fallback, { once: true, signal });
+      if (media instanceof HTMLImageElement && media.complete && !media.naturalWidth) fallback();
+    });
   });
 </script>

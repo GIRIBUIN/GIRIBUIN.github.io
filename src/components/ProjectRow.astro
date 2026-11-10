@@ -1,0 +1,20 @@
+---
+import { localizeProject, projectPath, type Project } from '../lib/projects';
+import { getUi, type Locale } from '../lib/i18n';
+interface Props { project: Project; locale: Locale; selected?: boolean; }
+const { project: entry, locale, selected = false } = Astro.props;
+const { data } = localizeProject(entry, locale);
+const ui = getUi(locale);
+// Existing records use summary for the contributor's scope; unowned plans do not.
+const contribution = data.role?.[locale] || (data.ownership ? data.summary : null);
+const Heading = selected ? 'h3' : 'h2';
+---
+<article class:list={['project-row', { 'selected-row': selected }]} data-project={data.slug} data-origin={data.origin} data-status={data.status} data-validation={data.validation} data-featured={String(data.featured)}>
+  <div class="project-row-copy">
+    <div class="project-heading"><Heading><a href={projectPath(data.slug, locale)} data-astro-prefetch>{data.title}</a></Heading>{!selected && data.status && <span class="status-label">{ui.projectStatus[data.status]}</span>}</div>
+    <p class="project-description">{data.oneLine || data.summary}</p>
+    {contribution && <p class="project-scope">{contribution}</p>}
+    {data.technologies.length > 0 && <p class="tech-line">{(data.cardTech || data.technologies).join(' · ')}</p>}
+    {!selected && (data.ownership || data.origin || data.validation) && <p class="project-meta">{[data.ownership?.type === 'team' ? ui.team + (data.ownership.teamSize ? ' · ' + data.ownership.teamSize + ' ' + ui.people : '') : data.ownership?.type === 'personal' ? ui.personal : null, data.origin ? ui.projectOrigin[data.origin] : null, data.validation ? ui.validationLabel + ': ' + ui.validation[data.validation] : null].filter(Boolean).join(' · ')}</p>}
+  </div>
+</article>

@@ -1,51 +1,89 @@
 ---
-import { site } from '../data/site';
-import { getUi, localePath, type Locale } from '../i18n/ui';
-import SocialIcon from './SocialIcon.astro';
-import SettingsHud from './SettingsHud.astro';
-interface Props { locale?: Locale; menuHome?: boolean; }
-const { locale = 'en', menuHome = false } = Astro.props;
+import { getUi, localePath, type Locale } from '../lib/i18n';
+import InterfaceIcon from './InterfaceIcon.astro';
+interface Props { locale: Locale; }
+const { locale } = Astro.props;
 const ui = getUi(locale);
-const homePath = localePath('/', locale);
-
+const path = localePath(Astro.url.pathname, 'en');
+const current = path.startsWith('/projects/') || path.startsWith('/work/') ? 'projects' : path.startsWith('/about/') ? 'about' : 'home';
+const pages = [{ id: 'home', path: '/', label: 'Home' }, { id: 'projects', path: '/projects/', label: 'Projects' }, { id: 'about', path: '/about/', label: 'About' }] as const;
 ---
-<header class="header" id="top" data-hidden="false">
-  <div class="shell header-inner">
-    <a class="header-brand" href={homePath} data-locale-path="/" aria-label={ui.home} data-i18n-aria-label="home"><img src="/favicon.svg" alt="" width="28" height="28" />{!menuHome && <span>GIRIBUIN</span>}</a>
-    {!menuHome && <div class="header-actions"><div class="social-links" aria-label={ui.socialLinks} data-i18n-aria-label="socialLinks">{site.socials.filter(link => link.url).map(link => <a href={link.url!} target="_blank" rel="noreferrer" aria-label={link.label} title={link.label}><SocialIcon name={link.id} /></a>)}</div></div>}
+<header class="site-header shell">
+  <a class="brand" href={localePath('/', locale)} aria-label="GIRIBUIN — Home" title="Home" data-astro-prefetch><img src="/favicon.svg" alt="" width="32" height="32" /></a>
+  <nav class="primary-nav" aria-label={ui.navigation}>{pages.map(page => <a href={localePath(page.path, locale)} aria-current={current === page.id ? 'page' : undefined} data-astro-prefetch>{page.label}</a>)}</nav>
+  <div class="language-menu">
+    <button id="language-toggle" class="icon-link" type="button" popovertarget="language-panel" aria-label={ui.language} title="Language" aria-expanded="false" aria-controls="language-panel" aria-haspopup="dialog"><InterfaceIcon name="language" /></button>
+    <nav id="language-panel" class="language-nav language-panel" popover="auto" role="dialog" aria-labelledby="language-title">
+      <h2 id="language-title">Language</h2>
+      {(['ko', 'en'] as const).map(code => <a href={localePath(path, code)} lang={code} hreflang={code} data-locale={code} aria-current={code === locale ? 'true' : undefined}>{code === 'ko' ? '한국어' : 'English'}</a>)}
+    </nav>
   </div>
 </header>
-<SettingsHud locale={locale} />
 <script>
-  const header = document.querySelector<HTMLElement>('.header');
-  if (header && !document.body.classList.contains('menu-home')) {
-    // Keep anchor clearance in sync with the actual one/two-row header.
-    const measure = () => document.documentElement.style.setProperty('--header-height', header.offsetHeight + 'px');
-    new ResizeObserver(measure).observe(header);
-    measure();
-    let lastY = Math.max(0, scrollY), direction = 0, travel = 0, pending = false;
-    const reveal = () => { header.dataset.hidden = 'false'; lastY = Math.max(0, scrollY); travel = 0; };
-    const update = () => {
-      const y = Math.max(0, scrollY), delta = y - lastY, nextDirection = Math.sign(delta);
-      if (y <= 24) { reveal(); travel = 0; }
-      else if (delta !== 0) {
-        if (nextDirection !== direction) { direction = nextDirection; travel = 0; }
-        travel += Math.abs(delta);
-        if (travel >= (direction > 0 ? 36 : 20)) {
-          header.dataset.hidden = direction > 0 && y > header.offsetHeight ? 'true' : 'false';
-          travel = 0;
+  import { onPageLoad } from '../lib/page-lifecycle';
+  onPageLoad(signal => {
+    const trigger = document.querySelector<HTMLButtonElement>('#language-toggle')!;
+    const panel = document.querySelector<HTMLElement>('#language-panel')!;
+    const header = document.querySelector<HTMLElement>('.site-header')!;
+    let lastScroll = scrollY, travel = 0, scrollFrame = 0;
+    const revealHeader = () => { delete header.dataset.scrollHidden; travel = 0; };
+    header.addEventListener('focusin', revealHeader, { signal });
+    addEventListener('scroll', () => {
+      if (scrollFrame) return;
+      scrollFrame = requestAnimationFrame(() => {
+        scrollFrame = 0;
+        const position = Math.max(0, scrollY), delta = position - lastScroll;
+        travel = delta * travel < 0 ? delta : travel + delta;
+        lastScroll = position;
+        if (position < header.offsetHeight || header.matches(':focus-within') || panel.matches(':popover-open')) revealHeader();
+        else if (travel > 16) header.dataset.scrollHidden = 'true';
+        else if (travel < -8) revealHeader();
+        place();
+      });
+    }, { passive: true, signal });
+    panel.querySelectorAll<HTMLAnchorElement>('a[data-locale]').forEach(link => {
+      link.search = location.search; link.hash = location.hash;
+      link.addEventListener('click', () => {
+        try { localStorage.setItem('portfolio.locale', link.dataset.locale!); }
+        catch {
+          // Even blocked storage must not bounce an explicit English Home choice.
+          if (link.pathname === '/' && link.dataset.locale === 'en') {
+            const target = new URL(link.href); target.searchParams.set('lang', 'en'); link.href = target.href;
+          }
         }
-      }
-      lastY = y; pending = false;
+      }, { signal });
+    });
+    const place = (opening = false) => {
+      if (!opening && !panel.matches(':popover-open')) return;
+      const anchor = trigger.getBoundingClientRect();
+      const viewport = window.visualViewport;
+      const left = viewport?.offsetLeft || 0, top = viewport?.offsetTop || 0;
+      const width = viewport?.width || innerWidth, height = viewport?.height || innerHeight;
+      const panelWidth = Math.min(220, width - 32);
+      panel.style.width = panelWidth + 'px';
+      panel.style.maxHeight = height - 32 + 'px';
+      panel.style.left = Math.max(left + 16, Math.min(anchor.right - panelWidth, left + width - panelWidth - 16)) + 'px';
+      panel.style.top = Math.max(top + 16, Math.min(anchor.bottom + 8, top + height - (panel.offsetHeight || 160) - 16)) + 'px';
+      panel.dataset.positioned = 'true';
     };
-    addEventListener('scroll', () => { if (!pending) { pending = true; requestAnimationFrame(update); } }, { passive: true });
-    header.addEventListener('focusin', reveal);
-    document.addEventListener('keydown', event => { if (event.key === 'Tab') reveal(); });
-  }
+    panel.addEventListener('beforetoggle', event => {
+      const open = (event as ToggleEvent).newState === 'open';
+      trigger.setAttribute('aria-expanded', String(open));
+      if (open) { revealHeader(); place(true); } else delete panel.dataset.positioned;
+    }, { signal });
+    panel.addEventListener('toggle', () => {
+      if (panel.matches(':popover-open')) { place(); panel.querySelector<HTMLAnchorElement>('[aria-current="true"]')?.focus({ preventScroll: true }); }
+    }, { signal });
+    panel.addEventListener('keydown', event => {
+      if (event.key === 'Escape') { event.preventDefault(); event.stopPropagation(); panel.hidePopover(); trigger.focus({ preventScroll: true }); }
+    }, { signal });
+    const reposition = () => place();
+    addEventListener('resize', reposition, { signal });
+    window.visualViewport?.addEventListener('resize', reposition, { signal });
+    window.visualViewport?.addEventListener('scroll', reposition, { signal });
+    return () => {
+      cancelAnimationFrame(scrollFrame);
+      if (panel.matches(':popover-open')) panel.hidePopover();
+    };
+  });
 </script>
-
-<style>
-  .header-brand { display: inline-flex; align-items: center; gap: 10px; min-height: 44px; color: var(--text); }
-  .header-brand img { width: 28px; height: 28px; }
-  .header-brand span { font-size: 12px; font-weight: 600; letter-spacing: .04em; }
-</style>

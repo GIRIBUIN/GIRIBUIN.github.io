@@ -1,0 +1,15 @@
+---
+import InterfaceIcon, { type IconName } from './InterfaceIcon.astro';
+import { site } from '../data/site';
+interface Props { className?: string; }
+const { className } = Astro.props;
+const github = site.socials.find(link => link.id === 'github');
+const links = [
+  { id: 'github', label: 'GitHub', url: github?.url },
+  { id: 'email', label: 'Email: ' + site.email, url: site.email ? 'mailto:' + site.email : null },
+  ...site.socials.filter(link => link.contact && ['linkedin', 'velog'].includes(link.id)),
+].filter(link => link.url);
+---
+<nav class:list={['icon-links', className]} aria-label="Contact">
+  {links.map(link => <a class="icon-link" href={link.url!} aria-label={link.label} title={link.label}><InterfaceIcon name={link.id as IconName} /></a>)}
+</nav>

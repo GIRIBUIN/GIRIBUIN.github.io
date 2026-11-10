@@ -1,33 +1,38 @@
 ---
 import Layout from '../layouts/Layout.astro';
-import VisualScene from './VisualScene.astro';
-import PortfolioExplorer from './explorer/PortfolioExplorer';
-import ProfilePanel from './explorer/ProfilePanel.astro';
-import DocumentsPanel from './explorer/DocumentsPanel.astro';
-import ContactPanel from './explorer/ContactPanel.astro';
-import ProjectActionIcon from './ProjectActionIcon.astro';
+import ProjectRow from './ProjectRow.astro';
 import { getProjects } from '../lib/projects';
-import { projectToExplorer } from '../lib/explorer-data';
+import { getUi, localePath, type Locale } from '../lib/i18n';
 import { site } from '../data/site';
-import { localePath, type Locale } from '../i18n/ui';
+import InterfaceIcon from './InterfaceIcon.astro';
 interface Props { locale?: Locale; }
 const { locale = 'en' } = Astro.props;
-const projects = await Promise.all((await getProjects()).map(projectToExplorer));
+const ui = getUi(locale);
+const projects = await getProjects();
+const selected = projects.filter(project => project.data.featured);
+const slugs = projects.map(project => project.data.slug);
+const github = site.socials.find(link => link.id === 'github');
 ---
-<Layout locale={locale} menuHome>
-  <section id="hero" class="title-screen" aria-labelledby="hero-title">
-    <h1 id="hero-title" class="visually-hidden">{site.handle}</h1>
-    <VisualScene locale={locale} />
-    <PortfolioExplorer projects={projects} locale={locale} client:load>
-      <ProfilePanel slot="about" locale={locale} />
-      <DocumentsPanel slot="resume" />
-      <ContactPanel slot="contact" locale={locale} />
-      <ProjectActionIcon slot="detailsIcon" name="deepDive" />
-      <ProjectActionIcon slot="demoIcon" name="liveDemo" />
-      <ProjectActionIcon slot="sourceIcon" name="source" />
-      <ProjectActionIcon slot="downloadIcon" name="release" />
-      <ProjectActionIcon slot="videoIcon" name="video" />
-    </PortfolioExplorer>
-    <noscript><p class="no-script-navigation"><a href={localePath('/projects/', locale)}>All projects ↗</a> · {site.email && <a href={'mailto:' + site.email}>{site.email}</a>}</p></noscript>
+<Layout locale={locale}>
+  <section class="home-intro" aria-labelledby="intro-name">
+    <p class="eyebrow">{site.role}</p>
+    <h1 id="intro-name">{site.name[locale]}</h1>
+    <p class="intro-copy">{site.intro[locale]}</p>
+    <nav class="icon-links home-links" aria-label={ui.contact}>{github?.url && <a class="icon-link" href={github.url} aria-label="GitHub" title="GitHub"><InterfaceIcon name="github" /></a>}{site.email && <a class="icon-link" href={'mailto:' + site.email} aria-label={'Email: ' + site.email} title={site.email}><InterfaceIcon name="email" /></a>}</nav>
+  </section>
+  <section class="selected-projects" aria-labelledby="selected-heading">
+    <div class="section-heading"><h2 id="selected-heading">{ui.selected}</h2><a class="archive-link" href={localePath('/projects/', locale)} aria-label={ui.allProjects} title={ui.allProjects} data-astro-prefetch><InterfaceIcon name="arrow-right" /></a></div>
+    <div class="project-list">{selected.map(project => <ProjectRow project={project} locale={locale} selected />)}</div>
   </section>
 </Layout>
+<script define:vars={{ slugs, locale }} data-astro-rerun>
+  // Resolve old window bookmarks without shipping the explorer state machine.
+  const parts = location.hash.slice(1).split('/');
+  const prefix = locale === 'ko' ? '/ko' : '';
+  if (parts[0] === 'projects' || ['work','tools'].includes(parts[0])) {
+    location.replace(prefix + '/projects/' + (slugs.includes(parts[1]) ? parts[1] + '/' : ''));
+  } else if (['about','resume','contact','skills','education','background','process'].includes(parts[0])) {
+    const section = parts[0] === 'resume' ? '#documents' : ['contact','skills','education'].includes(parts[0]) ? '#' + parts[0] : '';
+    location.replace(prefix + '/about/' + section);
+  }
+</script>

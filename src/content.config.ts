@@ -21,6 +21,7 @@ const projects = defineCollection({
   schema: z.object({
     title: z.string().min(1),
     translations: z.object({ en: translatedCopy.optional(), ko: translatedCopy.optional() }).optional(),
+    notes: z.object({ en: z.string().min(1).optional(), ko: z.string().min(1).optional() }).optional(),
     logo: nullableUrl,
     thumbnail: nullableUrl,
     slug: z.string().regex(/^[a-z0-9]+(?:-[a-z0-9]+)*$/),
@@ -34,10 +35,15 @@ const projects = defineCollection({
     category: z.string().min(1).nullish(),
     cardTech: z.array(z.string().min(1)).min(1).max(5).optional(),
     featured: z.boolean().default(false),
+    status: z.enum(['planning', 'active', 'completed', 'archived']).nullable().default(null),
+    origin: z.enum(['foundation', 'guided', 'independent']).nullable().default(null),
+    validation: z.enum(['prototype', 'tested', 'in-use']).nullable().default(null),
+    role: z.object({ en: z.string().min(1), ko: z.string().min(1) }).nullish(),
+    tags: z.array(z.string().min(1)).default([]),
     section: z.enum(['work', 'tools']).default('work'),
     order: z.number().optional(),
     hidden: z.boolean().default(false),
-    tech: z.array(z.string()).default([]),
+    technologies: z.array(z.string()).default([]),
     problem: z.string().optional(),
     decision: z.string().optional(),
     result: z.string().optional(),
@@ -61,7 +67,7 @@ const projects = defineCollection({
       ctx.addIssue({ code: 'custom', path: ['ownership', 'teamSize'], message: 'Personal projects use a null teamSize' });
     }
     data.cardTech?.forEach((tech, index) => {
-      if (!data.tech.includes(tech)) ctx.addIssue({ code: 'custom', path: ['cardTech', index], message: 'Card technologies must also exist in tech' });
+      if (!data.technologies.includes(tech)) ctx.addIssue({ code: 'custom', path: ['cardTech', index], message: 'Card technologies must also exist in technologies' });
     });
     if ((data.demo.type === 'image' || (data.demo.type === 'terminal' && data.demo.format === 'image')) && data.demo.url && !data.demo.alt) {
       ctx.addIssue({ code: 'custom', path: ['demo', 'alt'], message: 'Image demos require alt text' });
@@ -69,6 +75,6 @@ const projects = defineCollection({
   }),
 });
 const projectNotes = defineCollection({
-  loader: glob({ pattern: '**/*.md', base: './src/content/project-notes', generateId: ({ entry }) => entry.replace(/\.md$/, '') }),
+  loader: glob({ pattern: ['project-notes/**/*.md', 'project-translations/**/*.md'], base: './src/content', generateId: ({ entry }) => entry.replace(/^(?:project-notes|project-translations)\//, '').replace(/\.md$/, '') }),
 });
 export const collections = { projects, projectNotes };
